@@ -13,16 +13,29 @@
 import { createStore as createCoreStore, createHookSystem } from '../../core/src/index.js';
 
 let _store = null;
+let _storePromise = null;
 let _hooks = null;
 
 /**
- * @param {object} params
- * @returns {Context}
+ * Ensure the store singleton is initialized (async-safe).
+ * @param {object} config
  */
-export function createContext({ req, res, url, body, config = {} }) {
-  // Lazy init shared singletons
+async function ensureStore(config) {
+  if (_store) return _store;
+  if (_storePromise) return _storePromise;
+
+  _storePromise = createCoreStore({ engine: config.storage || 'memory', dataDir: config.dataDir });
+  _store = await _storePromise;
+  return _store;
+}
+
+/**
+ * @param {object} params
+ * @returns {Promise<Context>}
+ */
+export async function createContext({ req, res, url, body, config = {} }) {
   if (!_store) {
-    _store = createCoreStore({ engine: config.storage || 'memory' });
+    await ensureStore(config);
   }
   if (!_hooks) {
     _hooks = createHookSystem();

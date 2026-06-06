@@ -9,6 +9,7 @@
  */
 
 export { createContentType } from './content-type.js';
-export { createStore } from './store.js';
+export { createStore, createMemoryStore } from './store.js';
+export { createSQLiteStore } from './sqlite-store.js';
 export { createHookSystem } from './hooks.js';
 export { GionError, ValidationError, NotFoundError } from './errors.js';

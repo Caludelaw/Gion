@@ -136,18 +136,30 @@ export function createMemoryStore() {
 }
 
 /**
- * @returns {Store}
+ * Create a store instance based on the engine configuration.
+ *
+ * Supported engines:
+ *   - 'memory' — in-memory store (default, zero dependencies)
+ *   - 'sqlite'  — SQLite via sql.js WASM (persistent, requires sql.js package)
+ *
+ * @param {object} config
+ * @param {string} [config.engine] — 'memory' | 'sqlite'
+ * @param {string} [config.dataDir] — data directory for file-based stores
+ * @returns {Promise<Store>}
  */
-export function createStore(config = {}) {
-  const engine = config.engine || 'memory';
+export async function createStore(config = {}) {
+  const engine = (config.engine || process.env.GION_STORAGE || 'memory').toLowerCase();
 
   switch (engine) {
     case 'memory':
       return createMemoryStore();
-    // Future engines:
-    // case 'sqlite': return createSQLiteStore(config);
-    // case 'postgres': return createPostgresStore(config);
+
+    case 'sqlite': {
+      const { createSQLiteStore } = await import('./sqlite-store.js');
+      return createSQLiteStore(config);
+    }
+
     default:
-      throw new Error(`Unknown storage engine: ${engine}`);
+      throw new Error(`Unknown storage engine: "${engine}". Supported: memory, sqlite`);
   }
 }
