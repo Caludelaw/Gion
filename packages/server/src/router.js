@@ -10,6 +10,7 @@
 
 import { apiRoutes } from './routes/api.js';
 import { authRoutes } from './routes/auth.js';
+import { graphqlRoutes } from './routes/graphql.js';
 import { serveStatic } from './static.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -27,6 +28,11 @@ export async function router(ctx) {
   // Auth routes
   if (pathname.startsWith('/api/auth')) {
     return authRoutes(ctx);
+  }
+
+  // GraphQL API
+  if (pathname === '/api/graphql') {
+    return graphqlRoutes(ctx);
   }
 
   // Content API routes

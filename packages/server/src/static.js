@@ -46,7 +46,19 @@ export async function serveStatic(ctx, publicDir, urlPath) {
     const contentType = MIME_TYPES[ext] || 'application/octet-stream';
 
     const content = await readFile(fullPath);
-    ctx.res.writeHead(200, { 'Content-Type': contentType });
+
+    const headers = { 'Content-Type': contentType };
+
+    // Cache control: long cache for hashed assets, short for HTML
+    if (ext === '.html') {
+      headers['Cache-Control'] = 'no-cache';
+    } else if (ext === '.js' || ext === '.css' || ext === '.woff' || ext === '.woff2') {
+      headers['Cache-Control'] = 'public, max-age=31536000, immutable';
+    } else if (['.png', '.jpg', '.jpeg', '.gif', '.svg', '.ico'].includes(ext)) {
+      headers['Cache-Control'] = 'public, max-age=86400';
+    }
+
+    ctx.res.writeHead(200, headers);
     ctx.res.end(content);
     return true;
   } catch (err) {

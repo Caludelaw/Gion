@@ -48,6 +48,9 @@ export async function createSQLiteStore(config = {}) {
   let SQL = null;
   let db = null;
   let dbPath = null;
+  let dirty = false;
+  let flushTimer = null;
+  const FLUSH_INTERVAL = process.env.GION_SQLITE_FLUSH_MS ? parseInt(process.env.GION_SQLITE_FLUSH_MS) : 5000;
 
   async function init() {
     SQL = await sqlModule.default();
@@ -78,7 +81,22 @@ export async function createSQLiteStore(config = {}) {
     const data = db.export();
     const buffer = Buffer.from(data);
     await writeFile(dbPath, buffer);
+    dirty = false;
   }
+
+  /** Mark database as dirty and schedule a debounced flush */
+  function markDirty() {
+    dirty = true;
+    if (flushTimer) clearTimeout(flushTimer);
+    flushTimer = setTimeout(async () => {
+      if (dirty) await saveToDisk();
+    }, FLUSH_INTERVAL);
+  }
+
+  // Flush on process exit
+  process.on('beforeExit', async () => {
+    if (dirty && db) await saveToDisk();
+  });
 
   function rowToDoc(row) {
     if (!row) return null;
@@ -123,7 +141,7 @@ export async function createSQLiteStore(config = {}) {
         [id, type, data, status, createdBy, createdAt, now, meta]
       );
 
-      await saveToDisk();
+      markDirty();
 
       return { id, type, data: JSON.parse(data), status, createdBy, createdAt, updatedAt: now, meta: JSON.parse(meta) };
     },
@@ -161,14 +179,18 @@ export async function createSQLiteStore(config = {}) {
 
       const where = conditions.length > 0 ? `WHERE ${conditions.join(' AND ')}` : '';
 
-      const orderBy = options.orderBy || 'updated_at';
+      // Whitelist validation for ORDER BY columns — prevents SQL injection
+      const ALLOWED_ORDER_COLUMNS = new Set(['id', 'type', 'status', 'created_at', 'updated_at']);
+      const orderBy = ALLOWED_ORDER_COLUMNS.has(options.orderBy) ? options.orderBy : 'updated_at';
       const order = options.order === 'asc' ? 'ASC' : 'DESC';
-      const limit = options.limit || 50;
-      const offset = options.offset || 0;
+      // LIMIT/OFFSET must be integers
+      const limit = Math.min(Math.max(1, parseInt(options.limit) || 50), 1000);
+      const offset = Math.max(0, parseInt(options.offset) || 0);
 
-      const sql = `SELECT * FROM documents ${where} ORDER BY ${orderBy} ${order} LIMIT ${limit} OFFSET ${offset}`;
+      const sql = `SELECT * FROM documents ${where} ORDER BY ${orderBy} ${order} LIMIT ? OFFSET ?`;
+      const allParams = [...params, limit, offset];
       const stmt = db.prepare(sql);
-      stmt.bind(params);
+      stmt.bind(allParams);
 
       const results = [];
       while (stmt.step()) {
@@ -184,6 +206,9 @@ export async function createSQLiteStore(config = {}) {
       if (!existing) return null;
 
       const now = new Date().toISOString();
+
+      // Batch all updates in a single transaction
+      db.run('BEGIN TRANSACTION');
 
       if (patch.data) {
         const merged = { ...existing.data, ...patch.data };
@@ -208,8 +233,11 @@ export async function createSQLiteStore(config = {}) {
         existing.meta = merged;
       }
 
+      db.run('UPDATE documents SET updated_at = ? WHERE id = ?', [now, id]);
+      db.run('COMMIT');
+
       existing.updatedAt = now;
-      await saveToDisk();
+      markDirty();
       return existing;
     },
 
@@ -218,7 +246,7 @@ export async function createSQLiteStore(config = {}) {
       if (!existing) return false;
 
       db.run('DELETE FROM documents WHERE id = ?', [id]);
-      await saveToDisk();
+      markDirty();
       return true;
     },
 
@@ -249,6 +277,7 @@ export async function createSQLiteStore(config = {}) {
 
     /** Close database connection */
     async close() {
+      if (dirty && db) await saveToDisk();
       if (db) {
         db.close();
         db = null;

@@ -11,6 +11,27 @@ export function errorHandler(res, err) {
     return;
   }
 
+  // Body parser errors
+  if (err.code === 'PAYLOAD_TOO_LARGE') {
+    res.writeHead(413, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      error: 'PAYLOAD_TOO_LARGE',
+      message: `Request body exceeds limit of ${(err.maxSize / 1024 / 1024).toFixed(1)}MB`,
+      status: 413
+    }));
+    return;
+  }
+
+  if (err.code === 'INVALID_JSON') {
+    res.writeHead(400, { 'Content-Type': 'application/json' });
+    res.end(JSON.stringify({
+      error: 'INVALID_JSON',
+      message: 'Request body must be valid JSON',
+      status: 400
+    }));
+    return;
+  }
+
   if (err instanceof GionError) {
     res.writeHead(err.status, { 'Content-Type': 'application/json' });
     res.end(JSON.stringify(err.toJSON()));

@@ -10,7 +10,7 @@
 
 import { hashPassword, verifyPassword, signJWT, generateAPIKey } from '../../../core/src/auth.js';
 import { ValidationError, UnauthorizedError } from '../../../core/src/errors.js';
-import { requireAuth } from '../middleware/auth.js';
+import { requireAuth, getJwtSecret } from '../middleware/auth.js';
 import { getStore } from '../context.js';
 
 export async function authRoutes(ctx) {
@@ -58,7 +58,7 @@ export async function authRoutes(ctx) {
     });
 
     // Issue JWT immediately after registration
-    const secret = ctx.config.jwtSecret || process.env.GION_JWT_SECRET || 'gion-dev-secret';
+    const secret = getJwtSecret();
     const token = signJWT(
       { sub: user.id, username: user.data.username, role: 'author' },
       secret,
@@ -92,7 +92,7 @@ export async function authRoutes(ctx) {
       return;
     }
 
-    const secret = ctx.config.jwtSecret || process.env.GION_JWT_SECRET || 'gion-dev-secret';
+    const secret = getJwtSecret();
     const token = signJWT(
       { sub: user.id, username: user.data.username, role: user.data.role || 'author' },
       secret,
@@ -117,17 +117,20 @@ export async function authRoutes(ctx) {
     }
     ctx.actor = authResult.actor;
 
-    const { label } = ctx.body || {};
+    const { label, scopes } = ctx.body || {};
     const apiKey = generateAPIKey(label || 'Default');
 
-    // Store the hash
+    // Store the hash with scopes (default: read-only for all types)
+    const keyScopes = (Array.isArray(scopes) && scopes.length > 0) ? scopes : ['*:read'];
+
     await ctx.store.create({
       type: 'api_key',
       data: {
         prefix: apiKey.prefix,
         hash: apiKey.hash,
         label: apiKey.label,
-        ownerId: ctx.actor.id
+        ownerId: ctx.actor.id,
+        scopes: keyScopes
       },
       status: 'active'
     });
@@ -137,6 +140,7 @@ export async function authRoutes(ctx) {
       key: apiKey.key,
       prefix: apiKey.prefix,
       label: apiKey.label,
+      scopes: keyScopes,
       message: 'Save this key — it will not be shown again'
     }));
     return;
@@ -155,7 +159,12 @@ export async function authRoutes(ctx) {
     const keys = await ctx.store.list({ type: 'api_key', status: 'active' });
     const myKeys = keys
       .filter(k => k.data.ownerId === ctx.actor.id)
-      .map(k => ({ prefix: k.data.prefix, label: k.data.label, createdAt: k.createdAt }));
+      .map(k => ({
+        prefix: k.data.prefix,
+        label: k.data.label,
+        scopes: k.data.scopes || ['*:*'],
+        createdAt: k.createdAt
+      }));
 
     ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
     ctx.res.end(JSON.stringify({ keys: myKeys }));

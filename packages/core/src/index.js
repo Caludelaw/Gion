@@ -12,5 +12,5 @@ export { createContentType } from './content-type.js';
 export { createStore, createMemoryStore } from './store.js';
 export { createSQLiteStore } from './sqlite-store.js';
 export { createHookSystem } from './hooks.js';
-export { GionError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError } from './errors.js';
+export { GionError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError } from './errors.js';
 export { hashPassword, verifyPassword, signJWT, verifyJWT, generateAPIKey, verifyAPIKey } from './auth.js';

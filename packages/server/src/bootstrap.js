@@ -107,7 +107,8 @@ export function bootstrap() {
       prefix:  { type: 'string', required: true },
       hash:    { type: 'string', required: true },
       label:   { type: 'string' },
-      ownerId: { type: 'string', required: true }
+      ownerId: { type: 'string', required: true },
+      scopes:  { type: 'array', items: { type: 'string' } }
     }
   }));
 

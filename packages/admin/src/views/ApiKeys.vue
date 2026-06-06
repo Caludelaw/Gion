@@ -7,6 +7,16 @@
 
     <div v-if="showCreate" class="create-box">
       <input v-model="newLabel" placeholder="Key 标签 (如: Super Niuma Agent)" />
+      <div class="scope-section">
+        <label class="scope-label">权限范围:</label>
+        <div class="scope-grid">
+          <label v-for="s in availableScopes" :key="s.value" class="scope-chip">
+            <input type="checkbox" :value="s.value" v-model="selectedScopes" />
+            <span>{{ s.label }}</span>
+          </label>
+        </div>
+        <p class="scope-hint">默认: 只读所有内容。选中 "*:*" 为管理员权限。</p>
+      </div>
       <div class="create-actions">
         <button class="btn" @click="create">生成</button>
         <button class="btn btn-cancel" @click="showCreate = false">取消</button>
@@ -19,12 +29,13 @@
 
     <table v-if="keys.length" class="table">
       <thead>
-        <tr><th>前缀</th><th>标签</th><th>创建时间</th><th>操作</th></tr>
+        <tr><th>前缀</th><th>标签</th><th>权限</th><th>创建时间</th><th>操作</th></tr>
       </thead>
       <tbody>
         <tr v-for="k in keys" :key="k.prefix">
           <td><code>{{ k.prefix }}...</code></td>
           <td>{{ k.label || '-' }}</td>
+          <td><span class="scope-badge">{{ formatScopes(k.scopes) }}</span></td>
           <td class="date">{{ fmtDate(k.createdAt) }}</td>
           <td>
             <button class="btn-sm btn-danger" @click="revoke(k.prefix)">撤销</button>
@@ -44,6 +55,26 @@ const keys = ref([])
 const showCreate = ref(false)
 const newLabel = ref('')
 const newKey = ref('')
+const selectedScopes = ref(['*:read'])
+
+const availableScopes = [
+  { value: '*:*', label: '全部权限 (管理员)' },
+  { value: '*:read', label: '读取所有' },
+  { value: '*:write', label: '写入所有' },
+  { value: 'article:read', label: '文章 读' },
+  { value: 'article:write', label: '文章 写' },
+  { value: 'media:read', label: '媒体 读' },
+  { value: 'media:write', label: '媒体 写' },
+  { value: 'page:read', label: '页面 读' },
+  { value: 'page:write', label: '页面 写' },
+]
+
+function formatScopes(scopes) {
+  if (!scopes || scopes.length === 0) return '*:*'
+  if (scopes.includes('*:*')) return '全部'
+  if (scopes.length === 1 && scopes[0] === '*:read') return '只读'
+  return scopes.slice(0, 3).join(', ') + (scopes.length > 3 ? '...' : '')
+}
 
 async function load() {
   try {
@@ -56,8 +87,10 @@ async function load() {
 
 async function create() {
   try {
-    const res = await api.createApiKey({ label: newLabel.value || 'Default' })
+    const res = await api.createApiKey({ label: newLabel.value || 'Default', scopes: selectedScopes.value })
     newKey.value = res.key
+    newLabel.value = ''
+    selectedScopes.value = ['*:read']
     await load()
   } catch (e) {
     alert(e.message)
@@ -110,4 +143,12 @@ code { font-size: 12px; word-break: break-all; color: var(--text); }
 .btn-danger { color: var(--danger); }
 .btn-danger:hover { border-color: var(--danger); background: #FEF2F2; }
 .empty { color: var(--text-secondary); font-size: 14px; margin-top: 40px; text-align: center; }
+.scope-section { margin: 12px 0; }
+.scope-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 8px; }
+.scope-grid { display: flex; flex-wrap: wrap; gap: 8px; }
+.scope-chip { display: flex; align-items: center; gap: 4px; padding: 4px 10px; background: var(--bg); border: 1px solid var(--border); border-radius: 4px; font-size: 12px; cursor: pointer; }
+.scope-chip:hover { border-color: var(--primary); }
+.scope-chip input { margin: 0; }
+.scope-hint { font-size: 11px; color: var(--text-secondary); margin-top: 8px; }
+.scope-badge { font-size: 12px; background: var(--bg); padding: 2px 8px; border-radius: 4px; color: var(--text-secondary); }
 </style>

@@ -16,6 +16,7 @@
 
 import { NotFoundError, ValidationError } from '../../../core/src/errors.js';
 import { search as vectorSearch } from '../search.js';
+import { requireAuth, requireScopedAuth, optionalAuth } from '../middleware/auth.js';
 
 // Built-in content type registry
 // Plugins/extensions can register additional types via hooks
@@ -26,6 +27,19 @@ const _contentTypes = new Map();
  */
 export function registerContentType(ct) {
   _contentTypes.set(ct.name, ct);
+}
+
+/**
+ * Get all registered content types (for GraphQL resolver).
+ */
+export function getContentTypes() {
+  return Array.from(_contentTypes.values()).map(ct => ({
+    name: ct.name,
+    label: ct.label,
+    description: ct.description,
+    schemaOrg: ct.schemaOrg || null,
+    fieldCount: Object.keys(ct.fields).length
+  }));
 }
 
 /**
@@ -105,6 +119,19 @@ export async function apiRoutes(ctx) {
   // /api/content/:type
   const listMatch = pathname.match(/^\/api\/content\/([a-z][a-z0-9_]*)$/);
   if (listMatch && method === 'GET') {
+    // Auth required by default; set GION_PUBLIC_READ=1 to allow anonymous GET
+    if (!process.env.GION_PUBLIC_READ) {
+      const authResult = await requireAuth(ctx);
+      if (!authResult.authenticated) {
+        ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
+        ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
+        return;
+      }
+      ctx.actor = authResult.actor;
+    } else {
+      await optionalAuth(ctx);
+    }
+
     const type = listMatch[1];
     const docs = await ctx.store.list({ type, ...Object.fromEntries(ctx.url.searchParams) });
     ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
@@ -113,7 +140,15 @@ export async function apiRoutes(ctx) {
   }
 
   if (listMatch && method === 'POST') {
+    // Require scoped auth for content creation
     const type = listMatch[1];
+    const authResult = await requireScopedAuth(ctx, `${type}:write`);
+    if (!authResult.authenticated) {
+      ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
+      return;
+    }
+    ctx.actor = authResult.actor;
     const ct = _contentTypes.get(type);
     if (!ct) {
       ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
@@ -149,6 +184,18 @@ export async function apiRoutes(ctx) {
     const [, type, id] = itemMatch;
 
     if (method === 'GET') {
+      if (!process.env.GION_PUBLIC_READ) {
+        const authResult = await requireAuth(ctx);
+        if (!authResult.authenticated) {
+          ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
+          ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
+          return;
+        }
+        ctx.actor = authResult.actor;
+      } else {
+        await optionalAuth(ctx);
+      }
+
       const doc = await ctx.store.get(id);
       if (!doc) {
         ctx.res.writeHead(404, { 'Content-Type': 'application/json' });
@@ -161,6 +208,14 @@ export async function apiRoutes(ctx) {
     }
 
     if (method === 'PUT') {
+      const authResult = await requireScopedAuth(ctx, `${type}:write`);
+      if (!authResult.authenticated) {
+        ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
+        ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
+        return;
+      }
+      ctx.actor = authResult.actor;
+
       let payload = { id, type, data: ctx.body.data, status: ctx.body.status };
       payload = await ctx.hooks.run('beforeUpdate', payload, ctx);
 
@@ -178,6 +233,14 @@ export async function apiRoutes(ctx) {
     }
 
     if (method === 'DELETE') {
+      const authResult = await requireScopedAuth(ctx, `${type}:delete`);
+      if (!authResult.authenticated) {
+        ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
+        ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
+        return;
+      }
+      ctx.actor = authResult.actor;
+
       let payload = { id, type };
       payload = await ctx.hooks.run('beforeDelete', payload, ctx);
 
