@@ -87,5 +87,29 @@ export function bootstrap() {
     }
   }));
 
-  console.log(`  Bootstrap: 5 content types registered (article, page, category, media, author)`);
+  // User — 系统用户（人类管理员/作者）
+  registerContentType(createContentType('user', {
+    label: '用户',
+    description: '系统用户——人类作者、编辑、管理员',
+    fields: {
+      username: { type: 'string', required: true, maxLength: 50 },
+      email:    { type: 'string' },
+      password: { type: 'string', required: true }, // 只存哈希
+      role:     { type: 'enum', values: ['admin', 'editor', 'author'], default: 'author' }
+    }
+  }));
+
+  // API Key — Agent 认证密钥
+  registerContentType(createContentType('api_key', {
+    label: 'API Key',
+    description: 'AI Agent 认证密钥（用于 Agent 访问 API）',
+    fields: {
+      prefix:  { type: 'string', required: true },
+      hash:    { type: 'string', required: true },
+      label:   { type: 'string' },
+      ownerId: { type: 'string', required: true }
+    }
+  }));
+
+  console.log(`  Bootstrap: 7 content types registered (article, page, category, media, author, user, api_key)`);
 }

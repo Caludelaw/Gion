@@ -9,6 +9,7 @@
  */
 
 import { apiRoutes } from './routes/api.js';
+import { authRoutes } from './routes/auth.js';
 
 /**
  * @param {import('./context.js').Context} ctx
@@ -17,13 +18,18 @@ export async function router(ctx) {
   const { pathname } = ctx.url;
   const method = ctx.req.method;
 
-  // API routes
+  // Auth routes
+  if (pathname.startsWith('/api/auth')) {
+    return authRoutes(ctx);
+  }
+
+  // Content API routes
   if (pathname.startsWith('/api')) {
     return apiRoutes(ctx);
   }
 
-  // Health check (convenience)
-  if (pathname === '/health' || pathname === '/api/health') {
+  // Health check
+  if (pathname === '/health') {
     ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
     ctx.res.end(JSON.stringify({
       status: 'ok',
