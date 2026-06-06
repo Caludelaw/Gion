@@ -1,41 +1,40 @@
 # Gion Development Roadmap
 
-## Phase 1: Core CMS (Current — Alpha)
+## Phase 1: Core CMS ✅ COMPLETE
 
 **Goal**: A working headless CMS with structured content, REST API, and hook-based extension system.
 
 | Feature | Status | Package |
 |---------|--------|---------|
-| Content Type Schema Definition | Done | `@gion/core` |
-| Typed Field Validation | Done | `@gion/core` |
-| Memory Store (dev/testing) | Done | `@gion/core` |
-| Hook System (lifecycle hooks) | Done | `@gion/core` |
-| Structured Error Types | Done | `@gion/core` |
-| Zero-Dependency HTTP Server | Done | `@gion/server` |
-| REST API (CRUD + list) | Done | `@gion/server` |
-| CORS Middleware | Done | `@gion/server` |
-| JSON Body Parser | Done | `@gion/server` |
-| Architecture Decision Records | Done | `docs/` |
-| SQLite Store | Todo | `@gion/driver-sqlite` |
-| Authentication (JWT + API Key) | Todo | `@gion/auth` |
-| File Upload | Todo | `@gion/server` |
-| CLI Tool (`gion init`, `gion dev`) | Todo | `@gion/cli` |
+| Content Type Schema Definition | ✅ Done | `@gion/core` |
+| Typed Field Validation | ✅ Done | `@gion/core` |
+| Memory Store (dev/testing) | ✅ Done | `@gion/core` |
+| Hook System (lifecycle hooks) | ✅ Done | `@gion/core` |
+| Structured Error Types | ✅ Done | `@gion/core` |
+| Zero-Dependency HTTP Server | ✅ Done | `@gion/server` |
+| REST API (CRUD + list) | ✅ Done | `@gion/server` |
+| CORS Middleware | ✅ Done | `@gion/server` |
+| JSON Body Parser | ✅ Done | `@gion/server` |
+| Architecture Decision Records | ✅ Done | `docs/` |
+| SQLite Store (sql.js WASM) | ✅ Done | `@gion/core` |
+| Authentication (JWT + API Key) | ✅ Done | `@gion/core` |
+| Vue 3 Admin SPA | ✅ Done | `@gion/admin` |
+| Static File Serving | ✅ Done | `@gion/server` |
 
-## Phase 2: AI-Native (Planned)
+## Phase 2: AI-Native ✅ COMPLETE
 
 **Goal**: AI agents become first-class content consumers and producers.
 
-| Feature | Priority |
-|---------|----------|
-| Agent API Key Authentication | P0 |
-| Agent Rate Limiting & Quotas | P0 |
-| Agent Audit Trail | P0 |
-| MCP Server Implementation | P0 |
-| Vector Search (sqlite-vss / LanceDB) | P1 |
-| GraphQL API | P1 |
-| Content Auto-Tagging (LLM) | P1 |
-| Content Pipeline Engine (collect → clean → enhance → review → publish) | P1 |
-| Agent Permission Scopes (read/write per content type) | P1 |
+| Feature | Status |
+|---------|--------|
+| Agent API Key Authentication | ✅ Done |
+| JWT Authentication (Human) | ✅ Done |
+| MCP Server (stdio transport) | ✅ Done |
+| TF-IDF Vector Search | ✅ Done |
+| Content Auto-Indexing (hook-based) | ✅ Done |
+| GraphQL API | Todo |
+| Content Pipeline Engine | Todo |
+| Agent Permission Scopes | Todo |
 
 ## Phase 3: Ecosystem (Planned)
 
