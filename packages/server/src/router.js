@@ -10,6 +10,12 @@
 
 import { apiRoutes } from './routes/api.js';
 import { authRoutes } from './routes/auth.js';
+import { serveStatic } from './static.js';
+import { join, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+const PUBLIC_DIR = join(__dirname, '..', 'public');
 
 /**
  * @param {import('./context.js').Context} ctx
@@ -26,6 +32,12 @@ export async function router(ctx) {
   // Content API routes
   if (pathname.startsWith('/api')) {
     return apiRoutes(ctx);
+  }
+
+  // Admin SPA static files
+  if (pathname.startsWith('/admin')) {
+    const served = await serveStatic(ctx, PUBLIC_DIR, pathname);
+    if (served) return;
   }
 
   // Health check
