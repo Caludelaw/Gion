@@ -15,6 +15,7 @@
  */
 
 import { NotFoundError, ValidationError } from '../../../core/src/errors.js';
+import { search as vectorSearch } from '../search.js';
 
 // Built-in content type registry
 // Plugins/extensions can register additional types via hooks
@@ -43,6 +44,33 @@ export async function apiRoutes(ctx) {
       version: '0.1.0',
       uptime: process.uptime()
     }));
+    return;
+  }
+
+  // /api/search?q=xxx&type=article
+  if (pathname === '/api/search' && method === 'GET') {
+    const q = ctx.url.searchParams.get('q') || '';
+    const type = ctx.url.searchParams.get('type') || null;
+
+    if (!q || q.length < 2) {
+      ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: 'VALIDATION_ERROR', message: 'Query must be at least 2 characters' }));
+      return;
+    }
+
+    const results = vectorSearch(q, 20);
+    const docs = [];
+    for (const { docId, score } of results) {
+      try {
+        const doc = await ctx.store.get(docId);
+        if (doc && (!type || doc.type === type)) {
+          docs.push({ ...doc, _score: Math.round(score * 100) / 100 });
+        }
+      } catch (e) { /* skip */ }
+    }
+
+    ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
+    ctx.res.end(JSON.stringify({ query: q, docs, total: docs.length }));
     return;
   }
 

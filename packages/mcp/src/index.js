@@ -147,6 +147,34 @@ async function listContentTypes() {
   };
 }
 
+// ─── Tool: search_content ─────────────────────────────────
+
+async function searchContent(args) {
+  const { query, type } = args;
+  const params = new URLSearchParams({ q: query });
+  if (type) params.set('type', type);
+
+  const data = await request(`/search?${params}`);
+
+  return {
+    content: [{
+      type: 'text',
+      text: JSON.stringify({
+        query: data.query,
+        total: data.total,
+        docs: (data.docs || []).map(d => ({
+          id: d.id,
+          type: d.type,
+          title: d.data?.title || d.data?.name || '(untitled)',
+          status: d.status,
+          score: d._score,
+          excerpt: d.data?.excerpt || (typeof d.data?.body === 'object' ? d.data.body?.text?.substring(0, 200) : '')
+        }))
+      }, null, 2)
+    }]
+  };
+}
+
 // ─── Server ───────────────────────────────────────────────
 
 const server = new McpServer({
@@ -247,6 +275,22 @@ server.registerTool(
     inputSchema: { type: 'object', properties: {} }
   },
   listContentTypes
+);
+
+server.registerTool(
+  'search_content',
+  {
+    description: 'Semantic search across all content using TF-IDF vector similarity. Use this to find relevant documents by meaning, not just keyword matching.',
+    inputSchema: {
+      type: 'object',
+      properties: {
+        query: { type: 'string', description: 'Search query in natural language' },
+        type: { type: 'string', description: 'Optional content type filter' }
+      },
+      required: ['query']
+    }
+  },
+  searchContent
 );
 
 // ─── Start ────────────────────────────────────────────────

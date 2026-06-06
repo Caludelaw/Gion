@@ -22,6 +22,7 @@ import { corsMiddleware } from './middleware/cors.js';
 import { errorHandler } from './middleware/error-handler.js';
 import { createContext } from './context.js';
 import { bootstrap } from './bootstrap.js';
+import { initSearch } from './search.js';
 
 const DEFAULT_PORT = 3120;
 
@@ -34,6 +35,9 @@ export async function start(config = {}) {
   // Pre-init store so the first request doesn't pay cold-start cost
   const ctx = await createContext({ req: null, res: null, url: null, body: null, config: { storage, dataDir } });
   const storeType = ctx.store.getDbPath ? `sqlite (${ctx.store.getDbPath()})` : 'memory';
+
+  // Init vector search index
+  await initSearch(ctx.store, ctx.hooks);
 
   const server = createServer(async (req, res) => {
     try {
