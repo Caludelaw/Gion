@@ -120,7 +120,7 @@ gion.hooks.on('agent:onRequest', async (payload, ctx) => {
 
 ```bash
 # Clone
-git clone https://github.com/liuhuaian/gion.git
+git clone https://github.com/Caludelaw/Gion.git
 cd gion
 
 # Run (yes, that's it — zero npm install needed for core)
@@ -202,7 +202,7 @@ See [ROADMAP.md](docs/ROADMAP.md) for details.
 
 Gion is in active early development. We welcome contributions from developers who share our vision of agent-native content infrastructure.
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, and check [GitHub Issues](https://github.com/liuhuaian/gion/issues) for tasks tagged `good first issue`.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, and check [GitHub Issues](https://github.com/Caludelaw/Gion/issues) for tasks tagged `good first issue`.
 
 ---
 
