@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@gion/core": "0.1.0",
-    "graphql": "^16.14.1"
+    "graphql": "^16.14.1",
+    "sharp": "^0.34.5"
   }
 }

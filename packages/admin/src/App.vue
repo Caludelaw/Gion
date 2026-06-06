@@ -8,6 +8,7 @@
             {{ t.label }}
           </router-link>
         </template>
+        <router-link to="/media" class="nav-item">🖼️ 媒体库</router-link>
         <router-link to="/apikeys" class="nav-item">🔑 API Keys</router-link>
       </nav>
       <div class="sidebar-footer">

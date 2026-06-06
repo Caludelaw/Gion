@@ -35,6 +35,27 @@ export const api = {
   // Content Types
   listTypes: () => request('/content-types'),
 
+  // Media
+  uploadMedia: async (file) => {
+    const token = localStorage.getItem('gion_token')
+    const form = new FormData()
+    form.append('file', file)
+    const res = await fetch(BASE + '/media/upload', {
+      method: 'POST',
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+      body: form
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.message || res.statusText)
+    return data
+  },
+  listMedia: (params = {}) => {
+    const q = new URLSearchParams(params).toString()
+    return request(`/media${q ? '?' + q : ''}`)
+  },
+  getMedia: (id) => request(`/media/${id}`),
+  deleteMedia: (id) => request(`/media/${id}`, { method: 'DELETE' }),
+
   // Health
   health: () => request('/health')
 }

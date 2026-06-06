@@ -11,7 +11,9 @@
 import { apiRoutes } from './routes/api.js';
 import { authRoutes } from './routes/auth.js';
 import { graphqlRoutes } from './routes/graphql.js';
+import { mediaRoutes } from './routes/media.js';
 import { serveStatic } from './static.js';
+import { createMediaStore } from './media-store.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -35,6 +37,11 @@ export async function router(ctx) {
     return graphqlRoutes(ctx);
   }
 
+  // Media routes (upload/list/delete)
+  if (pathname.startsWith('/api/media')) {
+    return mediaRoutes(ctx);
+  }
+
   // Content API routes
   if (pathname.startsWith('/api')) {
     return apiRoutes(ctx);
@@ -43,6 +50,15 @@ export async function router(ctx) {
   // Admin SPA static files
   if (pathname.startsWith('/admin')) {
     const served = await serveStatic(ctx, PUBLIC_DIR, pathname);
+    if (served) return;
+  }
+
+  // Uploaded media files
+  if (pathname.startsWith('/uploads/')) {
+    const mediaStore = createMediaStore();
+    // Strip /uploads/ prefix to serve from uploadDir root
+    const relativePath = pathname.slice('/uploads/'.length);
+    const served = await serveStatic(ctx, mediaStore.uploadDir, relativePath);
     if (served) return;
   }
 

@@ -6,6 +6,7 @@ import Dashboard from '../views/Dashboard.vue'
 import ContentList from '../views/ContentList.vue'
 import ContentEdit from '../views/ContentEdit.vue'
 import ApiKeys from '../views/ApiKeys.vue'
+import Media from '../views/Media.vue'
 
 const routes = [
   { path: '/login', component: Login, meta: { public: true } },
@@ -14,7 +15,8 @@ const routes = [
   { path: '/content/:type', component: ContentList, props: true },
   { path: '/content/:type/new', component: ContentEdit, props: true },
   { path: '/content/:type/:id', component: ContentEdit, props: true },
-  { path: '/apikeys', component: ApiKeys }
+  { path: '/apikeys', component: ApiKeys },
+  { path: '/media', component: Media }
 ]
 
 const router = createRouter({

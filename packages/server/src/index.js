@@ -23,6 +23,7 @@ import { errorHandler } from './middleware/error-handler.js';
 import { createContext } from './context.js';
 import { bootstrap } from './bootstrap.js';
 import { initSearch } from './search.js';
+import { logger } from './logger.js';
 
 const DEFAULT_PORT = 3120;
 
