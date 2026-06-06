@@ -1,0 +1,14 @@
+{
+  "name": "@gion/server",
+  "version": "0.1.0",
+  "description": "Gion CMS HTTP server — REST API and static file serving",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "dev": "node --watch src/index.js",
+    "start": "node src/index.js"
+  },
+  "dependencies": {
+    "@gion/core": "0.1.0"
+  }
+}

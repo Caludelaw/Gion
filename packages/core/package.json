@@ -1,0 +1,10 @@
+{
+  "name": "@gion/core",
+  "version": "0.1.0",
+  "description": "Gion CMS core — content model, storage abstraction, and plugin runtime",
+  "main": "src/index.js",
+  "type": "module",
+  "scripts": {
+    "test": "node --test src/**/*.test.js"
+  }
+}

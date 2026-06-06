@@ -1,0 +1,91 @@
+/**
+ * Bootstrap — 初始化内置内容类型
+ *
+ * Gion 启动时自动注册内置内容类型。
+ * 第三方扩展/插件可以通过 hook 系统注册自定义类型。
+ */
+
+import { createContentType } from '../../core/src/content-type.js';
+import { registerContentType } from './routes/api.js';
+
+export function bootstrap() {
+  // Article — 博客文章
+  registerContentType(createContentType('article', {
+    label: '文章',
+    description: '博客文章类型，支持标题、正文、摘要、标签、分类等',
+    schemaOrg: 'Article',
+    fields: {
+      title:       { type: 'string',  required: true,  maxLength: 200, semantic: 'headline' },
+      slug:        { type: 'string',  required: true,  semantic: 'identifier' },
+      body:        { type: 'json',    required: true,  semantic: 'articleBody' },
+      excerpt:     { type: 'string',  maxLength: 500,  semantic: 'description' },
+      featuredImage: { type: 'media', semantic: 'image' },
+      tags:        { type: 'array',   items: { type: 'string' }, semantic: 'keywords' },
+      category:    { type: 'relation', target: 'category' },
+      status:      { type: 'enum',    values: ['draft', 'published', 'archived'] },
+      publishedAt: { type: 'datetime' }
+    }
+  }));
+
+  // Page — 静态页面
+  registerContentType(createContentType('page', {
+    label: '页面',
+    description: '静态页面，如关于、联系、隐私政策',
+    schemaOrg: 'WebPage',
+    fields: {
+      title:  { type: 'string', required: true, maxLength: 200 },
+      slug:   { type: 'string', required: true },
+      body:   { type: 'json',   required: true },
+      status: { type: 'enum',   values: ['draft', 'published', 'archived'] },
+      order:  { type: 'number' }
+    }
+  }));
+
+  // Category — 分类
+  registerContentType(createContentType('category', {
+    label: '分类',
+    description: '内容分类（关联文章等）',
+    fields: {
+      name:        { type: 'string', required: true, maxLength: 100 },
+      slug:        { type: 'string', required: true },
+      description: { type: 'string', maxLength: 500 },
+      parent:      { type: 'relation', target: 'category' }
+    }
+  }));
+
+  // Media — 媒体文件元数据
+  registerContentType(createContentType('media', {
+    label: '媒体',
+    description: '上传文件的元数据记录',
+    schemaOrg: 'MediaObject',
+    fields: {
+      filename:    { type: 'string', required: true },
+      mimeType:    { type: 'string', required: true },
+      size:        { type: 'number' },
+      url:         { type: 'string', required: true },
+      width:       { type: 'number' },
+      height:      { type: 'number' },
+      altText:     { type: 'string' },
+      caption:     { type: 'string' },
+      uploadedBy:  { type: 'string' }
+    }
+  }));
+
+  // Author — 作者/贡献者（未来支持 Agent 作者）
+  registerContentType(createContentType('author', {
+    label: '作者',
+    description: '内容作者——可以是人类也可以是 AI Agent',
+    schemaOrg: 'Person',
+    fields: {
+      name:     { type: 'string', required: true },
+      slug:     { type: 'string', required: true },
+      bio:      { type: 'string', maxLength: 1000 },
+      avatar:   { type: 'media' },
+      website:  { type: 'string' },
+      email:    { type: 'string' },
+      type:     { type: 'enum', values: ['human', 'agent'], default: 'human' }
+    }
+  }));
+
+  console.log(`  Bootstrap: 5 content types registered (article, page, category, media, author)`);
+}
