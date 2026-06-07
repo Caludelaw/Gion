@@ -11,7 +11,7 @@
  */
 
 import { requireAuth } from '../middleware/auth.js';
-import { createLogger } from './logger.js';
+import { createLogger } from '../logger.js';
 
 const log = createLogger('wechat');
 

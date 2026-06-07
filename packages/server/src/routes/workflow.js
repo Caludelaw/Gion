@@ -12,11 +12,11 @@
  *   GET  /api/workflow/status/:id — 查看状态
  */
 
-import { getStore } from './context.js';
-import { requireAuth } from './middleware/auth.js';
-import { record as auditRecord } from './audit.js';
-import { notify } from './notify.js';
-import { createLogger } from './logger.js';
+import { getStore } from '../context.js';
+import { requireAuth } from '../middleware/auth.js';
+import { record as auditRecord } from '../audit.js';
+import { notify } from '../notify.js';
+import { createLogger } from '../logger.js';
 
 const log = createLogger('workflow');
 
