@@ -19,6 +19,7 @@ import { workflowRoutes } from './routes/workflow.js';
 import { wechatRoutes } from './routes/wechat.js';
 import { ssoRoutes } from './routes/sso.js';
 import { themeRoutes } from './routes/theme.js';
+import { rssSitemapRoutes } from './routes/rss.js';
 import { serveStatic } from './static.js';
 import { createMediaStore } from './media-store.js';
 import { renderTheme, serveThemeAsset } from './theme-engine.js';
@@ -146,6 +147,11 @@ export async function router(ctx) {
       timestamp: new Date().toISOString()
     }));
     return;
+  }
+
+  // RSS & Sitemap
+  if (pathname === '/rss.xml' || pathname === '/sitemap.xml') {
+    return rssSitemapRoutes(ctx);
   }
 
   // Frontend Theme — catch-all for non-API, non-admin paths

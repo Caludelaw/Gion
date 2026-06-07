@@ -9,6 +9,7 @@
         </template>
         <router-link to="/media" class="nav-item">🖼️ 媒体库</router-link>
         <router-link to="/categories" class="nav-item">📂 栏目管理</router-link>
+        <router-link to="/navigation" class="nav-item">🧭 导航菜单</router-link>
 
         <div class="nav-section">管理</div>
         <router-link to="/users" class="nav-item">👥 用户管理</router-link>

@@ -17,6 +17,7 @@ import Users from '../views/Users.vue'
 import Categories from '../views/Categories.vue'
 import Theme from '../views/Theme.vue'
 import ThemeManager from '../views/ThemeManager.vue'
+import Navigation from '../views/Navigation.vue'
 
 const routes = [
   { path: '/login', component: Login, meta: { public: true } },
@@ -36,7 +37,8 @@ const routes = [
   { path: '/users', component: Users },
   { path: '/categories', component: Categories },
   { path: '/theme', component: Theme },
-  { path: '/theme-manager', component: ThemeManager }
+  { path: '/theme-manager', component: ThemeManager },
+  { path: '/navigation', component: Navigation }
 ]
 
 const router = createRouter({

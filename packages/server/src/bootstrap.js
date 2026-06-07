@@ -189,5 +189,17 @@ export function bootstrap() {
     }
   }));
 
-  console.log(`  Bootstrap: 12 content types registered`);
+  // Navigation — 站点导航菜单
+  registerContentType(createContentType('navigation', {
+    label: '导航菜单',
+    description: '站点前台导航菜单项',
+    fields: {
+      title:  { type: 'string', required: true },
+      url:    { type: 'string', required: true },
+      order:  { type: 'number' },
+      target: { type: 'string' }
+    }
+  }));
+
+  console.log(`  Bootstrap: 13 content types registered`);
 }
