@@ -29,6 +29,8 @@ import { getWSS } from './websocket.js';
 import { getWebhookManager } from './webhook.js';
 import { rateLimit } from './middleware/rate-limit.js';
 import { record as auditRecord } from './audit.js';
+import { snapshotRevision } from './revisions.js';
+import { notify } from './notify.js';
 
 export async function start(configOverrides = {}) {
   const config = loadConfig();
@@ -72,6 +74,14 @@ export async function start(configOverrides = {}) {
         resourceId: doc.id,
         detail: { title: doc.data?.title, status: doc.status }
       }).catch(() => {});
+
+      // Snapshot revision (async, don't block)
+      if (wsEvent !== 'delete') {
+        snapshotRevision(doc, { id: doc.createdBy || 'system' }).catch(() => {});
+      }
+
+      // IM notification (async, don't block)
+      notify(`content_${wsEvent}d`, { doc, summary: payload.title || '' }).catch(() => {});
     });
   }
 

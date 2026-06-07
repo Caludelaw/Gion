@@ -14,7 +14,7 @@ import { graphqlRoutes } from './routes/graphql.js';
 import { mediaRoutes } from './routes/media.js';
 import { collabRoutes } from './routes/collab.js';
 import { webhookRoutes } from './routes/webhook.js';
-import { auditRoutes } from './routes/audit.js';
+import { auditRoutes, revisionRoutes } from './routes/audit.js';
 import { serveStatic } from './static.js';
 import { createMediaStore } from './media-store.js';
 import { join, dirname } from 'node:path';
@@ -58,6 +58,12 @@ export async function router(ctx) {
   // Media routes (upload/list/delete)
   if (pathname.startsWith('/api/media')) {
     return mediaRoutes(ctx);
+  }
+
+  // Revision routes (must precede content routes)
+  const revMatch = pathname.match(/^\/api\/content\/([a-z][a-z0-9_]*)\/([\w-]+)\/(revisions.*)$/);
+  if (revMatch) {
+    return revisionRoutes(ctx, revMatch[1], revMatch[2]);
   }
 
   // Content API routes

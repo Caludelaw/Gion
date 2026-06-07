@@ -170,5 +170,21 @@ export function bootstrap() {
     }
   }));
 
-  console.log(`  Bootstrap: 11 content types registered`);
+  // Revision — 内容版本快照
+  registerContentType(createContentType('revision', {
+    label: '版本历史',
+    description: '文档的版本快照，用于版本管理和回滚',
+    fields: {
+      docId:      { type: 'string', required: true },
+      docType:    { type: 'string' },
+      data:       { type: 'json', required: true },
+      status:     { type: 'string' },
+      meta:       { type: 'json' },
+      author:     { type: 'string' },
+      authorType: { type: 'string' },
+      timestamp:  { type: 'string' }
+    }
+  }));
+
+  console.log(`  Bootstrap: 12 content types registered`);
 }

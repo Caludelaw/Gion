@@ -146,13 +146,27 @@ export function checkScope(actor, required) {
   const scopes = actor.scopes || [];
   if (scopes.includes('*:*')) return true;
 
-  const [reqType, reqAction] = required.split(':');
+  // Parse required: "type:action" or "type:field:action"
+  const parts = required.split(':');
+  const reqType = parts[0];
+  const reqField = parts.length === 3 ? parts[1] : null;
+  const reqAction = parts.length === 3 ? parts[2] : parts[1];
 
   for (const scope of scopes) {
-    const [sType, sAction] = scope.split(':');
-    const typeMatch = sType === '*' || sType === reqType;
-    const actionMatch = sAction === '*' || sAction === reqAction;
-    if (typeMatch && actionMatch) return true;
+    const sParts = scope.split(':');
+
+    if (sParts.length === 3) {
+      // Field-level scope: type:field:action
+      const typeMatch = sParts[0] === '*' || sParts[0] === reqType;
+      const fieldMatch = sParts[1] === '*' || (reqField && sParts[1] === reqField);
+      const actionMatch = sParts[2] === '*' || sParts[2] === reqAction;
+      if (typeMatch && fieldMatch && (reqField ? true : true) && actionMatch) return true;
+    } else {
+      // Type-level scope: type:action
+      const typeMatch = sParts[0] === '*' || sParts[0] === reqType;
+      const actionMatch = sParts[1] === '*' || sParts[1] === reqAction;
+      if (typeMatch && actionMatch) return true;
+    }
   }
 
   return false;

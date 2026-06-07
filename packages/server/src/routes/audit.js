@@ -106,6 +106,56 @@ export async function auditRoutes(ctx) {
   ctx.res.end(JSON.stringify({ error: 'NOT_FOUND' }));
 }
 
+// ── Revision Routes (also used by API) ────────────────────
+
+import { getRevisions, diffObjects, restoreRevision } from '../revisions.js';
+
+/**
+ * Handle revision routes.
+ * GET  /api/content/:type/:id/revisions
+ * POST /api/content/:type/:id/revisions/:revId/restore
+ */
+export async function revisionRoutes(ctx, type, id) {
+  const { pathname } = ctx.url;
+  const method = ctx.req.method;
+
+  const authResult = await requireAuth(ctx);
+  if (!authResult.authenticated) {
+    ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
+    ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
+    return;
+  }
+
+  // GET revisions
+  if (pathname.endsWith('/revisions') && method === 'GET') {
+    const revs = await getRevisions(id);
+    const result = revs.map((r, i, arr) => ({
+      ...r,
+      diff: i < arr.length - 1 ? diffObjects(arr[i + 1].data, r.data) : []
+    }));
+    ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
+    ctx.res.end(JSON.stringify({ revisions: result, total: result.length }));
+    return;
+  }
+
+  // POST restore
+  const restoreMatch = pathname.match(/\/revisions\/([\w-]+)\/restore$/);
+  if (restoreMatch && method === 'POST') {
+    const doc = await restoreRevision(id, restoreMatch[1]);
+    if (!doc) {
+      ctx.res.writeHead(404, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: 'NOT_FOUND' }));
+      return;
+    }
+    ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
+    ctx.res.end(JSON.stringify({ success: true, doc }));
+    return;
+  }
+
+  ctx.res.writeHead(404, { 'Content-Type': 'application/json' });
+  ctx.res.end(JSON.stringify({ error: 'NOT_FOUND' }));
+}
+
 function getDefaultSettings() {
   return {
     siteName: 'Gion CMS',
