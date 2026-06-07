@@ -306,6 +306,37 @@ reg('create_api_key',        'Create a new API key for an AI agent to access Gio
 reg('rebuild_search_index',  'Rebuild the TF-IDF search index from all existing content. Use this after importing or migrating content.',                           { type:'object', properties:{} }, rebuildSearchIndex);
 reg('get_content_relations', 'Discover content related to a document by analyzing field references and text similarity.',                                           { type:'object', properties:{ type:{ type:'string' }, id:{ type:'string' } }, required:['type','id'] }, getContentRelations);
 
+// ── v2.0 New Tools ────────────────────────────────────────
+
+async function queryAuditLog(args) {
+  const params = new URLSearchParams();
+  if (args.actorId) params.set('actorId', args.actorId);
+  if (args.action) params.set('action', args.action);
+  if (args.limit) params.set('limit', String(args.limit));
+  const data = await request(`/audit?${params}`);
+  return ok({ total: data.total, entries: data.entries?.slice(0, 50).map(e => ({ action: e.action, actorType: e.actorType, resourceType: e.resourceType, createdAt: e.createdAt, summary: e.detail?.title || e.resourceId })) });
+}
+
+async function getSiteSettings() {
+  const data = await request('/site-settings');
+  return ok(data);
+}
+
+async function updateSiteSettings(args) {
+  const data = await request('/site-settings', { method: 'PUT', body: JSON.stringify(args) });
+  return ok(data);
+}
+
+async function listPipelines() {
+  const data = await request('/pipelines');
+  return ok(data.templates || data);
+}
+
+reg('query_audit_log',       'Query the audit log for content operations. Filter by actor, action type, or date range.',                                             { type:'object', properties:{ actorId:{ type:'string' }, action:{ type:'string', enum:['create','update','delete','publish','archive','login','review'] }, limit:{ type:'number' } } }, queryAuditLog);
+reg('get_site_settings',     'Get site configuration including ICP备案 number, analytics ID, site name, and language settings.',                                    { type:'object', properties:{} }, getSiteSettings);
+reg('update_site_settings',  'Update site configuration. Use this to set ICP备案号 (icpNumber), analytics, language, etc.',                                         { type:'object', properties:{ icpNumber:{ type:'string' }, gonganNumber:{ type:'string' }, analyticsId:{ type:'string' }, siteName:{ type:'string' }, language:{ type:'string' } } }, updateSiteSettings);
+reg('list_pipelines',        'List available content processing pipelines (translation, SEO, review). Use to discover Agent automation capabilities.',               { type:'object', properties:{} }, listPipelines);
+
 // ─────────────────────────────────────────────────────────────
 // START
 // ─────────────────────────────────────────────────────────────

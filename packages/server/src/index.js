@@ -28,6 +28,7 @@ import { loadConfig, getConfig, getConfigWarnings, configSummary } from './confi
 import { getWSS } from './websocket.js';
 import { getWebhookManager } from './webhook.js';
 import { rateLimit } from './middleware/rate-limit.js';
+import { record as auditRecord } from './audit.js';
 
 export async function start(configOverrides = {}) {
   const config = loadConfig();
@@ -61,6 +62,16 @@ export async function start(configOverrides = {}) {
 
       // Webhook fire (async, don't block)
       webhooks.fire(wsEvent, { ...payload, data: doc.data }).catch(() => {});
+
+      // Audit log (async, don't block)
+      auditRecord({
+        actorId: doc.createdBy || doc._meta?.createdBy?.agentId || 'system',
+        actorType: doc._meta?.createdBy?.type || 'system',
+        action: wsEvent,
+        resourceType: doc.type,
+        resourceId: doc.id,
+        detail: { title: doc.data?.title, status: doc.status }
+      }).catch(() => {});
     });
   }
 

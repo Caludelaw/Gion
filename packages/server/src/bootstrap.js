@@ -127,5 +127,48 @@ export function bootstrap() {
     }
   }));
 
-  console.log(`  Bootstrap: 8 content types registered (article, page, category, media, author, user, api_key, webhook)`);
+  // AuditLog — 操作审计日志（append-only，≥180天）
+  registerContentType(createContentType('audit_log', {
+    label: '审计日志',
+    description: '操作审计日志，满足等保合规要求，保留≥180天',
+    fields: {
+      actorId:      { type: 'string', required: true },
+      actorType:    { type: 'string', required: true },
+      action:       { type: 'string', required: true },
+      resourceType: { type: 'string' },
+      resourceId:   { type: 'string' },
+      detail:       { type: 'json' },
+      ip:           { type: 'string' }
+    }
+  }));
+
+  // SiteSettings — 站点全局配置
+  registerContentType(createContentType('site_settings', {
+    label: '站点配置',
+    description: '全局站点配置：ICP备案号、公安备案、统计分析等',
+    fields: {
+      siteName:        { type: 'string' },
+      siteDescription: { type: 'string' },
+      icpNumber:       { type: 'string' },
+      gonganNumber:    { type: 'string' },
+      analyticsId:     { type: 'string' },
+      language:        { type: 'string' },
+      timezone:        { type: 'string' }
+    }
+  }));
+
+  // ReviewPolicy — Agent 内容审核策略
+  registerContentType(createContentType('review_policy', {
+    label: '审核策略',
+    description: 'Agent 生成内容的自动审核策略配置',
+    fields: {
+      name:          { type: 'string', required: true },
+      rules:         { type: 'json' },
+      requireHuman:  { type: 'boolean' },
+      blockedTerms:  { type: 'array', items: { type: 'string' } },
+      active:        { type: 'boolean' }
+    }
+  }));
+
+  console.log(`  Bootstrap: 11 content types registered`);
 }
