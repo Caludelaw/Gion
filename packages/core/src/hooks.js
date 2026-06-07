@@ -66,8 +66,8 @@ export function createHookSystem() {
     for (const entry of handlers) {
       try {
         result = await entry.fn(result, context);
-        // If a handler returns null/undefined explicitly, stop the chain
-        if (result === null || result === undefined) {
+        // If a handler returns null explicitly, stop the chain
+        if (result === null) {
           context._stoppedAt = name;
           break;
         }

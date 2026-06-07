@@ -24,14 +24,11 @@ import { createContext } from './context.js';
 import { bootstrap } from './bootstrap.js';
 import { initSearch } from './search.js';
 import { logger } from './logger.js';
+import { loadConfig, getConfig, getConfigWarnings, configSummary } from './config.js';
 
-const DEFAULT_PORT = 3120;
-
-export async function start(config = {}) {
-  const port = config.port || process.env.GION_PORT || DEFAULT_PORT;
-  const host = config.host || process.env.GION_HOST || '0.0.0.0';
-  const storage = config.storage || process.env.GION_STORAGE || 'memory';
-  const dataDir = config.dataDir || process.env.GION_DATA_DIR || null;
+export async function start(configOverrides = {}) {
+  const config = loadConfig();
+  const { port, host, storage, dataDir, version } = config;
 
   // Pre-init store so the first request doesn't pay cold-start cost
   const ctx = await createContext({ req: null, res: null, url: null, body: null, config: { storage, dataDir } });
@@ -80,7 +77,7 @@ export async function start(config = {}) {
       ' ╚██████╔╝██║╚██████╔╝██║ ╚████║',
       '  ╚═════╝ ╚═╝ ╚═════╝ ╚═╝  ╚═══╝',
       '',
-      `  Gion CMS v${config.version || '0.1.0'}`,
+      `  Gion CMS v${version}`,
       `  AI Agent-Native Content Infrastructure`,
       `  Store:     ${storeType}`,
       '',
