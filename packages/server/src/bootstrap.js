@@ -112,5 +112,20 @@ export function bootstrap() {
     }
   }));
 
-  console.log(`  Bootstrap: 7 content types registered (article, page, category, media, author, user, api_key)`);
+  // Webhook — 内容变更事件推送
+  registerContentType(createContentType('webhook', {
+    label: 'Webhook',
+    description: '内容变更事件的外部推送端点',
+    fields: {
+      url:    { type: 'string', required: true },
+      events: { type: 'array', items: { type: 'string' } },
+      types:  { type: 'array', items: { type: 'string' } },
+      secret: { type: 'string', required: true },
+      label:  { type: 'string' },
+      active: { type: 'boolean' },
+      stats:  { type: 'json' }
+    }
+  }));
+
+  console.log(`  Bootstrap: 8 content types registered (article, page, category, media, author, user, api_key, webhook)`);
 }

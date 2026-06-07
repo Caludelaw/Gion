@@ -11,7 +11,7 @@ const schema = [
   // Server
   { key: 'port',          env: 'GION_PORT',          type: 'number',  default: 3120,  min: 1, max: 65535 },
   { key: 'host',          env: 'GION_HOST',          type: 'string',  default: '0.0.0.0' },
-  { key: 'version',       env: 'GION_VERSION',       type: 'string',  default: '0.2.0' },
+  { key: 'version',       env: 'GION_VERSION',       type: 'string',  default: '0.3.0' },
 
   // Storage
   { key: 'storage',       env: 'GION_STORAGE',       type: 'enum',    default: 'memory',  values: ['memory', 'sqlite'] },

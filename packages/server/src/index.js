@@ -26,6 +26,7 @@ import { initSearch } from './search.js';
 import { logger } from './logger.js';
 import { loadConfig, getConfig, getConfigWarnings, configSummary } from './config.js';
 import { getWSS } from './websocket.js';
+import { getWebhookManager } from './webhook.js';
 
 export async function start(configOverrides = {}) {
   const config = loadConfig();
@@ -41,15 +42,24 @@ export async function start(configOverrides = {}) {
   // Init WebSocket for real-time updates
   const wss = getWSS();
 
-  // Register content change broadcasts via hooks (before attach so hooks are ready)
+  // Init webhook manager
+  const webhooks = getWebhookManager(ctx.store);
+
+  // Register content change broadcasts via hooks
   for (const event of ['afterCreate', 'afterUpdate', 'afterDelete']) {
     ctx.hooks.on(event, async (doc) => {
       const wsEvent = event.replace('after', '').toLowerCase();
-      wss.broadcast(doc.type || '*', wsEvent, {
+      const payload = {
         id: doc.id, type: doc.type, status: doc.status,
         title: doc.data?.title || doc.data?.name || '',
         updatedAt: doc.updatedAt
-      });
+      };
+
+      // WebSocket broadcast
+      wss.broadcast(doc.type || '*', wsEvent, payload);
+
+      // Webhook fire (async, don't block)
+      webhooks.fire(wsEvent, { ...payload, data: doc.data }).catch(() => {});
     });
   }
 

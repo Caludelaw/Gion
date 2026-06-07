@@ -13,6 +13,7 @@ import { authRoutes } from './routes/auth.js';
 import { graphqlRoutes } from './routes/graphql.js';
 import { mediaRoutes } from './routes/media.js';
 import { collabRoutes } from './routes/collab.js';
+import { webhookRoutes } from './routes/webhook.js';
 import { serveStatic } from './static.js';
 import { createMediaStore } from './media-store.js';
 import { join, dirname } from 'node:path';
@@ -41,6 +42,11 @@ export async function router(ctx) {
   // Collaboration & WebSocket
   if (pathname.startsWith('/api/collab') || pathname === '/api/ws') {
     return collabRoutes(ctx);
+  }
+
+  // Webhooks
+  if (pathname.startsWith('/api/webhooks')) {
+    return webhookRoutes(ctx);
   }
 
   // Media routes (upload/list/delete)
