@@ -16,6 +16,7 @@ import { collabRoutes } from './routes/collab.js';
 import { webhookRoutes } from './routes/webhook.js';
 import { auditRoutes, revisionRoutes } from './routes/audit.js';
 import { workflowRoutes } from './routes/workflow.js';
+import { wechatRoutes } from './routes/wechat.js';
 import { ssoRoutes } from './routes/sso.js';
 import { serveStatic } from './static.js';
 import { createMediaStore } from './media-store.js';
@@ -65,6 +66,11 @@ export async function router(ctx) {
   // SSO routes
   if (pathname.startsWith('/api/sso')) {
     return ssoRoutes(ctx);
+  }
+
+  // WeChat integration routes
+  if (pathname.startsWith('/api/wechat')) {
+    return wechatRoutes(ctx);
   }
 
   // Media routes (upload/list/delete)
