@@ -6,11 +6,12 @@
 <title data-gion="siteName">Gion CMS</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="/theme/style.css">
+<link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed">
 </head>
 <body>
 <header class="site-header">
   <div class="header-inner">
-    <a href="/" class="site-logo" data-gion="siteName">Gion</a>
+    <a href="/" class="site-logo">Gion</a>
     <nav class="site-nav" id="nav"></nav>
   </div>
 </header>
@@ -27,171 +28,209 @@
 <script>
 (function() {
 var G = window.__GION__ || {};
-var $ = (s) => document.querySelector(s);
 
-// ── Config injection ──
-function injectConfig() {
-  document.title = G.site?.name || 'Gion CMS';
-  $('meta[name=description]').content = G.site?.description || '';
-  document.documentElement.lang = G.site?.language || 'zh-CN';
+// ── Init ──────────────────────────────────────────────────
+document.title = G.site?.name || 'Gion CMS';
+document.documentElement.lang = G.site?.language || 'zh-CN';
+document.querySelectorAll('[data-gion=siteName]').forEach(function(el){ el.textContent = G.site?.name || 'Gion' });
 
-  // Site name
-  document.querySelectorAll('[data-gion=siteName]').forEach(el => el.textContent = G.site?.name || 'Gion');
-
-  // ICP
-  var icp = $('#icp');
-  if (G.site?.icp) { icp.innerHTML = '<a href="https://beian.miit.gov.cn" target="_blank">'+G.site.icp+'</a>' + (G.site.gongan ? ' | <span>'+G.site.gongan+'</span>' : ''); }
-
-  // Analytics
-  if (G.site?.analytics) {
-    var s = document.createElement('script');
-    s.src = 'https://hm.baidu.com/hm.js?'+G.site.analytics;
-    document.head.appendChild(s);
-  }
+// ICP
+var icpEl = document.getElementById('icp');
+if (icpEl && G.site?.icp) {
+  icpEl.innerHTML = '<a href="https://beian.miit.gov.cn" target="_blank">'+G.site.icp+'</a>' + (G.site.gongan ? ' | '+G.site.gongan : '');
 }
 
-// ── Theme vars ──
-function applyTheme() {
-  var t = G.theme || {};
-  var root = document.documentElement.style;
-  if (t.primaryColor) root.setProperty('--accent', t.primaryColor);
-  if (t.bgColor) root.setProperty('--bg', t.bgColor);
-  if (t.textColor) root.setProperty('--text', t.textColor);
-  if (t.fontFamily) root.setProperty('--font', t.fontFamily);
-  if (t.fontSize) root.setProperty('--font-size', t.fontSize);
-  if (t.maxWidth) root.setProperty('--max-width', t.maxWidth);
-  if (t.customCSS) {
-    var style = document.createElement('style');
-    style.textContent = t.customCSS;
-    document.head.appendChild(style);
-  }
-}
+// Theme CSS vars
+var theme = G.theme || {};
+var rs = document.documentElement.style;
+if (theme.primaryColor) rs.setProperty('--accent', theme.primaryColor);
+if (theme.bgColor) rs.setProperty('--bg', theme.bgColor);
+if (theme.textColor) rs.setProperty('--text', theme.textColor);
+if (theme.fontFamily) rs.setProperty('--font', theme.fontFamily);
+if (theme.fontSize) rs.setProperty('--font-size', theme.fontSize);
+if (theme.maxWidth) rs.setProperty('--max-width', theme.maxWidth);
+if (theme.customCSS) { var s = document.createElement('style'); s.textContent = theme.customCSS; document.head.appendChild(s); }
 
-// ── API helper ──
-async function api(path) {
-  var res = await fetch('/api'+path);
-  return res.json();
-}
+// ── API ───────────────────────────────────────────────────
+function api(path) { return fetch('/api'+path).then(function(r){ return r.json() }); }
 
-// ── Router ──
-var routes = {
-  '/': renderHome,
-  '/post/': renderPost,
-  '/page/': renderPage,
-  '/category/': renderCategory,
-  '/search': renderSearch
-};
-
-async function route() {
-  var path = location.pathname;
-  if (path === '/') return renderHome();
-  if (path.startsWith('/post/')) return renderPost(path.split('/')[2]);
-  if (path.startsWith('/page/')) return renderPage(path.split('/')[2]);
-  if (path.startsWith('/category/')) return renderCategory(path.split('/')[2]);
+// ── Router ────────────────────────────────────────────────
+function route() {
+  var p = location.pathname;
+  if (p === '/' || p === '') return renderHome();
+  if (p.startsWith('/post/')) return renderPost(p.split('/post/')[1]);
+  if (p.startsWith('/page/')) return renderPage(p.split('/page/')[1]);
+  if (p.startsWith('/category/')) return renderCategory(p.split('/category/')[1]);
+  if (p === '/search') return renderSearch();
   render404();
 }
 
-// ── Pages ──
-async function renderHome() {
-  var main = $('#main');
-  main.innerHTML = '<div class="loading">Loading...</div>';
+// ── Navigation (from CMS navigation type + categories) ───
+function buildNav(navItems, categories, pages) {
+  var nav = document.getElementById('nav');
+  var html = '<a href="/">首页</a>';
+  (navItems||[]).forEach(function(item){
+    html += '<a href="'+escAttr(item.data?.url||'#')+'"'+(item.data?.target==='_blank'?' target="_blank"':'')+'>'+escHtml(item.data?.title||'')+'</a>';
+  });
+  if (!navItems || !navItems.length) {
+    (categories||[]).forEach(function(c){
+      html += '<a href="/category/'+(c.data?.slug||c.data?.name||c.id)+'">'+escHtml(c.data?.name||c.data?.title||c.id)+'</a>';
+    });
+    (pages||[]).forEach(function(p){
+      html += '<a href="/page/'+(p.data?.slug||p.id)+'">'+escHtml(p.data?.title||p.id)+'</a>';
+    });
+  }
+  html += '<a href="/search">🔍</a>';
+  html += '<a href="/admin/">管理</a>';
+  nav.innerHTML = html;
+}
 
-  try {
-    var articles = await api('/content/article?status=published&limit=10');
-    var pages = await api('/content/page?status=published&limit=10');
-    var cats = await api('/content/category?limit=20');
+// ── Home ──────────────────────────────────────────────────
+function renderHome() {
+  var main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">加载中...</div>';
 
-    var catsById = {};
-    (cats.docs||[]).forEach(c => catsById[c.id] = c.data?.name || c.id);
+  Promise.all([
+    api('/content/article?status=published&limit=10'),
+    api('/content/navigation?limit=20'),
+    api('/content/category?limit=20')
+  ]).then(function(res){
+    var articles = res[0].docs || [];
+    var navItems = (res[1].docs||[]).sort(function(a,b){ return (a.data?.order||0)-(b.data?.order||0) });
+    var categories = res[2].docs || [];
 
+    buildNav(navItems, categories, []);
+
+    if (!articles.length) {
+      main.innerHTML = '<div class="empty-page"><h1>👋 欢迎</h1><p>还没有文章，去 <a href="/admin/">管理后台</a> 写第一篇。</p></div>';
+      return;
+    }
     var html = '<div class="post-list">';
-    (articles.docs||[]).forEach(a => {
+    articles.forEach(function(a){
       var ex = excerpt(a.data?.body);
-      var date = a.updatedAt ? new Date(a.updatedAt).toLocaleDateString('zh-CN') : '';
-      html += '<article class="post-card"><h2><a href="/post/'+(a.data?.slug||a.id)+'">'+(a.data?.title||'Untitled')+'</a></h2><time>'+date+'</time><p>'+ex+'</p></article>';
+      html += '<article class="post-card"><h2><a href="/post/'+(a.data?.slug||a.id)+'">'+escHtml(a.data?.title||'Untitled')+'</a></h2><time>'+fmtDate(a.updatedAt)+'</time><p>'+ex+'</p></article>';
     });
     html += '</div>';
     main.innerHTML = html;
-
-    // Build nav
-    buildNav(cats.docs||[], pages.docs||[], true);
-  } catch(e) { main.innerHTML = '<p class="error">Failed to load</p>'; }
+  }).catch(function(e){ main.innerHTML = '<p class="error">加载失败: '+e.message+'</p>'; });
 }
 
-async function renderPost(slug) {
-  var main = $('#main');
-  main.innerHTML = '<div class="loading">Loading...</div>';
-  try {
-    var docs = await api('/content/article?search='+encodeURIComponent(slug)+'&limit=1');
-    var doc = docs.docs?.[0];
+// ── Single Post ───────────────────────────────────────────
+function renderPost(slug) {
+  var main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">加载中...</div>';
+
+  api('/content/article?limit=100').then(function(data){
+    var docs = data.docs || [];
+    var doc = docs.find(function(d){ return d.data?.slug === slug });
     if (!doc) { render404(); return; }
-    main.innerHTML = '<article class="post-single"><h1>'+doc.data?.title+'</h1><time>'+new Date(doc.updatedAt).toLocaleDateString('zh-CN')+'</time><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
-    document.title = (doc.data?.title||'') + ' - ' + (G.site?.name||'Gion');
-  } catch(e) { main.innerHTML = '<p class="error">Failed to load</p>'; }
+    main.innerHTML = '<article class="post-single"><h1>'+escHtml(doc.data?.title||'')+'</h1><time>'+fmtDate(doc.updatedAt)+'</time><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
+    document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Gion');
+    // CTA
+    if (doc.data?.status !== 'published') {
+      main.innerHTML += '<p class="cta-note">此内容未发布。</p>';
+    }
+  }).catch(function(e){ main.innerHTML = '<p class="error">加载失败</p>'; });
 }
 
-async function renderPage(slug) {
-  var main = $('#main');
-  main.innerHTML = '<div class="loading">Loading...</div>';
-  try {
-    var docs = await api('/content/page?search='+encodeURIComponent(slug)+'&limit=1');
-    var doc = docs.docs?.[0];
+// ── Static Page ───────────────────────────────────────────
+function renderPage(slug) {
+  var main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">加载中...</div>';
+
+  api('/content/page?limit=100').then(function(data){
+    var docs = data.docs || [];
+    var doc = docs.find(function(d){ return d.data?.slug === slug });
     if (!doc) { render404(); return; }
-    main.innerHTML = '<article class="post-single"><h1>'+doc.data?.title+'</h1><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
-    document.title = (doc.data?.title||'') + ' - ' + (G.site?.name||'Gion');
-  } catch(e) { main.innerHTML = '<p class="error">Failed to load</p>'; }
+    main.innerHTML = '<article class="post-single"><h1>'+escHtml(doc.data?.title||'')+'</h1><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
+    document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Gion');
+  }).catch(function(e){ main.innerHTML = '<p class="error">加载失败</p>'; });
 }
 
-async function renderCategory(name) {
-  var main = $('#main');
-  main.innerHTML = '<div class="loading">Loading...</div>';
-  try {
-    var docs = await api('/content/article?status=published&limit=50');
-    var filtered = (docs.docs||[]).filter(a => (a.data?.tags||[]).some(t => t.toLowerCase() === name.toLowerCase()) || a.data?.categoryId);
-    var html = '<h1 class="page-title">分类: '+name+'</h1><div class="post-list">';
-    filtered.forEach(a => {
-      var ex = excerpt(a.data?.body);
-      html += '<article class="post-card"><h2><a href="/post/'+(a.data?.slug||a.id)+'">'+(a.data?.title||'Untitled')+'</a></h2><time>'+new Date(a.updatedAt).toLocaleDateString('zh-CN')+'</time><p>'+ex+'</p></article>';
+// ── Category ──────────────────────────────────────────────
+function renderCategory(slug) {
+  var main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">加载中...</div>';
+
+  api('/content/article?status=published&limit=50').then(function(data){
+    var articles = data.docs || [];
+    var name = slug;
+
+    var cats = api('/content/category?limit=50').then(function(cdata){
+      var c = (cdata.docs||[]).find(function(x){ return (x.data?.slug||'') === slug });
+      if (c) name = c.data?.name || slug;
+    });
+
+    cats.then(function(){
+      var filtered = articles.filter(function(a){
+        var tags = a.data?.tags || [];
+        return tags.some(function(t){ return t.toLowerCase() === slug.toLowerCase() }) || a.data?.categoryId;
+      });
+      var html = '<h1 class="page-title">分类: '+escHtml(name)+'</h1><div class="post-list">';
+      filtered.forEach(function(a){
+        var ex = excerpt(a.data?.body);
+        html += '<article class="post-card"><h2><a href="/post/'+(a.data?.slug||a.id)+'">'+escHtml(a.data?.title||'')+'</a></h2><time>'+fmtDate(a.updatedAt)+'</time><p>'+ex+'</p></article>';
+      });
+      html += '</div>';
+      main.innerHTML = html;
+    });
+  }).catch(function(){ main.innerHTML = '<p class="error">加载失败</p>'; });
+}
+
+// ── Search ────────────────────────────────────────────────
+function renderSearch() {
+  var main = document.getElementById('main');
+  var q = (new URL(location.href)).searchParams.get('q') || '';
+  main.innerHTML = '<h1 class="page-title">🔍 搜索</h1><form onsubmit="event.preventDefault();location.href=\'/search?q=\'+encodeURIComponent(this.q.value)" class="search-form"><input name="q" value="'+escAttr(q)+'" class="search-input" placeholder="输入关键词..." autofocus><button class="btn-primary">搜索</button></form><div id="search-results"></div>';
+
+  if (!q) return;
+  document.getElementById('search-results').innerHTML = '<div class="loading">搜索中...</div>';
+
+  api('/search?q='+encodeURIComponent(q)).then(function(data){
+    var docs = data.docs || [];
+    var results = document.getElementById('search-results');
+    if (!docs.length) { results.innerHTML = '<p class="empty">未找到相关结果</p>'; return; }
+    var html = '<div class="post-list">';
+    docs.forEach(function(d){
+      var ex = excerpt(d.data?.body);
+      html += '<article class="post-card"><h2><a href="/post/'+(d.data?.slug||d.id)+'">'+escHtml(d.data?.title||'')+' <small class="score">'+Math.round(d._score*100)+'%</small></a></h2><p>'+ex+'</p></article>';
     });
     html += '</div>';
-    main.innerHTML = html;
-  } catch(e) { main.innerHTML = '<p class="error">Failed to load</p>'; }
+    results.innerHTML = html;
+  }).catch(function(e){ document.getElementById('search-results').innerHTML = '<p class="error">搜索失败</p>'; });
 }
 
+// ── 404 ───────────────────────────────────────────────────
 function render404() {
-  $('#main').innerHTML = '<div class="empty-page"><h1>404</h1><p>Page not found</p><a href="/">Back to Home</a></div>';
+  document.getElementById('main').innerHTML = '<div class="empty-page"><h1>404</h1><p>页面未找到</p><a href="/">返回首页</a></div>';
 }
 
-// ── Body rendering ──
+// ── Body Renderer (TipTap JSON → HTML) ────────────────────
 function renderBody(body) {
   if (!body) return '';
-  if (typeof body === 'string') return '<p>'+escapeHtml(body)+'</p>';
-  // TipTap/ProseMirror JSON
+  if (typeof body === 'string') return '<p>'+escHtml(body)+'</p>';
   if (body.type === 'doc' && Array.isArray(body.content)) {
     return body.content.map(renderNode).join('');
   }
-  if (body.text) return '<p>'+escapeHtml(typeof body.text === 'string' ? body.text : JSON.stringify(body.text))+'</p>';
+  if (body.text) return '<p>'+escHtml(String(body.text||body))+'</p>';
   return '';
 }
 
 function renderNode(node) {
   if (!node) return '';
   var text = '';
-  if (node.content) {
-    text = node.content.map(renderNode).join('');
-  } else if (node.text) {
-    text = escapeHtml(node.text);
-  }
+  if (node.content) text = node.content.map(renderNode).join('');
+  else if (node.text) text = escHtml(String(node.text));
   if (node.marks) {
-    node.marks.forEach(m => {
+    node.marks.forEach(function(m){
       if (m.type === 'bold') text = '<strong>'+text+'</strong>';
       if (m.type === 'italic') text = '<em>'+text+'</em>';
       if (m.type === 'code') text = '<code>'+text+'</code>';
-      if (m.type === 'link') text = '<a href="'+escapeHtml(m.attrs?.href||'#')+'">'+text+'</a>';
+      if (m.type === 'link') text = '<a href="'+escAttr(m.attrs?.href||'#')+'" target="_blank">'+text+'</a>';
+      if (m.type === 'strike') text = '<s>'+text+'</s>';
     });
   }
   switch (node.type) {
-    case 'doc': return text;
     case 'paragraph': return '<p>'+text+'</p>';
     case 'heading': return '<h'+(node.attrs?.level||2)+'>'+text+'</h'+(node.attrs?.level||2)+'>';
     case 'bulletList': return '<ul>'+text+'</ul>';
@@ -200,38 +239,25 @@ function renderNode(node) {
     case 'blockquote': return '<blockquote>'+text+'</blockquote>';
     case 'codeBlock': return '<pre><code>'+text+'</code></pre>';
     case 'horizontalRule': return '<hr>';
-    case 'image': return '<img src="'+escapeHtml(node.attrs?.src||'')+'" alt="'+escapeHtml(node.attrs?.alt||'')+'">';
+    case 'image': return '<img src="'+escAttr(node.attrs?.src||'')+'" alt="'+escAttr(node.attrs?.alt||'')+'" loading="lazy">';
     default: return text;
   }
 }
 
-// ── Utilities ──
+// ── Utils ─────────────────────────────────────────────────
 function excerpt(body) {
-  var text = '';
-  if (typeof body === 'string') text = body;
-  else if (body?.text) text = body.text;
-  else if (body?.content) text = body.content.map(n => n.text||'').join(' ');
-  return text.substring(0, 200) + (text.length > 200 ? '...' : '');
+  if (!body) return '';
+  if (typeof body === 'string') return body.replace(/<[^>]+>/g,'').substring(0,200)+(body.length>200?'...':'');
+  if (body.text) return escHtml(String(body.text)).substring(0,200);
+  if (body.content) return body.content.map(function(n){ return n.text||'' }).join(' ').substring(0,200)+(JSON.stringify(body).length>200?'...':'');
+  return '';
 }
 
-function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function fmtDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'}); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
 
-function buildNav(cats, pages, showHome) {
-  var nav = $('#nav');
-  var html = showHome ? '<a href="/">Home</a>' : '';
-  (cats||[]).slice(0,6).forEach(c => {
-    html += '<a href="/category/'+(c.data?.slug||c.data?.name||c.id)+'">'+(c.data?.name||c.id)+'</a>';
-  });
-  (pages||[]).forEach(p => {
-    html += '<a href="/page/'+(p.data?.slug||p.id)+'">'+(p.data?.title||p.id)+'</a>';
-  });
-  html += '<a href="/admin/">Admin</a>';
-  nav.innerHTML = html;
-}
-
-// ── Bootstrap ──
-injectConfig();
-applyTheme();
+// ── Boot ──────────────────────────────────────────────────
 route();
 })();
 </script>
