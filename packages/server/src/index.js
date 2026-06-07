@@ -25,6 +25,7 @@ import { bootstrap } from './bootstrap.js';
 import { initSearch } from './search.js';
 import { logger } from './logger.js';
 import { loadConfig, getConfig, getConfigWarnings, configSummary } from './config.js';
+import { getWSS } from './websocket.js';
 
 export async function start(configOverrides = {}) {
   const config = loadConfig();
@@ -36,6 +37,21 @@ export async function start(configOverrides = {}) {
 
   // Init vector search index
   await initSearch(ctx.store, ctx.hooks);
+
+  // Init WebSocket for real-time updates
+  const wss = getWSS();
+
+  // Register content change broadcasts via hooks (before attach so hooks are ready)
+  for (const event of ['afterCreate', 'afterUpdate', 'afterDelete']) {
+    ctx.hooks.on(event, async (doc) => {
+      const wsEvent = event.replace('after', '').toLowerCase();
+      wss.broadcast(doc.type || '*', wsEvent, {
+        id: doc.id, type: doc.type, status: doc.status,
+        title: doc.data?.title || doc.data?.name || '',
+        updatedAt: doc.updatedAt
+      });
+    });
+  }
 
   const server = createServer(async (req, res) => {
     try {
@@ -67,6 +83,9 @@ export async function start(configOverrides = {}) {
     }
   });
 
+  // Attach WebSocket to HTTP server
+  wss.attach(server);
+
   server.listen(port, host, () => {
     const startMsg = [
       '',
@@ -86,6 +105,7 @@ export async function start(configOverrides = {}) {
       '',
       `  API:     http://localhost:${port}/api`,
       `  Health:  http://localhost:${port}/api/health`,
+      `  Live:    ws://localhost:${port}`,
       '',
       `  Ready.`,
       ''

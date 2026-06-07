@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Gion WebSocket Test</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family: monospace; background: #0F172A; color: #E2E8F0; padding: 20px; }
+  h1 { font-size: 18px; color: #10B981; margin-bottom: 16px; }
+  .panel { background: #1E293B; border: 1px solid #334155; border-radius: 8px; padding: 16px; margin-bottom: 16px; }
+  .panel h2 { font-size: 14px; color: #94A3B8; margin-bottom: 8px; }
+  .status { display: inline-block; padding: 2px 10px; border-radius: 4px; font-size: 12px; }
+  .connected { background: #065F46; color: #10B981; }
+  .disconnected { background: #7F1D1D; color: #FCA5A5; }
+  .log { max-height: 300px; overflow-y: auto; font-size: 12px; line-height: 1.6; }
+  .log .create { color: #10B981; }
+  .log .update { color: #F59E0B; }
+  .log .delete { color: #EF4444; }
+  .log .info { color: #94A3B8; }
+  button { padding: 6px 16px; border: 1px solid #334155; background: #1E293B; color: #E2E8F0; border-radius: 4px; cursor: pointer; font-size: 12px; margin-right: 8px; margin-bottom: 8px; }
+  button:hover { border-color: #10B981; color: #10B981; }
+  input { padding: 6px 10px; background: #0F172A; border: 1px solid #334155; color: #E2E8F0; border-radius: 4px; font-size: 12px; width: 200px; }
+</style>
+</head>
+<body>
+<h1>⚡ Gion WebSocket Live Test</h1>
+
+<div class="panel">
+  <h2>Connection</h2>
+  <div><span id="ws-status" class="status disconnected">disconnected</span></div>
+  <p style="margin-top:8px;font-size:12px;color:#94A3B8;" id="ws-url"></p>
+</div>
+
+<div class="panel">
+  <h2>Subscribe</h2>
+  <input id="channel" value="article" placeholder="channel name" />
+  <button onclick="subscribe()">Subscribe</button>
+  <button onclick="unsubscribe()">Unsubscribe</button>
+  <button onclick="connect()">Connect</button>
+</div>
+
+<div class="panel">
+  <h2>Events</h2>
+  <div class="log" id="log">
+    <div class="info">Waiting for WebSocket events...</div>
+  </div>
+</div>
+
+<script>
+const protocol = location.protocol === 'https:' ? 'wss:' : 'ws:';
+const wsUrl = `${protocol}//${location.host}`;
+document.getElementById('ws-url').textContent = wsUrl;
+
+let ws = null;
+
+function connect() {
+  if (ws) ws.close();
+  ws = new WebSocket(wsUrl);
+
+  ws.onopen = () => {
+    document.getElementById('ws-status').className = 'status connected';
+    document.getElementById('ws-status').textContent = 'connected';
+    log('info', 'WebSocket connected');
+  };
+
+  ws.onmessage = (e) => {
+    const msg = JSON.parse(e.data);
+    if (msg.type === 'subscribed') {
+      log('info', `Subscribed to "${msg.channel}"`);
+    } else if (msg.type === 'content_change') {
+      log(msg.event, `[${msg.channel}] ${msg.event}: ${msg.doc.title || msg.doc.id}`);
+    }
+  };
+
+  ws.onclose = () => {
+    document.getElementById('ws-status').className = 'status disconnected';
+    document.getElementById('ws-status').textContent = 'disconnected';
+    log('info', 'WebSocket disconnected');
+  };
+
+  ws.onerror = () => log('info', 'WebSocket error');
+}
+
+function subscribe() {
+  const ch = document.getElementById('channel').value || 'article';
+  if (ws) ws.send(JSON.stringify({ type: 'subscribe', channel: ch }));
+}
+
+function unsubscribe() {
+  const ch = document.getElementById('channel').value || 'article';
+  if (ws) ws.send(JSON.stringify({ type: 'unsubscribe', channel: ch }));
+}
+
+function log(ev, msg) {
+  const el = document.getElementById('log');
+  const div = document.createElement('div');
+  div.className = ev;
+  div.textContent = `[${new Date().toLocaleTimeString()}] ${msg}`;
+  el.prepend(div);
+  if (el.children.length > 100) el.removeChild(el.lastChild);
+}
+
+connect();
+</script>
+</body>
+</html>

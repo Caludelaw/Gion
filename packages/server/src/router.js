@@ -12,6 +12,7 @@ import { apiRoutes } from './routes/api.js';
 import { authRoutes } from './routes/auth.js';
 import { graphqlRoutes } from './routes/graphql.js';
 import { mediaRoutes } from './routes/media.js';
+import { collabRoutes } from './routes/collab.js';
 import { serveStatic } from './static.js';
 import { createMediaStore } from './media-store.js';
 import { join, dirname } from 'node:path';
@@ -37,6 +38,11 @@ export async function router(ctx) {
     return graphqlRoutes(ctx);
   }
 
+  // Collaboration & WebSocket
+  if (pathname.startsWith('/api/collab') || pathname === '/api/ws') {
+    return collabRoutes(ctx);
+  }
+
   // Media routes (upload/list/delete)
   if (pathname.startsWith('/api/media')) {
     return mediaRoutes(ctx);
@@ -56,9 +62,14 @@ export async function router(ctx) {
   // Uploaded media files
   if (pathname.startsWith('/uploads/')) {
     const mediaStore = createMediaStore();
-    // Strip /uploads/ prefix to serve from uploadDir root
     const relativePath = pathname.slice('/uploads/'.length);
     const served = await serveStatic(ctx, mediaStore.uploadDir, relativePath);
+    if (served) return;
+  }
+
+  // Public static files (ws-test.html, etc.)
+  {
+    const served = await serveStatic(ctx, PUBLIC_DIR, pathname);
     if (served) return;
   }
 
