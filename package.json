@@ -1,17 +1,19 @@
 {
   "name": "gion",
-  "version": "0.1.0",
-  "private": true,
+  "version": "0.4.0",
+  "private": false,
   "description": "AI Agent-Native CMS — content infrastructure built for the agent era",
   "workspaces": [
     "packages/*"
   ],
+  "bin": {
+    "gion": "scripts/cli.js"
+  },
   "scripts": {
     "dev": "node packages/server/src/index.js",
-    "start": "node packages/server/src/index.js",
-    "build": "node scripts/build.js",
-    "test": "node scripts/test.js",
-    "lint": "node scripts/lint.js",
+    "start": "GION_PUBLIC_READ=1 node packages/server/src/index.js",
+    "build": "cd packages/admin && npx vite build",
+    "test": "node --test packages/core/src/core.test.js packages/core/src/server.test.js",
     "clean": "rm -rf packages/*/dist packages/*/node_modules"
   },
   "engines": {
@@ -27,8 +29,10 @@
     "ai-agent",
     "mcp",
     "content-management",
-    "agent-native"
+    "agent-native",
+    "blog",
+    "static-site"
   ],
-  "author": "Liu Huai'an <liuhuaian@bbgtalk.com>",
+  "author": "Liu Huai'an",
   "license": "MIT"
 }
