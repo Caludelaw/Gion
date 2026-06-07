@@ -18,8 +18,10 @@ import { auditRoutes, revisionRoutes } from './routes/audit.js';
 import { workflowRoutes } from './routes/workflow.js';
 import { wechatRoutes } from './routes/wechat.js';
 import { ssoRoutes } from './routes/sso.js';
+import { themeRoutes } from './routes/theme.js';
 import { serveStatic } from './static.js';
 import { createMediaStore } from './media-store.js';
+import { renderTheme, serveThemeAsset } from './theme-engine.js';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -68,6 +70,11 @@ export async function router(ctx) {
     return ssoRoutes(ctx);
   }
 
+  // Theme management routes
+  if (pathname.startsWith('/api/theme')) {
+    return themeRoutes(ctx);
+  }
+
   // WeChat integration routes
   if (pathname.startsWith('/api/wechat')) {
     return wechatRoutes(ctx);
@@ -103,6 +110,13 @@ export async function router(ctx) {
     if (served) return;
   }
 
+  // Theme static assets
+  if (pathname.startsWith('/theme/')) {
+    const assetPath = pathname.replace('/theme/', '');
+    const served = await serveThemeAsset(ctx, assetPath);
+    if (served) return;
+  }
+
   // Public static files (ws-test.html, etc.)
   {
     const served = await serveStatic(ctx, PUBLIC_DIR, pathname);
@@ -132,6 +146,11 @@ export async function router(ctx) {
       timestamp: new Date().toISOString()
     }));
     return;
+  }
+
+  // Frontend Theme — catch-all for non-API, non-admin paths
+  if (!pathname.startsWith('/api') && !pathname.startsWith('/admin') && !pathname.startsWith('/uploads')) {
+    return renderTheme(ctx);
   }
 
   // 404

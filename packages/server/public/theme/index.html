@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-gion="siteName">Gion CMS</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="/theme/style.css">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="site-logo" data-gion="siteName">Gion</a>
+    <nav class="site-nav" id="nav"></nav>
+  </div>
+</header>
+
+<main class="site-main" id="main"></main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>Powered by <a href="https://github.com/Caludelaw/Gion" target="_blank">Gion CMS</a></p>
+    <p class="icp" id="icp"></p>
+  </div>
+</footer>
+
+<script>
+(function() {
+var G = window.__GION__ || {};
+var $ = (s) => document.querySelector(s);
+
+// ── Config injection ──
+function injectConfig() {
+  document.title = G.site?.name || 'Gion CMS';
+  $('meta[name=description]').content = G.site?.description || '';
+  document.documentElement.lang = G.site?.language || 'zh-CN';
+
+  // Site name
+  document.querySelectorAll('[data-gion=siteName]').forEach(el => el.textContent = G.site?.name || 'Gion');
+
+  // ICP
+  var icp = $('#icp');
+  if (G.site?.icp) { icp.innerHTML = '<a href="https://beian.miit.gov.cn" target="_blank">'+G.site.icp+'</a>' + (G.site.gongan ? ' | <span>'+G.site.gongan+'</span>' : ''); }
+
+  // Analytics
+  if (G.site?.analytics) {
+    var s = document.createElement('script');
+    s.src = 'https://hm.baidu.com/hm.js?'+G.site.analytics;
+    document.head.appendChild(s);
+  }
+}
+
+// ── Theme vars ──
+function applyTheme() {
+  var t = G.theme || {};
+  var root = document.documentElement.style;
+  if (t.primaryColor) root.setProperty('--accent', t.primaryColor);
+  if (t.bgColor) root.setProperty('--bg', t.bgColor);
+  if (t.textColor) root.setProperty('--text', t.textColor);
+  if (t.fontFamily) root.setProperty('--font', t.fontFamily);
+  if (t.fontSize) root.setProperty('--font-size', t.fontSize);
+  if (t.maxWidth) root.setProperty('--max-width', t.maxWidth);
+  if (t.customCSS) {
+    var style = document.createElement('style');
+    style.textContent = t.customCSS;
+    document.head.appendChild(style);
+  }
+}
+
+// ── API helper ──
+async function api(path) {
+  var res = await fetch('/api'+path);
+  return res.json();
+}
+
+// ── Router ──
+var routes = {
+  '/': renderHome,
+  '/post/': renderPost,
+  '/page/': renderPage,
+  '/category/': renderCategory,
+  '/search': renderSearch
+};
+
+async function route() {
+  var path = location.pathname;
+  if (path === '/') return renderHome();
+  if (path.startsWith('/post/')) return renderPost(path.split('/')[2]);
+  if (path.startsWith('/page/')) return renderPage(path.split('/')[2]);
+  if (path.startsWith('/category/')) return renderCategory(path.split('/')[2]);
+  render404();
+}
+
+// ── Pages ──
+async function renderHome() {
+  var main = $('#main');
+  main.innerHTML = '<div class="loading">Loading...</div>';
+
+  try {
+    var articles = await api('/content/article?status=published&limit=10');
+    var pages = await api('/content/page?status=published&limit=10');
+    var cats = await api('/content/category?limit=20');
+
+    var catsById = {};
+    (cats.docs||[]).forEach(c => catsById[c.id] = c.data?.name || c.id);
+
+    var html = '<div class="post-list">';
+    (articles.docs||[]).forEach(a => {
+      var ex = excerpt(a.data?.body);
+      var date = a.updatedAt ? new Date(a.updatedAt).toLocaleDateString('zh-CN') : '';
+      html += '<article class="post-card"><h2><a href="/post/'+(a.data?.slug||a.id)+'">'+(a.data?.title||'Untitled')+'</a></h2><time>'+date+'</time><p>'+ex+'</p></article>';
+    });
+    html += '</div>';
+    main.innerHTML = html;
+
+    // Build nav
+    buildNav(cats.docs||[], pages.docs||[], true);
+  } catch(e) { main.innerHTML = '<p class="error">Failed to load</p>'; }
+}
+
+async function renderPost(slug) {
+  var main = $('#main');
+  main.innerHTML = '<div class="loading">Loading...</div>';
+  try {
+    var docs = await api('/content/article?search='+encodeURIComponent(slug)+'&limit=1');
+    var doc = docs.docs?.[0];
+    if (!doc) { render404(); return; }
+    main.innerHTML = '<article class="post-single"><h1>'+doc.data?.title+'</h1><time>'+new Date(doc.updatedAt).toLocaleDateString('zh-CN')+'</time><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
+    document.title = (doc.data?.title||'') + ' - ' + (G.site?.name||'Gion');
+  } catch(e) { main.innerHTML = '<p class="error">Failed to load</p>'; }
+}
+
+async function renderPage(slug) {
+  var main = $('#main');
+  main.innerHTML = '<div class="loading">Loading...</div>';
+  try {
+    var docs = await api('/content/page?search='+encodeURIComponent(slug)+'&limit=1');
+    var doc = docs.docs?.[0];
+    if (!doc) { render404(); return; }
+    main.innerHTML = '<article class="post-single"><h1>'+doc.data?.title+'</h1><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
+    document.title = (doc.data?.title||'') + ' - ' + (G.site?.name||'Gion');
+  } catch(e) { main.innerHTML = '<p class="error">Failed to load</p>'; }
+}
+
+async function renderCategory(name) {
+  var main = $('#main');
+  main.innerHTML = '<div class="loading">Loading...</div>';
+  try {
+    var docs = await api('/content/article?status=published&limit=50');
+    var filtered = (docs.docs||[]).filter(a => (a.data?.tags||[]).some(t => t.toLowerCase() === name.toLowerCase()) || a.data?.categoryId);
+    var html = '<h1 class="page-title">分类: '+name+'</h1><div class="post-list">';
+    filtered.forEach(a => {
+      var ex = excerpt(a.data?.body);
+      html += '<article class="post-card"><h2><a href="/post/'+(a.data?.slug||a.id)+'">'+(a.data?.title||'Untitled')+'</a></h2><time>'+new Date(a.updatedAt).toLocaleDateString('zh-CN')+'</time><p>'+ex+'</p></article>';
+    });
+    html += '</div>';
+    main.innerHTML = html;
+  } catch(e) { main.innerHTML = '<p class="error">Failed to load</p>'; }
+}
+
+function render404() {
+  $('#main').innerHTML = '<div class="empty-page"><h1>404</h1><p>Page not found</p><a href="/">Back to Home</a></div>';
+}
+
+// ── Body rendering ──
+function renderBody(body) {
+  if (!body) return '';
+  if (typeof body === 'string') return '<p>'+escapeHtml(body)+'</p>';
+  // TipTap/ProseMirror JSON
+  if (body.type === 'doc' && Array.isArray(body.content)) {
+    return body.content.map(renderNode).join('');
+  }
+  if (body.text) return '<p>'+escapeHtml(typeof body.text === 'string' ? body.text : JSON.stringify(body.text))+'</p>';
+  return '';
+}
+
+function renderNode(node) {
+  if (!node) return '';
+  var text = '';
+  if (node.content) {
+    text = node.content.map(renderNode).join('');
+  } else if (node.text) {
+    text = escapeHtml(node.text);
+  }
+  if (node.marks) {
+    node.marks.forEach(m => {
+      if (m.type === 'bold') text = '<strong>'+text+'</strong>';
+      if (m.type === 'italic') text = '<em>'+text+'</em>';
+      if (m.type === 'code') text = '<code>'+text+'</code>';
+      if (m.type === 'link') text = '<a href="'+escapeHtml(m.attrs?.href||'#')+'">'+text+'</a>';
+    });
+  }
+  switch (node.type) {
+    case 'doc': return text;
+    case 'paragraph': return '<p>'+text+'</p>';
+    case 'heading': return '<h'+(node.attrs?.level||2)+'>'+text+'</h'+(node.attrs?.level||2)+'>';
+    case 'bulletList': return '<ul>'+text+'</ul>';
+    case 'orderedList': return '<ol>'+text+'</ol>';
+    case 'listItem': return '<li>'+text+'</li>';
+    case 'blockquote': return '<blockquote>'+text+'</blockquote>';
+    case 'codeBlock': return '<pre><code>'+text+'</code></pre>';
+    case 'horizontalRule': return '<hr>';
+    case 'image': return '<img src="'+escapeHtml(node.attrs?.src||'')+'" alt="'+escapeHtml(node.attrs?.alt||'')+'">';
+    default: return text;
+  }
+}
+
+// ── Utilities ──
+function excerpt(body) {
+  var text = '';
+  if (typeof body === 'string') text = body;
+  else if (body?.text) text = body.text;
+  else if (body?.content) text = body.content.map(n => n.text||'').join(' ');
+  return text.substring(0, 200) + (text.length > 200 ? '...' : '');
+}
+
+function escapeHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+
+function buildNav(cats, pages, showHome) {
+  var nav = $('#nav');
+  var html = showHome ? '<a href="/">Home</a>' : '';
+  (cats||[]).slice(0,6).forEach(c => {
+    html += '<a href="/category/'+(c.data?.slug||c.data?.name||c.id)+'">'+(c.data?.name||c.id)+'</a>';
+  });
+  (pages||[]).forEach(p => {
+    html += '<a href="/page/'+(p.data?.slug||p.id)+'">'+(p.data?.title||p.id)+'</a>';
+  });
+  html += '<a href="/admin/">Admin</a>';
+  nav.innerHTML = html;
+}
+
+// ── Bootstrap ──
+injectConfig();
+applyTheme();
+route();
+})();
+</script>
+</body>
+</html>

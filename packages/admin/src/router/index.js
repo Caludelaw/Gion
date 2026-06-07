@@ -16,6 +16,7 @@ import Revisions from '../views/Revisions.vue'
 import Users from '../views/Users.vue'
 import Categories from '../views/Categories.vue'
 import Theme from '../views/Theme.vue'
+import ThemeManager from '../views/ThemeManager.vue'
 
 const routes = [
   { path: '/login', component: Login, meta: { public: true } },
@@ -34,7 +35,8 @@ const routes = [
   { path: '/workflow', component: Workflow },
   { path: '/users', component: Users },
   { path: '/categories', component: Categories },
-  { path: '/theme', component: Theme }
+  { path: '/theme', component: Theme },
+  { path: '/theme-manager', component: ThemeManager }
 ]
 
 const router = createRouter({

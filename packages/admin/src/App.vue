@@ -16,6 +16,7 @@
         <router-link to="/webhooks" class="nav-item">🔗 Webhooks</router-link>
         <router-link to="/settings" class="nav-item">⚙️ 站点配置</router-link>
         <router-link to="/theme" class="nav-item">🎨 外观主题</router-link>
+        <router-link to="/theme-manager" class="nav-item">📦 主题管理</router-link>
 
         <div class="nav-section">安全</div>
         <router-link to="/audit" class="nav-item">📋 审计日志</router-link>
