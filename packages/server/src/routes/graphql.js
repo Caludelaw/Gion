@@ -229,6 +229,14 @@ export async function graphqlRoutes(ctx) {
       ctx.actor = authResult.actor;
     }
 
+    // Validate query depth (prevent DoS via deeply nested queries)
+    const maxDepth = parseInt(process.env.GION_GRAPHQL_MAX_DEPTH) || 5;
+    if (estimateQueryDepth(query) > maxDepth) {
+      ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ errors: [{ message: `Query depth exceeds maximum of ${maxDepth}` }] }));
+      return;
+    }
+
     try {
       const result = await graphql({
         schema: s,
@@ -246,6 +254,19 @@ export async function graphqlRoutes(ctx) {
     }
     return;
   }
+}
+
+/**
+ * Estimate query depth to prevent deeply nested DoS attacks.
+ * Simple bracket-based heuristic.
+ */
+function estimateQueryDepth(query) {
+  let depth = 0, maxDepth = 0;
+  for (const ch of query) {
+    if (ch === '{') { depth++; maxDepth = Math.max(maxDepth, depth); }
+    if (ch === '}') depth--;
+  }
+  return maxDepth;
 }
 
 // ─── GraphiQL HTML ────────────────────────────────────────

@@ -111,12 +111,24 @@ export async function router(ctx) {
 
   // Health check
   if (pathname === '/health') {
+    const mem = process.memoryUsage();
+    const { getWSS } = await import('./websocket.js');
+    const { getConfig } = await import('./config.js');
+    const cfg = getConfig();
     ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
     ctx.res.end(JSON.stringify({
       status: 'ok',
       name: 'gion',
-      version: ctx.config.version || '0.1.0',
-      uptime: process.uptime(),
+      version: cfg.version,
+      uptime: Math.floor(process.uptime()),
+      node: process.version,
+      env: cfg.nodeEnv,
+      store: cfg.storage,
+      memory: {
+        rss: Math.round(mem.rss / 1024 / 1024) + 'MB',
+        heapUsed: Math.round(mem.heapUsed / 1024 / 1024) + 'MB'
+      },
+      ws: getWSS().getStats(),
       timestamp: new Date().toISOString()
     }));
     return;

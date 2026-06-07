@@ -153,7 +153,10 @@ export function bootstrap() {
       gonganNumber:    { type: 'string' },
       analyticsId:     { type: 'string' },
       language:        { type: 'string' },
-      timezone:        { type: 'string' }
+      timezone:        { type: 'string' },
+      seoTitle:        { type: 'string' },
+      seoDescription:  { type: 'string' },
+      seoKeywords:     { type: 'array', items: { type: 'string' } }
     }
   }));
 
