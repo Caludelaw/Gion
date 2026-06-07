@@ -5,7 +5,7 @@
  * GET /sitemap.xml — XML sitemap for search engines
  */
 
-import { getStore } from './context.js';
+import { getStore } from '../context.js';
 
 export async function rssSitemapRoutes(ctx) {
   const { pathname } = ctx.url;
