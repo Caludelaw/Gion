@@ -27,6 +27,7 @@ import { logger } from './logger.js';
 import { loadConfig, getConfig, getConfigWarnings, configSummary } from './config.js';
 import { getWSS } from './websocket.js';
 import { getWebhookManager } from './webhook.js';
+import { rateLimit } from './middleware/rate-limit.js';
 
 export async function start(configOverrides = {}) {
   const config = loadConfig();
@@ -75,6 +76,12 @@ export async function start(configOverrides = {}) {
 
       // 2. Parse URL
       const url = new URL(req.url, `http://${req.headers.host || 'localhost'}`);
+
+      // 3. Rate limit (skip for health, static files)
+      if (!url.pathname.startsWith('/admin') && !url.pathname.startsWith('/uploads') && url.pathname !== '/health' && url.pathname !== '/ws-test.html') {
+        const ctx = { req, res, url };
+        if (!rateLimit(ctx)) return; // 429 already written
+      }
 
       // 3. Parse body (for POST/PUT/PATCH)
       let body = null;

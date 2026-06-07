@@ -1,0 +1,11 @@
+{
+  "app": { "title": "Gion CMS", "logo": "⚡ Gion" },
+  "nav": { "dashboard": "仪表盘", "media": "媒体库", "apikeys": "API Keys", "logout": "退出" },
+  "login": { "title": "登录", "username": "用户名", "password": "密码", "submit": "登录", "register_link": "注册账号", "error_invalid": "用户名或密码错误" },
+  "register": { "title": "注册", "username": "用户名", "email": "邮箱", "password": "密码", "submit": "注册", "login_link": "已有账号？去登录", "error_taken": "用户名已被占用" },
+  "dashboard": { "title": "仪表盘", "welcome": "欢迎使用 Gion CMS", "total_content": "内容总数", "content_types": "内容类型", "recent": "最近更新" },
+  "content": { "title": "内容", "new": "新建", "edit": "编辑", "save_draft": "保存草稿", "publish": "发布", "delete": "删除", "delete_confirm": "确认删除？", "field_title": "标题", "field_slug": "Slug", "field_body": "正文", "field_status": "状态", "no_items": "暂无内容", "create_first": "创建第一篇内容" },
+  "media": { "title": "媒体库", "upload": "上传文件", "uploading": "上传中...", "copy_url": "复制链接", "delete": "删除", "no_items": "暂无媒体文件", "size_label": "大小", "url_copied": "链接已复制" },
+  "apikeys": { "title": "API Keys", "generate": "生成新 Key", "label": "标签", "scopes": "权限范围", "prefix": "前缀", "created": "创建时间", "revoke": "撤销", "revoke_confirm": "撤销后该 Key 立即失效，确认？", "copy_warning": "⚠️ 复制此 Key，关闭后不可查看", "no_keys": "暂无 API Key", "scope_all": "全部权限", "scope_read": "只读", "scope_hint": "默认：只读所有内容。选中 \"*:*\" 为管理员权限。" },
+  "common": { "save": "保存", "cancel": "取消", "confirm": "确认", "loading": "加载中...", "error": "错误", "back": "返回", "search": "搜索", "no_results": "无结果" }
+}

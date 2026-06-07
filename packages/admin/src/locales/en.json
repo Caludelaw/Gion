@@ -1,0 +1,86 @@
+{
+  "app": {
+    "title": "Gion CMS",
+    "logo": "⚡ Gion"
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "media": "Media Library",
+    "apikeys": "API Keys",
+    "logout": "Logout"
+  },
+  "login": {
+    "title": "Login",
+    "username": "Username",
+    "password": "Password",
+    "submit": "Login",
+    "register_link": "Create account",
+    "error_invalid": "Invalid username or password"
+  },
+  "register": {
+    "title": "Register",
+    "username": "Username",
+    "email": "Email",
+    "password": "Password",
+    "submit": "Register",
+    "login_link": "Already have an account? Login",
+    "error_taken": "Username already taken"
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "welcome": "Welcome to Gion CMS",
+    "total_content": "Total Content",
+    "content_types": "Content Types",
+    "recent": "Recent Updates"
+  },
+  "content": {
+    "title": "Content",
+    "new": "New",
+    "edit": "Edit",
+    "save_draft": "Save Draft",
+    "publish": "Publish",
+    "delete": "Delete",
+    "delete_confirm": "Delete this item?",
+    "field_title": "Title",
+    "field_slug": "Slug",
+    "field_body": "Body",
+    "field_status": "Status",
+    "no_items": "No content yet",
+    "create_first": "Create your first item"
+  },
+  "media": {
+    "title": "Media Library",
+    "upload": "Upload File",
+    "uploading": "Uploading...",
+    "copy_url": "Copy URL",
+    "delete": "Delete",
+    "no_items": "No media files yet",
+    "size_label": "Size",
+    "url_copied": "URL copied"
+  },
+  "apikeys": {
+    "title": "API Keys",
+    "generate": "Generate New Key",
+    "label": "Label",
+    "scopes": "Scopes",
+    "prefix": "Prefix",
+    "created": "Created",
+    "revoke": "Revoke",
+    "revoke_confirm": "This key will be permanently revoked. Continue?",
+    "copy_warning": "Copy this key now — it will not be shown again",
+    "no_keys": "No API keys yet",
+    "scope_all": "All Permissions",
+    "scope_read": "Read Only",
+    "scope_hint": "Default: read all. Select \"*:*\" for admin."
+  },
+  "common": {
+    "save": "Save",
+    "cancel": "Cancel",
+    "confirm": "Confirm",
+    "loading": "Loading...",
+    "error": "Error",
+    "back": "Back",
+    "search": "Search",
+    "no_results": "No results"
+  }
+}
