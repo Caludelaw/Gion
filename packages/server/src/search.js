@@ -6,6 +6,7 @@
  */
 
 import { TFIDFIndex } from '../../core/src/vector-index.js';
+import { tryLoadJieba, setTokenizer } from '../../core/src/tokenizer.js';
 
 let index = null;
 
@@ -16,6 +17,15 @@ let index = null;
  */
 export async function initSearch(store, hooks) {
   index = new TFIDFIndex();
+
+  // Try to load jieba for Chinese tokenization (optional)
+  const jieba = await tryLoadJieba();
+  if (jieba) {
+    setTokenizer(jieba);
+    console.log('  Search: jieba Chinese tokenizer loaded');
+  } else {
+    console.log('  Search: using n-gram tokenizer (install nodejieba for better Chinese search)');
+  }
 
   // Index all existing documents
   const allTypes = ['article', 'page', 'category', 'media', 'author'];

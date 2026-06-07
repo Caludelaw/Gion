@@ -1,0 +1,9 @@
+{
+  "name": "@gion/llm-providers",
+  "version": "0.1.0",
+  "type": "module",
+  "description": "LLM Provider abstraction for Gion CMS — supports Qwen, ERNIE, DeepSeek, Moonshot, and OpenAI-compatible APIs",
+  "main": "src/index.js",
+  "keywords": ["gion", "llm", "qwen", "ernie", "deepseek", "moonshot"],
+  "license": "MIT"
+}

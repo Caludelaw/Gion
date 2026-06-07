@@ -65,11 +65,15 @@ export function createHookSystem() {
     let result = payload;
     for (const entry of handlers) {
       try {
-        result = await entry.fn(result, context);
+        const returned = await entry.fn(result, context);
         // If a handler returns null explicitly, stop the chain
-        if (result === null) {
+        if (returned === null) {
           context._stoppedAt = name;
           break;
+        }
+        // Only update if handler returned a value (allows pass-through for side-effect handlers)
+        if (returned !== undefined) {
+          result = returned;
         }
       } catch (err) {
         // Re-throw with hook context
