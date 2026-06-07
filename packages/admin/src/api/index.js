@@ -4,7 +4,6 @@ async function request(path, options = {}) {
   const token = localStorage.getItem('gion_token')
   const headers = { 'Content-Type': 'application/json', ...options.headers }
   if (token) headers['Authorization'] = `Bearer ${token}`
-
   const res = await fetch(BASE + path, { ...options, headers })
   const data = await res.json()
   if (!res.ok) throw new Error(data.message || res.statusText)
@@ -20,16 +19,16 @@ export const api = {
   revokeApiKey: (prefix) => request(`/auth/apikeys/${prefix}`, { method: 'DELETE' }),
 
   // Content
-  list: (type, params = {}) => {
+  listContent: (type, params = {}) => {
     const q = new URLSearchParams(params).toString()
     return request(`/content/${type}${q ? '?' + q : ''}`)
   },
-  get: (type, id) => request(`/content/${type}/${id}`),
-  create: (type, data, status = 'draft') =>
+  getContent: (type, id) => request(`/content/${type}/${id}`),
+  createContent: (type, data, status = 'draft') =>
     request(`/content/${type}`, { method: 'POST', body: JSON.stringify({ data, status }) }),
-  update: (type, id, data) =>
+  updateContent: (type, id, data) =>
     request(`/content/${type}/${id}`, { method: 'PUT', body: JSON.stringify({ data }) }),
-  delete: (type, id) =>
+  deleteContent: (type, id) =>
     request(`/content/${type}/${id}`, { method: 'DELETE' }),
 
   // Content Types
@@ -58,5 +57,41 @@ export const api = {
   deleteMedia: (id) => request(`/media/${id}`, { method: 'DELETE' }),
 
   // Health
-  health: () => request('/health')
+  health: () => request('/health'),
+
+  // Settings
+  getSettings: () => request('/site-settings'),
+
+  // Audit
+  getAuditLog: (params = {}) => {
+    const q = new URLSearchParams(params).toString()
+    return request(`/audit${q ? '?' + q : ''}`)
+  },
+
+  // Webhooks
+  getWebhooks: () => request('/webhooks'),
+
+  // Pipelines
+  getPipelines: () => request('/pipelines'),
+
+  // Revisions
+  getRevisions: (type, id) => request(`/content/${type}/${id}/revisions`),
+
+  // Collaboration
+  getCollabSessions: () => request('/collab/sessions'),
+  acquireCollab: (docId) => request(`/collab/sessions/${docId}`, { method: 'POST' }),
+  releaseCollab: (docId) => request(`/collab/sessions/${docId}`, { method: 'DELETE' }),
+
+  // Workflow
+  requestReview: (docId) => request(`/workflow/request/${docId}`, { method: 'POST' }),
+  approveReview: (docId, body) => request(`/workflow/approve/${docId}`, { method: 'POST', body: JSON.stringify(body) }),
+  rejectReview: (docId, body) => request(`/workflow/reject/${docId}`, { method: 'POST', body: JSON.stringify(body) }),
+  getWorkflowStatus: (docId) => request(`/workflow/status/${docId}`),
+
+  // Aliases (backward compat)
+  get list() { return this.listContent },
+  get get() { return this.getContent },
+  get create() { return this.createContent },
+  get update() { return this.updateContent },
+  get delete() { return this.deleteContent },
 }

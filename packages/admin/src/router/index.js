@@ -7,6 +7,12 @@ import ContentList from '../views/ContentList.vue'
 import ContentEdit from '../views/ContentEdit.vue'
 import ApiKeys from '../views/ApiKeys.vue'
 import Media from '../views/Media.vue'
+import Settings from '../views/Settings.vue'
+import AuditLog from '../views/AuditLog.vue'
+import Webhooks from '../views/Webhooks.vue'
+import Pipelines from '../views/Pipelines.vue'
+import Workflow from '../views/Workflow.vue'
+import Revisions from '../views/Revisions.vue'
 
 const routes = [
   { path: '/login', component: Login, meta: { public: true } },
@@ -15,8 +21,14 @@ const routes = [
   { path: '/content/:type', component: ContentList, props: true },
   { path: '/content/:type/new', component: ContentEdit, props: true },
   { path: '/content/:type/:id', component: ContentEdit, props: true },
+  { path: '/content/:type/:id/revisions', component: Revisions, props: true },
   { path: '/apikeys', component: ApiKeys },
-  { path: '/media', component: Media }
+  { path: '/media', component: Media },
+  { path: '/settings', component: Settings },
+  { path: '/audit', component: AuditLog },
+  { path: '/webhooks', component: Webhooks },
+  { path: '/pipelines', component: Pipelines },
+  { path: '/workflow', component: Workflow }
 ]
 
 const router = createRouter({
