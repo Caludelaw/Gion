@@ -15,6 +15,8 @@ import { mediaRoutes } from './routes/media.js';
 import { collabRoutes } from './routes/collab.js';
 import { webhookRoutes } from './routes/webhook.js';
 import { auditRoutes, revisionRoutes } from './routes/audit.js';
+import { workflowRoutes } from './routes/workflow.js';
+import { ssoRoutes } from './routes/sso.js';
 import { serveStatic } from './static.js';
 import { createMediaStore } from './media-store.js';
 import { join, dirname } from 'node:path';
@@ -53,6 +55,16 @@ export async function router(ctx) {
   // Audit, pipelines, site settings
   if (pathname.startsWith('/api/audit') || pathname.startsWith('/api/pipelines') || pathname === '/api/site-settings') {
     return auditRoutes(ctx);
+  }
+
+  // Workflow routes (review/approve/reject)
+  if (pathname.startsWith('/api/workflow')) {
+    return workflowRoutes(ctx);
+  }
+
+  // SSO routes
+  if (pathname.startsWith('/api/sso')) {
+    return ssoRoutes(ctx);
   }
 
   // Media routes (upload/list/delete)
