@@ -338,4 +338,69 @@ describe('GionError', () => {
     assert.equal(json.message, 'Invalid title');
     assert.equal(json.status, 400);
   });
+
+  it('should report type conflicts', () => {
+    try {
+      new ConflictError('duplicate');
+      assert.ok(true);
+    } catch {
+      assert.fail('Should not throw');
+    }
+  });
+});
+
+// ════════════════════════════════════════════════════════════
+// Tokenizer
+// ════════════════════════════════════════════════════════════
+
+describe('Tokenizer', () => {
+  it('should tokenize Chinese text (n-gram fallback)', async () => {
+    const { tokenize } = await import('./tokenizer.js');
+    const tokens = tokenize('人工智能正在改变内容管理');
+    assert.ok(tokens.length > 0);
+    // Should find 2-grams like 人工, 工智, 智能 etc.
+    assert.ok(tokens.includes('智能'));
+  });
+
+  it('should tokenize English text', async () => {
+    const { tokenize } = await import('./tokenizer.js');
+    const tokens = tokenize('AI is changing content management');
+    assert.ok(tokens.includes('changing'));
+    assert.ok(tokens.includes('content'));
+  });
+
+  it('should filter stopwords', async () => {
+    const { tokenize } = await import('./tokenizer.js');
+    const tokens = tokenize('这是一个测试内容');
+    assert.ok(!tokens.includes('了'));
+    assert.ok(!tokens.includes('的'));
+  });
+});
+
+// ════════════════════════════════════════════════════════════
+// Vector Index
+// ════════════════════════════════════════════════════════════
+
+describe('VectorIndex', () => {
+  it('should index and search documents', async () => {
+    const { TFIDFIndex } = await import('./vector-index.js');
+    const idx = new TFIDFIndex();
+    idx.add('1', 'artificial intelligence content management');
+    idx.add('2', 'machine learning deep learning neural networks');
+    idx.add('3', 'content management system headless cms');
+
+    const results = idx.search('content management system');
+    assert.ok(results.length > 0);
+    // '3' has "content management system headless cms" — most relevant
+    assert.equal(results[0].docId, '3');
+  });
+
+  it('should return empty for no match', async () => {
+    const { TFIDFIndex } = await import('./vector-index.js');
+    const idx = new TFIDFIndex();
+    idx.add('1', 'hello world');
+
+    const results = idx.search('zzz');
+    assert.equal(results.length, 0);
+  });
 });

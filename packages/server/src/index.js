@@ -151,6 +151,26 @@ export async function start(configOverrides = {}) {
     console.log(startMsg);
   });
 
+  // Graceful shutdown
+  const shutdown = async (signal) => {
+    logger.info(`${signal} received. Shutting down...`);
+    wss.close();
+    server.close(() => {
+      logger.info('HTTP server closed');
+      // Flush store if needed
+      if (ctx.store.flush) {
+        ctx.store.flush().then(() => process.exit(0)).catch(() => process.exit(0));
+      } else {
+        process.exit(0);
+      }
+    });
+    // Force exit after 10s
+    setTimeout(() => process.exit(1), 10000);
+  };
+
+  process.on('SIGTERM', () => shutdown('SIGTERM'));
+  process.on('SIGINT', () => shutdown('SIGINT'));
+
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
       console.error(`Port ${port} is already in use. Try: GION_PORT=${port + 1} npm start`);
