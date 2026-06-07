@@ -3,7 +3,7 @@
  *
  * 两种认证方式：
  *   Bearer <JWT>        → 解析 JWT，识别人类用户
- *   X-Gion-Agent-Key    → 匹配 API Key，识别 AI Agent
+ *   X-Taichu-Agent-Key    → 匹配 API Key，识别 AI Agent
  *
  * 使用：
  *   const result = await requireAuth(ctx);
@@ -24,10 +24,10 @@ let _jwtSecret = null;
  * Get or auto-generate a JWT secret.
  *
  * Priority:
- *   1. GION_JWT_SECRET environment variable
- *   2. Auto-generated secret persisted to .gion/data/.jwt_secret
+ *   1. TAICHU_JWT_SECRET environment variable
+ *   2. Auto-generated secret persisted to .taichu/data/.jwt_secret
  *
- * The hardcoded default 'gion-dev-secret' is explicitly rejected.
+ * The hardcoded default 'taichu-dev-secret' is explicitly rejected.
  *
  * @returns {string}
  */
@@ -35,14 +35,14 @@ export function getJwtSecret() {
   if (_jwtSecret) return _jwtSecret;
 
   // 1. Environment variable
-  const envSecret = process.env.GION_JWT_SECRET;
-  if (envSecret && envSecret !== 'gion-dev-secret' && envSecret !== 'change-me') {
+  const envSecret = process.env.TAICHU_JWT_SECRET;
+  if (envSecret && envSecret !== 'taichu-dev-secret' && envSecret !== 'change-me') {
     _jwtSecret = envSecret;
     return _jwtSecret;
   }
 
   // 2. Auto-generate and persist
-  const dataDir = process.env.GION_DATA_DIR || join(process.cwd(), '.gion', 'data');
+  const dataDir = process.env.TAICHU_DATA_DIR || join(process.cwd(), '.taichu', 'data');
   const secretFile = join(dataDir, '.jwt_secret');
 
   if (existsSync(secretFile)) {
@@ -69,7 +69,7 @@ export function getJwtSecret() {
  */
 export async function requireAuth(ctx) {
   const authHeader = ctx.req.headers['authorization'];
-  const agentKey = ctx.req.headers['x-gion-agent-key'];
+  const agentKey = ctx.req.headers['x-taichu-agent-key'];
 
   // ── JWT Auth (Human) ──
   if (authHeader && authHeader.startsWith('Bearer ')) {

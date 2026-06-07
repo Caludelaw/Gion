@@ -1,6 +1,6 @@
-# Contributing to Gion
+# Contributing to Taichu
 
-Thanks for your interest in contributing! Gion is an open-source, community-driven project. This guide will help you get started.
+Thanks for your interest in contributing! Taichu is an open-source, community-driven project. This guide will help you get started.
 
 ## Code of Conduct
 
@@ -10,7 +10,7 @@ All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md). Be respe
 
 ### Reporting Bugs
 
-1. Check [existing issues](https://github.com/liuhuaian/gion/issues) to avoid duplicates
+1. Check [existing issues](https://github.com/liuhuaian/taichu/issues) to avoid duplicates
 2. Use the **Bug Report** template when creating a new issue
 3. Include:
    - Node.js version (`node --version`)
@@ -30,7 +30,7 @@ All contributors must follow our [Code of Conduct](CODE_OF_CONDUCT.md). Be respe
 
 ### Architecture Decisions
 
-Gion uses **Architecture Decision Records (ADRs)** to document significant technical choices. See [docs/architecture/](docs/architecture/) for existing decisions. If your contribution involves a significant architectural change, propose an ADR first.
+Taichu uses **Architecture Decision Records (ADRs)** to document significant technical choices. See [docs/architecture/](docs/architecture/) for existing decisions. If your contribution involves a significant architectural change, propose an ADR first.
 
 ### Pull Requests
 
@@ -44,8 +44,8 @@ Gion uses **Architecture Decision Records (ADRs)** to document significant techn
 
 ```bash
 # Fork & clone
-git clone https://github.com/YOUR_USERNAME/gion.git
-cd gion
+git clone https://github.com/YOUR_USERNAME/taichu.git
+cd taichu
 
 # Start development server
 npm start
@@ -59,7 +59,7 @@ npm run lint
 
 #### Code Standards
 
-- **No external dependencies in `@gion/core`** — core must remain zero-dependency
+- **No external dependencies in `@taichu/core`** — core must remain zero-dependency
 - **ES modules only** — use `import`/`export`, not `require`
 - **JSDoc for public APIs** — everything exported should have type annotations
 - **2-space indentation** — see `.editorconfig`
@@ -93,7 +93,7 @@ Your PR will be evaluated on:
 - **Correctness** — does it work as described?
 - **Simplicity** — is the implementation the simplest possible?
 - **Test coverage** — are edge cases covered?
-- **Architecture alignment** — does it follow Gion's design philosophy?
+- **Architecture alignment** — does it follow Taichu's design philosophy?
 - **Documentation** — are public APIs documented?
 
 ### First-Time Contributors
@@ -105,16 +105,16 @@ Look for issues tagged `good first issue` — these are specifically curated for
 
 ## Project Philosophy
 
-Before contributing, understand what Gion is — and isn't:
+Before contributing, understand what Taichu is — and isn't:
 
-### Gion Is:
+### Taichu Is:
 - A content infrastructure for the AI agent era
 - Structured, semantic, API-first
 - Agent-native: permissions, pipelines, audit trails
 - Zero-dependency core
 - Modular: pluggable storage, renderers, extensions
 
-### Gion Is NOT:
+### Taichu Is NOT:
 - A WordPress clone with AI features bolted on
 - A general-purpose web framework
 - A blogging platform per se (though it can serve that use case)
@@ -126,7 +126,7 @@ Before contributing, understand what Gion is — and isn't:
 - **Discussions**: Architecture debates, RFC proposals, community Q&A
 - **Pull Requests**: Code contributions
 
-Maintainers aim to respond within 3 business days. Please be patient — Gion is a community project maintained by volunteers.
+Maintainers aim to respond within 3 business days. Please be patient — Taichu is a community project maintained by volunteers.
 
 ---
 

@@ -30,7 +30,7 @@ export async function handleOIDC(provider, config) {
 
 export function getSSOProviders() {
   const providers = [];
-  if (process.env.GION_SSO_OIDC_CLIENT_ID) {
+  if (process.env.TAICHU_SSO_OIDC_CLIENT_ID) {
     providers.push({
       name: 'oidc',
       label: 'OIDC / OAuth 2.0',
@@ -38,7 +38,7 @@ export function getSSOProviders() {
       loginUrl: '/api/sso/oidc'
     });
   }
-  if (process.env.GION_SSO_LDAP_URL) {
+  if (process.env.TAICHU_SSO_LDAP_URL) {
     providers.push({
       name: 'ldap',
       label: 'LDAP / Active Directory',
@@ -70,7 +70,7 @@ const ANALYTICS = {
 
 export function getAnalyticsScript(provider, id) {
   const p = ANALYTICS[provider];
-  return p ? p.script(id, process.env.GION_ANALYTICS_WEBSITE_ID) : '';
+  return p ? p.script(id, process.env.TAICHU_ANALYTICS_WEBSITE_ID) : '';
 }
 
 export function getAnalyticsProviders() {

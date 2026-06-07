@@ -10,7 +10,7 @@ import { createLogger } from './logger.js';
 import { randomUUID } from 'node:crypto';
 
 const log = createLogger('revision');
-const MAX_REVISIONS = parseInt(process.env.GION_MAX_REVISIONS) || 100;
+const MAX_REVISIONS = parseInt(process.env.TAICHU_MAX_REVISIONS) || 100;
 
 /**
  * Snapshot a document revision.

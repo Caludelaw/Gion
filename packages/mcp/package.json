@@ -1,10 +1,10 @@
 {
-  "name": "@gion/mcp",
+  "name": "@taichu/mcp",
   "version": "0.1.0",
   "type": "module",
   "main": "src/index.js",
   "bin": {
-    "gion-mcp": "./src/index.js"
+    "taichu-mcp": "./src/index.js"
   },
   "scripts": {
     "start": "node src/index.js"

@@ -1,13 +1,13 @@
 /**
  * Plugin System — 扩展协议与沙箱
  *
- * Gion 插件基于标准 npm 包 + manifest.json 声明。
+ * Taichu 插件基于标准 npm 包 + manifest.json 声明。
  *
- * 插件清单 (gion.plugin.json):
+ * 插件清单 (taichu.plugin.json):
  * {
- *   "name": "@gion/plugin-seo",
+ *   "name": "@taichu/plugin-seo",
  *   "version": "1.0.0",
- *   "description": "SEO optimization plugin for Gion",
+ *   "description": "SEO optimization plugin for Taichu",
  *   "hooks": ["afterCreate", "afterUpdate"],
  *   "routes": false,
  *   "adminPanel": false,
@@ -42,7 +42,7 @@ const log = createLogger('plugin');
 
 /**
  * @typedef {object} PluginAPI
- * @property {object} store       — Gion Store instance
+ * @property {object} store       — Taichu Store instance
  * @property {object} hooks       — Hook system
  * @property {object} logger      — Plugin-specific logger
  * @property {object} config      — App config
@@ -56,11 +56,11 @@ class PluginManager {
 
   /**
    * Load a plugin from a directory.
-   * @param {string} pluginPath — path to plugin directory (must contain gion.plugin.json)
+   * @param {string} pluginPath — path to plugin directory (must contain taichu.plugin.json)
    * @param {PluginAPI} api
    */
   async load(pluginPath, api) {
-    const manifestPath = join(pluginPath, 'gion.plugin.json');
+    const manifestPath = join(pluginPath, 'taichu.plugin.json');
     if (!existsSync(manifestPath)) {
       throw new Error(`Plugin manifest not found: ${manifestPath}`);
     }
@@ -126,7 +126,7 @@ class PluginManager {
     for (const entry of entries) {
       if (entry.isDirectory()) {
         const pluginPath = join(pluginsDir, entry.name);
-        const manifestPath = join(pluginPath, 'gion.plugin.json');
+        const manifestPath = join(pluginPath, 'taichu.plugin.json');
         if (existsSync(manifestPath)) {
           try {
             await this.load(pluginPath, api);

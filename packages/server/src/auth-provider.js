@@ -2,7 +2,7 @@
  * Auth Provider — 可插拔认证方式
  *
  * 内置：email/password（默认）、phone（短信验证码）、wechat（OAuth）
- * 通过 @gion/plugin-auth-providers 扩展。
+ * 通过 @taichu/plugin-auth-providers 扩展。
  *
  * 使用：
  *   import { registerProvider, getProvider } from './auth-provider.js';

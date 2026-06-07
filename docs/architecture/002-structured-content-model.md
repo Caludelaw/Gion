@@ -31,7 +31,7 @@ Accepted: Each content type registers a schema (typed fields + validation rules 
 
 ## Decision
 
-**Gion uses typed content type schemas with optional JSON-LD semantic markup.**
+**Taichu uses typed content type schemas with optional JSON-LD semantic markup.**
 
 Each content type:
 1. Defines typed fields (`string`, `number`, `json`, `array`, `enum`, `datetime`, `media`, `relation`)

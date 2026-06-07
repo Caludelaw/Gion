@@ -10,7 +10,7 @@ import { join, extname } from 'node:path';
 import { createHash } from 'node:crypto';
 import sharp from 'sharp';
 
-const DEFAULT_UPLOAD_DIR = join(process.cwd(), '.gion', 'uploads');
+const DEFAULT_UPLOAD_DIR = join(process.cwd(), '.taichu', 'uploads');
 const THUMB_SIZE = 300;
 
 /**
@@ -18,7 +18,7 @@ const THUMB_SIZE = 300;
  * @param {string} [config.uploadDir]
  */
 export function createMediaStore(config = {}) {
-  const uploadDir = config.uploadDir || process.env.GION_UPLOAD_DIR || DEFAULT_UPLOAD_DIR;
+  const uploadDir = config.uploadDir || process.env.TAICHU_UPLOAD_DIR || DEFAULT_UPLOAD_DIR;
   const thumbDir = join(uploadDir, 'thumbnails');
 
   let initialized = false;

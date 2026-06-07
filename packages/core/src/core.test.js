@@ -1,5 +1,5 @@
 /**
- * @gion/core — 核心模块测试
+ * @taichu/core — 核心模块测试
  *
  * 运行: node --test packages/core/src/core.test.js
  */
@@ -11,7 +11,7 @@ import { createContentType } from './content-type.js';
 import { createMemoryStore } from './store.js';
 import { createHookSystem } from './hooks.js';
 import { hashPassword, verifyPassword, signJWT, verifyJWT, generateAPIKey, verifyAPIKey } from './auth.js';
-import { GionError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError } from './errors.js';
+import { TaichuError, ValidationError, NotFoundError, UnauthorizedError, ForbiddenError, ConflictError } from './errors.js';
 import { createHmac } from 'node:crypto';
 
 // ════════════════════════════════════════════════════════════
@@ -227,10 +227,10 @@ describe('HookSystem', () => {
 
 describe('Password Hashing', () => {
   it('should hash and verify a password', () => {
-    const hashed = hashPassword('gion2026');
+    const hashed = hashPassword('taichu2026');
     assert.ok(hashed.startsWith('pbkdf2_sha256$'));
 
-    assert.equal(verifyPassword('gion2026', hashed), true);
+    assert.equal(verifyPassword('taichu2026', hashed), true);
   });
 
   it('should reject wrong password', () => {
@@ -287,10 +287,10 @@ describe('JWT', () => {
 describe('API Key', () => {
   it('should generate a valid API key', () => {
     const key = generateAPIKey('Test Agent');
-    assert.ok(key.key.startsWith('gion_'));
-    assert.ok(key.prefix.startsWith('gion_'));
+    assert.ok(key.key.startsWith('taichu_'));
+    assert.ok(key.prefix.startsWith('taichu_'));
     assert.equal(key.label, 'Test Agent');
-    assert.equal(key.key.length, 69); // gion_ + 64 hex chars
+    assert.equal(key.key.length, 71); // taichu_ + 64 hex chars
   });
 
   it('should verify a valid API key', () => {
@@ -300,7 +300,7 @@ describe('API Key', () => {
 
   it('should reject invalid API key', () => {
     const key = generateAPIKey('Test');
-    assert.equal(verifyAPIKey('gion_fake', key.hash), false);
+    assert.equal(verifyAPIKey('taichu_fake', key.hash), false);
   });
 
   it('should produce different keys each time', () => {
@@ -315,12 +315,12 @@ describe('API Key', () => {
 // Errors
 // ════════════════════════════════════════════════════════════
 
-describe('GionError', () => {
+describe('TaichuError', () => {
   it('should create a base error', () => {
-    const err = new GionError('test');
+    const err = new TaichuError('test');
     assert.equal(err.message, 'test');
     assert.equal(err.status, 500);
-    assert.equal(err.code, 'GION_ERROR');
+    assert.equal(err.code, 'TAICHU_ERROR');
   });
 
   it('should create typed errors with correct status codes', () => {

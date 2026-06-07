@@ -7,18 +7,18 @@
  *   3. IP        → 匿名请求兜底
  *
  * 环境变量：
- *   GION_RATE_LIMIT_WINDOW_MS  — 时间窗口（默认 60000ms = 1分钟）
- *   GION_RATE_LIMIT_MAX         — 窗口内最大请求数（默认 100）
- *   GION_RATE_LIMIT_AUTH_MAX    — 认证用户窗口内最大请求数（默认 300）
- *   GION_RATE_LIMIT_LOGIN_MAX   — 登录端点窗口内最大请求数（默认 10）
+ *   TAICHU_RATE_LIMIT_WINDOW_MS  — 时间窗口（默认 60000ms = 1分钟）
+ *   TAICHU_RATE_LIMIT_MAX         — 窗口内最大请求数（默认 100）
+ *   TAICHU_RATE_LIMIT_AUTH_MAX    — 认证用户窗口内最大请求数（默认 300）
+ *   TAICHU_RATE_LIMIT_LOGIN_MAX   — 登录端点窗口内最大请求数（默认 10）
  *
  * 响应：429 Too Many Requests + Retry-After 头
  */
 
-const DEFAULT_WINDOW = parseInt(process.env.GION_RATE_LIMIT_WINDOW_MS) || 60000;
-const DEFAULT_MAX = parseInt(process.env.GION_RATE_LIMIT_MAX) || 100;
-const AUTH_MAX = parseInt(process.env.GION_RATE_LIMIT_AUTH_MAX) || 300;
-const LOGIN_MAX = parseInt(process.env.GION_RATE_LIMIT_LOGIN_MAX) || 10;
+const DEFAULT_WINDOW = parseInt(process.env.TAICHU_RATE_LIMIT_WINDOW_MS) || 60000;
+const DEFAULT_MAX = parseInt(process.env.TAICHU_RATE_LIMIT_MAX) || 100;
+const AUTH_MAX = parseInt(process.env.TAICHU_RATE_LIMIT_AUTH_MAX) || 300;
+const LOGIN_MAX = parseInt(process.env.TAICHU_RATE_LIMIT_LOGIN_MAX) || 10;
 
 /** @type {Map<string, { tokens: number, lastRefill: number }>} */
 const buckets = new Map();
@@ -39,7 +39,7 @@ setInterval(() => {
  */
 function getClientId(ctx) {
   // API Key header
-  const agentKey = ctx.req.headers['x-gion-agent-key'];
+  const agentKey = ctx.req.headers['x-taichu-agent-key'];
   if (agentKey) return `ak:${agentKey}`;
 
   // JWT (via actor if already authenticated)

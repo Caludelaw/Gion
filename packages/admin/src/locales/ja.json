@@ -1,9 +1,9 @@
 {
-  "app": { "title": "Gion CMS", "logo": "⚡ Gion" },
+  "app": { "title": "Taichu CMS", "logo": "⚡ Taichu" },
   "nav": { "dashboard": "ダッシュボード", "media": "メディアライブラリ", "apikeys": "API キー", "logout": "ログアウト" },
   "login": { "title": "ログイン", "username": "ユーザー名", "password": "パスワード", "submit": "ログイン", "register_link": "アカウント作成", "error_invalid": "ユーザー名またはパスワードが無効です" },
   "register": { "title": "登録", "username": "ユーザー名", "email": "メールアドレス", "password": "パスワード", "submit": "登録", "login_link": "アカウントをお持ちですか？ログイン", "error_taken": "このユーザー名は既に使用されています" },
-  "dashboard": { "title": "ダッシュボード", "welcome": "Gion CMS へようこそ", "total_content": "総コンテンツ数", "content_types": "コンテンツタイプ", "recent": "最近の更新" },
+  "dashboard": { "title": "ダッシュボード", "welcome": "Taichu CMS へようこそ", "total_content": "総コンテンツ数", "content_types": "コンテンツタイプ", "recent": "最近の更新" },
   "content": { "title": "コンテンツ", "new": "新規作成", "edit": "編集", "save_draft": "下書き保存", "publish": "公開", "delete": "削除", "delete_confirm": "削除してもよろしいですか？", "field_title": "タイトル", "field_slug": "スラッグ", "field_body": "本文", "field_status": "ステータス", "no_items": "コンテンツがありません", "create_first": "最初のコンテンツを作成" },
   "media": { "title": "メディアライブラリ", "upload": "ファイルをアップロード", "uploading": "アップロード中...", "copy_url": "URL をコピー", "delete": "削除", "no_items": "メディアファイルがありません", "size_label": "サイズ", "url_copied": "URL をコピーしました" },
   "apikeys": { "title": "API キー", "generate": "新しいキーを生成", "label": "ラベル", "scopes": "権限範囲", "prefix": "プレフィックス", "created": "作成日時", "revoke": "無効化", "revoke_confirm": "このキーは永久に無効化されます。続行しますか？", "copy_warning": "⚠️ このキーをコピーしてください。再度表示されません", "no_keys": "API キーがありません", "scope_all": "全権限", "scope_read": "読み取り専用", "scope_hint": "デフォルト：読み取り専用。\"*:*\" を選択すると管理者権限になります。" },

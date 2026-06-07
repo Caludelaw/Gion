@@ -1,8 +1,8 @@
-# Gion CMS — 社区推广内容
+# Taichu CMS — 社区推广内容
 
 ## 一句话定位
 
-> Gion — AI Agent 时代的开源 CMS。人类和 Agent 同为内容的第一公民。npm start 即可跑，MIT 协议。
+> Taichu — AI Agent 时代的开源 CMS。人类和 Agent 同为内容的第一公民。npm start 即可跑，MIT 协议。
 
 ## 掘金 / CSDN / 思否首文
 
@@ -13,7 +13,7 @@
 ### 正文要点
 
 - **痛点**：WordPress 太老、Strapi 太重、Ghost 不够。现有 CMS 没有一个把 AI Agent 当作一等公民。
-- **解决**：Gion 从第一行代码起，API 层就同时为人类（JWT）和 Agent（API Key）设计。
+- **解决**：Taichu 从第一行代码起，API 层就同时为人类（JWT）和 Agent（API Key）设计。
 - **三通道 API**：REST + GraphQL + MCP(29 tools)。Agent 通过 MCP 可以自动发现 CMS 能力，无需硬编码。
 - **中国市场友好**：中文文档、ICP 备案配置、jieba 分词搜索、通义千问/文心一言/DeepSeek/Moonshot 四个国产 LLM 适配。
 - **零外部依赖核心**：`npm start` 即跑，SQLite 持久化，Docker 一键部署。
@@ -21,8 +21,8 @@
 
 ### 结尾 CTA
 
-- GitHub: https://github.com/Caludelaw/Gion
-- Gitee: https://gitee.com/Caludelaw/Gion
+- GitHub: https://github.com/Caludelaw/Taichu
+- Gitee: https://gitee.com/Caludelaw/Taichu
 - 中文文档: docs/zh/README.md
 
 ## Bilibili 视频脚本（3 分钟）
@@ -34,7 +34,7 @@
 
 ## 微信群运营计划
 
-- 群名：Gion CMS 开发者交流群
+- 群名：Taichu CMS 开发者交流群
 - 定位：中文用户反馈 + 功能讨论 + 贡献指南
 - 人数目标：首月 200 人
 

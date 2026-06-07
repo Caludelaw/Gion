@@ -1,6 +1,6 @@
 # MCP 接入指南
 
-Gion 内置 24 个 MCP Tools，Agent 可通过 Model Context Protocol 直接操控 CMS。
+Taichu 内置 24 个 MCP Tools，Agent 可通过 Model Context Protocol 直接操控 CMS。
 
 ## 配置
 
@@ -9,12 +9,12 @@ Gion 内置 24 个 MCP Tools，Agent 可通过 Model Context Protocol 直接操�
 ```json
 {
   "mcpServers": {
-    "gion": {
+    "taichu": {
       "command": "node",
-      "args": ["/path/to/gion/packages/mcp/src/index.js"],
+      "args": ["/path/to/taichu/packages/mcp/src/index.js"],
       "env": {
-        "GION_API": "http://localhost:3120",
-        "GION_AGENT_KEY": "gion_xxxx..."
+        "TAICHU_API": "http://localhost:3120",
+        "TAICHU_AGENT_KEY": "taichu_xxxx..."
       }
     }
   }
@@ -25,12 +25,12 @@ Gion 内置 24 个 MCP Tools，Agent 可通过 Model Context Protocol 直接操�
 
 ```json
 {
-  "gion": {
+  "taichu": {
     "command": "node",
     "args": ["packages/mcp/src/index.js"],
     "env": {
-      "GION_API": "http://localhost:3120",
-      "GION_AGENT_KEY": "gion_xxxx..."
+      "TAICHU_API": "http://localhost:3120",
+      "TAICHU_AGENT_KEY": "taichu_xxxx..."
     }
   }
 }

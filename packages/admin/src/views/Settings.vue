@@ -30,7 +30,7 @@
       </div>
       <div class="form-group">
         <label>SEO 关键词 (逗号分隔)</label>
-        <input v-model="keywordsStr" class="input" placeholder="Gion, CMS, AI Agent" />
+        <input v-model="keywordsStr" class="input" placeholder="Taichu, CMS, AI Agent" />
       </div>
 
       <h3 class="section-title">统计 & 语言</h3>
@@ -96,7 +96,7 @@ async function save() {
   try {
     await fetch('/api/site-settings', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` },
       body: JSON.stringify(settings.value)
     })
     saved.value = true

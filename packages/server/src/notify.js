@@ -3,9 +3,9 @@
  *
  * 通过 Webhook 发送消息卡、Markdown 通知。
  * 环境变量：
- *   GION_NOTIFY_FEISHU     — 飞书机器人 Webhook URL
- *   GION_NOTIFY_DINGTALK   — 钉钉机器人 Webhook URL
- *   GION_NOTIFY_WECOM      — 企业微信机器人 Webhook URL
+ *   TAICHU_NOTIFY_FEISHU     — 飞书机器人 Webhook URL
+ *   TAICHU_NOTIFY_DINGTALK   — 钉钉机器人 Webhook URL
+ *   TAICHU_NOTIFY_WECOM      — 企业微信机器人 Webhook URL
  */
 
 import { createLogger } from './logger.js';
@@ -20,14 +20,14 @@ const log = createLogger('notify');
 export async function notify(event, data) {
   const promises = [];
 
-  if (process.env.GION_NOTIFY_FEISHU) {
-    promises.push(sendFeishu(process.env.GION_NOTIFY_FEISHU, event, data));
+  if (process.env.TAICHU_NOTIFY_FEISHU) {
+    promises.push(sendFeishu(process.env.TAICHU_NOTIFY_FEISHU, event, data));
   }
-  if (process.env.GION_NOTIFY_DINGTALK) {
-    promises.push(sendDingTalk(process.env.GION_NOTIFY_DINGTALK, event, data));
+  if (process.env.TAICHU_NOTIFY_DINGTALK) {
+    promises.push(sendDingTalk(process.env.TAICHU_NOTIFY_DINGTALK, event, data));
   }
-  if (process.env.GION_NOTIFY_WECOM) {
-    promises.push(sendWecom(process.env.GION_NOTIFY_WECOM, event, data));
+  if (process.env.TAICHU_NOTIFY_WECOM) {
+    promises.push(sendWecom(process.env.TAICHU_NOTIFY_WECOM, event, data));
   }
 
   await Promise.allSettled(promises);

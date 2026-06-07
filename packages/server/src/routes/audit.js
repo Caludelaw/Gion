@@ -158,7 +158,7 @@ export async function revisionRoutes(ctx, type, id) {
 
 function getDefaultSettings() {
   return {
-    siteName: 'Gion CMS',
+    siteName: 'Taichu CMS',
     siteDescription: '',
     icpNumber: '',
     gonganNumber: '',

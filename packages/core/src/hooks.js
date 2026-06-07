@@ -1,7 +1,7 @@
 /**
  * Hook System — 插件/扩展的生命周期钩子
  *
- * Gion 的插件系统基于生命周期钩子（Lifecycle Hooks）。
+ * Taichu 的插件系统基于生命周期钩子（Lifecycle Hooks）。
  * 与 WordPress 的 add_action / add_filter 精神一致，但：
  *   - 纯函数式，无全局状态
  *   - 支持异步钩子

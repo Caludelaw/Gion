@@ -1,7 +1,7 @@
 /**
  * Theme Engine — 前端主题渲染
  *
- * Gion 的 Headless CMS → 前端主题桥接层。
+ * Taichu 的 Headless CMS → 前端主题桥接层。
  *
  * 架构：
  *   /           → 渲染默认主题（index.html with injected config）
@@ -12,18 +12,18 @@
  *
  * 主题文件：
  *   默认主题：packages/server/public/theme/index.html
- *   自定义主题：.gion/themes/{theme-name}/index.html
+ *   自定义主题：.taichu/themes/{theme-name}/index.html
  *
  * 主题配置：
  *   GET /api/site-settings → { theme: { primaryColor, fontFamily, ... } }
- *   主题 HTML 通过内嵌 <script>window.__GION__ = {...}</script> 获取配置
+ *   主题 HTML 通过内嵌 <script>window.__TAICHU__ = {...}</script> 获取配置
  */
 
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { getStore } from './context.js';
 
-const THEME_DIR = join(process.cwd(), '.gion', 'themes');
+const THEME_DIR = join(process.cwd(), '.taichu', 'themes');
 const DEFAULT_THEME = join(import.meta.dirname || join(process.cwd(), 'packages', 'server', 'src'), '..', 'public', 'theme', 'index.html');
 
 /**
@@ -51,7 +51,7 @@ export async function renderTheme(ctx) {
   const config = {
     apiBase: '/api',
     site: {
-      name: siteConfig.siteName || 'Gion CMS',
+      name: siteConfig.siteName || 'Taichu CMS',
       description: siteConfig.siteDescription || '',
       icp: siteConfig.icpNumber || '',
       gongan: siteConfig.gonganNumber || '',
@@ -71,7 +71,7 @@ export async function renderTheme(ctx) {
     let html = readFileSync(themeFile, 'utf-8');
 
     // Inject config before </head>
-    const configScript = `<script>window.__GION__ = ${JSON.stringify(config)};</script>`;
+    const configScript = `<script>window.__TAICHU__ = ${JSON.stringify(config)};</script>`;
     html = html.replace('</head>', `${configScript}\n</head>`);
 
     ctx.res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8', 'Cache-Control': 'no-cache' });
@@ -81,7 +81,7 @@ export async function renderTheme(ctx) {
     if (themeName !== 'default') {
       try {
         let html = readFileSync(DEFAULT_THEME, 'utf-8');
-        const configScript = `<script>window.__GION__ = ${JSON.stringify(config)};</script>`;
+        const configScript = `<script>window.__TAICHU__ = ${JSON.stringify(config)};</script>`;
         html = html.replace('</head>', `${configScript}\n</head>`);
         ctx.res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
         ctx.res.end(html);

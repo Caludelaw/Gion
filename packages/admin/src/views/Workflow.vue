@@ -43,7 +43,7 @@ async function approve(item) {
   try {
     await fetch(`/api/workflow/approve/${item.id}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` },
       body: JSON.stringify({ comment: 'Approved' })
     })
     await load()
@@ -56,7 +56,7 @@ async function rejectPrompt(item) {
   try {
     await fetch(`/api/workflow/reject/${item.id}`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` },
       body: JSON.stringify({ reason })
     })
     await load()

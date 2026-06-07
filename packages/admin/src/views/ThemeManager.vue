@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="page-title">🎨 主题管理</h1>
-    <p class="desc">管理您网站的前端主题。Gion 默认提供一个干净简洁的博客主题。您可以上传自定义主题替换它。</p>
+    <p class="desc">管理您网站的前端主题。Taichu 默认提供一个干净简洁的博客主题。您可以上传自定义主题替换它。</p>
 
     <div class="cards">
       <div class="card" v-for="t in themes" :key="t.name" :class="{ active: t.active }">
@@ -35,10 +35,10 @@
 
     <div class="note">
       <h3>💡 如何创建自定义主题</h3>
-      <p>1. 创建 <code>index.html</code> 文件，其中通过 <code>window.__GION__</code> 读取站点配置和主题变量</p>
+      <p>1. 创建 <code>index.html</code> 文件，其中通过 <code>window.__TAICHU__</code> 读取站点配置和主题变量</p>
       <p>2. 通过 <code>/api/content/article</code> 等 REST API 获取内容数据</p>
       <p>3. 将所有文件打包成 <code>.zip</code>，上传至此页面</p>
-      <p>4. Gion 会自动将主题注入站点配置并渲染前端页面</p>
+      <p>4. Taichu 会自动将主题注入站点配置并渲染前端页面</p>
       <p class="mt-8"><strong>主题变量参考：</strong></p>
       <pre class="code-block">{{ themeVarExample }}</pre>
     </div>
@@ -50,7 +50,7 @@ import { ref, onMounted } from 'vue'
 import { api } from '../api/index.js'
 
 const themes = ref([
-  { name: 'default', label: '默认博客主题', description: 'Gion 内置的简洁博客主题，支持文章/页面/分类/搜索', active: true }
+  { name: 'default', label: '默认博客主题', description: 'Taichu 内置的简洁博客主题，支持文章/页面/分类/搜索', active: true }
 ])
 
 const themeName = ref('')
@@ -58,7 +58,7 @@ const file = ref(null)
 const fileLabel = ref('选择文件')
 const uploading = ref(false)
 
-const themeVarExample = `// window.__GION__ 包含以下配置：
+const themeVarExample = `// window.__TAICHU__ 包含以下配置：
 {
   apiBase: "/api",
   site: {
@@ -102,7 +102,7 @@ async function activate(name) {
   try {
     await fetch('/api/site-settings', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` },
       body: JSON.stringify({ theme: { activeTheme: name } })
     })
     themes.value.forEach(t => t.active = (t.name === name))
@@ -117,7 +117,7 @@ async function upload() {
     form.append('name', themeName.value)
     const res = await fetch('/api/theme/upload', {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` },
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` },
       body: form
     })
     if (!res.ok) throw new Error((await res.json()).message)
@@ -131,7 +131,7 @@ async function upload() {
 
 function removeTheme(name) {
   if (!confirm('确认删除主题「'+name+'」？')) return
-  fetch('/api/theme/' + name, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` } })
+  fetch('/api/theme/' + name, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` } })
   themes.value = themes.value.filter(t => t.name !== name)
 }
 </script>

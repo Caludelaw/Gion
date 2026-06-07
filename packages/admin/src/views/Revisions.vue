@@ -48,7 +48,7 @@ async function restore(revId) {
   try {
     await fetch(`/api/content/${type}/${contentId}/revisions/${revId}/restore`, {
       method: 'POST',
-      headers: { 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` }
+      headers: { 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` }
     })
     alert('已恢复')
     location.reload()

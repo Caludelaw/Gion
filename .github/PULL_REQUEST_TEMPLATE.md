@@ -17,7 +17,7 @@ Fixes #
 
 ## Checklist
 
-- [ ] My code follows Gion's code style (JSDoc, ES modules, 2-space indent)
+- [ ] My code follows Taichu's code style (JSDoc, ES modules, 2-space indent)
 - [ ] I have added tests that prove my fix/feature works
 - [ ] All tests pass (`npm test`)
 - [ ] Linting passes (`npm run lint`)

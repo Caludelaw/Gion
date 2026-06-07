@@ -1,7 +1,7 @@
 {
   "app": {
-    "title": "Gion CMS",
-    "logo": "⚡ Gion"
+    "title": "Taichu CMS",
+    "logo": "⚡ Taichu"
   },
   "nav": {
     "dashboard": "Dashboard",
@@ -28,7 +28,7 @@
   },
   "dashboard": {
     "title": "Dashboard",
-    "welcome": "Welcome to Gion CMS",
+    "welcome": "Welcome to Taichu CMS",
     "total_content": "Total Content",
     "content_types": "Content Types",
     "recent": "Recent Updates"

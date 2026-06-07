@@ -1,8 +1,8 @@
-# Gion API Documentation
+# Taichu API Documentation
 
 ## Overview
 
-Gion is API-first. Everything you can do in the admin UI, you can do via the API.
+Taichu is API-first. Everything you can do in the admin UI, you can do via the API.
 
 - **Base URL**: `http://localhost:3120/api`
 - **Content-Type**: `application/json`
@@ -20,7 +20,7 @@ Response:
 ```json
 {
   "status": "ok",
-  "name": "gion",
+  "name": "taichu",
   "version": "0.1.0",
   "uptime": 123.456
 }

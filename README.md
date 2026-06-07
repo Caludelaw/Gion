@@ -1,8 +1,8 @@
 <p align="center">
-  <img src="https://via.placeholder.com/120x120/10B981/FFFFFF?text=G" alt="Gion" width="120" height="120" />
+  <img src="https://via.placeholder.com/120x120/10B981/FFFFFF?text=G" alt="Taichu" width="120" height="120" />
 </p>
 
-<h1 align="center">Gion CMS</h1>
+<h1 align="center">Taichu CMS</h1>
 <p align="center"><strong>AI Agent-Native Content Infrastructure</strong></p>
 
 <p align="center">
@@ -14,9 +14,9 @@
 
 ---
 
-## What is Gion?
+## What is Taichu?
 
-Gion is a **content management system built for the AI agent era**. While WordPress and Typecho were architected for human authors editing HTML in a browser, Gion is architected for a world where AI agents are first-class content producers and consumers.
+Taichu is a **content management system built for the AI agent era**. While WordPress and Typecho were architected for human authors editing HTML in a browser, Taichu is architected for a world where AI agents are first-class content producers and consumers.
 
 ### The Problem
 
@@ -26,9 +26,9 @@ Gion is a **content management system built for the AI agent era**. While WordPr
 
 ### Our Answer
 
-Gion treats **AI agents as first-class citizens** alongside human authors:
+Taichu treats **AI agents as first-class citizens** alongside human authors:
 
-| | Traditional CMS | Headless CMS | **Gion** |
+| | Traditional CMS | Headless CMS | **Taichu** |
 |---|---|---|---|
 | Authors | Humans only | Humans only | **Humans + AI Agents** |
 | Content format | HTML strings | Structured JSON | **Semantic JSON-LD** |
@@ -44,7 +44,7 @@ Gion treats **AI agents as first-class citizens** alongside human authors:
 
 ### Content as Data, Not HTML
 
-Gion stores structured data — not HTML blobs. An article is a document with typed fields (`title: string`, `body: json`, `tags: array`), not a `wp_post` row with a `post_content` column full of HTML.
+Taichu stores structured data — not HTML blobs. An article is a document with typed fields (`title: string`, `body: json`, `tags: array`), not a `wp_post` row with a `post_content` column full of HTML.
 
 This means:
 - AI agents can read and write content without parsing HTML
@@ -59,18 +59,18 @@ Every API endpoint, permission, and workflow is designed for both human and agen
 ```bash
 # Human access (JWT)
 curl -H "Authorization: Bearer $JWT_TOKEN" \
-  https://gion.example.com/api/content/article
+  https://taichu.example.com/api/content/article
 
 # Agent access (API Key)
-curl -H "X-Gion-Agent-Key: $AGENT_KEY" \
-  https://gion.example.com/api/content/article
+curl -H "X-Taichu-Agent-Key: $AGENT_KEY" \
+  https://taichu.example.com/api/content/article
 ```
 
 Agent-specific features:
 - **Rate limiting per agent** — prevent runaway agents from overwhelming the system
 - **Content pipelines** — agents can register as processors in content workflows
 - **Audit trails** — every agent action is logged and attributable
-- **MCP protocol** — agents discover Gion's capabilities automatically via Model Context Protocol (Phase 2)
+- **MCP protocol** — agents discover Taichu's capabilities automatically via Model Context Protocol (Phase 2)
 
 ### Zero Dependencies (Core)
 
@@ -89,7 +89,7 @@ Like WordPress's plugin system, but for agents:
 
 ```js
 // Register a content type
-gion.registerContentType(createContentType('product', {
+taichu.registerContentType(createContentType('product', {
   label: 'Product',
   fields: {
     name: { type: 'string', required: true },
@@ -99,7 +99,7 @@ gion.registerContentType(createContentType('product', {
 }));
 
 // Hook into the content pipeline
-gion.hooks.on('afterCreate', async (doc, ctx) => {
+taichu.hooks.on('afterCreate', async (doc, ctx) => {
   if (doc.type === 'article') {
     await autoGenerateExcerpt(doc);
     await indexForSearch(doc);
@@ -107,7 +107,7 @@ gion.hooks.on('afterCreate', async (doc, ctx) => {
 });
 
 // Agent capability extension
-gion.hooks.on('agent:onRequest', async (payload, ctx) => {
+taichu.hooks.on('agent:onRequest', async (payload, ctx) => {
   if (ctx.agent.scope === 'seo-optimizer') {
     payload.enhancements = ['keywords', 'readability'];
   }
@@ -120,13 +120,13 @@ gion.hooks.on('agent:onRequest', async (payload, ctx) => {
 
 ```bash
 # Clone
-git clone https://github.com/Caludelaw/Gion.git
-cd gion
+git clone https://github.com/Caludelaw/Taichu.git
+cd taichu
 
 # Run (yes, that's it — zero npm install needed for core)
 npm start
 
-# Gion is now running at http://localhost:3120
+# Taichu is now running at http://localhost:3120
 # Health check: http://localhost:3120/api/health
 ```
 
@@ -138,7 +138,7 @@ curl -X POST http://localhost:3120/api/content/article \
   -H "Content-Type: application/json" \
   -d '{
     "data": {
-      "title": "Hello Gion",
+      "title": "Hello Taichu",
       "body": {"text": "Welcome to the agent-native CMS."},
       "status": "published"
     }
@@ -156,7 +156,7 @@ curl http://localhost:3120/api/content/article/<id>
 ## Project Structure
 
 ```
-gion/
+taichu/
 ├── packages/
 │   ├── core/           # Content model, storage abstraction, hook system
 │   │   └── src/
@@ -200,12 +200,12 @@ See [ROADMAP.md](docs/ROADMAP.md) for details.
 
 ## Contributing
 
-Gion is in active early development. We welcome contributions from developers who share our vision of agent-native content infrastructure.
+Taichu is in active early development. We welcome contributions from developers who share our vision of agent-native content infrastructure.
 
-Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, and check [GitHub Issues](https://github.com/Caludelaw/Gion/issues) for tasks tagged `good first issue`.
+Read [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines, and check [GitHub Issues](https://github.com/Caludelaw/Taichu/issues) for tasks tagged `good first issue`.
 
 ---
 
 ## License
 
-MIT © 2026 Liu Huai'an and Gion contributors. See [LICENSE](LICENSE).
+MIT © 2026 Liu Huai'an and Taichu contributors. See [LICENSE](LICENSE).

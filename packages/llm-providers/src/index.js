@@ -1,5 +1,5 @@
 /**
- * @gion/llm-providers — 国产 LLM API 适配层
+ * @taichu/llm-providers — 国产 LLM API 适配层
  *
  * 提供统一的 ChatProvider 接口，内置 4 个国产模型 Adapter：
  *   - qwen     通义千问 (阿里云 DashScope)
@@ -10,7 +10,7 @@
  * 所有 Provider 实现 OpenAI-compatible 接口，可以无缝切换。
  *
  * 使用：
- *   import { createProvider } from '@gion/llm-providers';
+ *   import { createProvider } from '@taichu/llm-providers';
  *   const llm = createProvider('qwen', { apiKey: 'xxx' });
  *   const reply = await llm.chat([{ role: 'user', content: 'Hello' }]);
  */
@@ -35,7 +35,7 @@ class BaseChatProvider {
    * @returns {Promise<{ content: string, model: string, usage?: object }>}
    */
   async chat(messages, options = {}) {
-    const apiKey = options.apiKey || this.config.apiKey || process.env.GION_LLM_API_KEY;
+    const apiKey = options.apiKey || this.config.apiKey || process.env.TAICHU_LLM_API_KEY;
     const model = options.model || this.config.model || this.defaultModel;
     const url = options.baseURL || this.baseURL;
 

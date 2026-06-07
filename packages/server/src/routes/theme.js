@@ -11,7 +11,7 @@ import { pipeline } from 'node:stream';
 import { createBrotliDecompress } from 'node:zlib';
 import { requireAuth } from '../middleware/auth.js';
 
-const THEME_DIR = join(process.cwd(), '.gion', 'themes');
+const THEME_DIR = join(process.cwd(), '.taichu', 'themes');
 
 export async function themeRoutes(ctx) {
   const { pathname } = ctx.url;

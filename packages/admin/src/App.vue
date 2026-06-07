@@ -1,7 +1,7 @@
 <template>
   <div v-if="auth.isLoggedIn" class="layout">
     <aside class="sidebar">
-      <div class="logo" @click="$router.push('/dashboard')">⚡ Gion</div>
+      <div class="logo" @click="$router.push('/dashboard')">⚡ Taichu</div>
       <nav>
         <div class="nav-section">内容</div>
         <template v-for="t in types" :key="t.name">

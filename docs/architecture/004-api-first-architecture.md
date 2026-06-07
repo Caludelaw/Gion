@@ -6,23 +6,23 @@
 
 ## Context
 
-Gion must serve three distinct consumers:
+Taichu must serve three distinct consumers:
 1. **Human authors** — via admin SPA (browser)
 2. **Human readers** — via public frontend (browser, RSS)
 3. **AI agents** — via programmatic API and MCP protocol
 
-A traditional CMS renders HTML server-side and adds a REST API as an afterthought. Gion must invert this: API is primary, rendering is secondary.
+A traditional CMS renders HTML server-side and adds a REST API as an afterthought. Taichu must invert this: API is primary, rendering is secondary.
 
 ## Decision Drivers
 
-1. **Agent discoverability** — agents should auto-discover Gion's capabilities
+1. **Agent discoverability** — agents should auto-discover Taichu's capabilities
 2. **Multi-channel output** — same content serves web, mobile, RSS, and agents
 3. **Protocol evolution** — API design should accommodate future protocols
 4. **Admin SPA** — the management interface is a client of the API, not server-rendered
 
 ## Decision
 
-**Gion is API-first with three API channels: REST, GraphQL, and MCP.**
+**Taichu is API-first with three API channels: REST, GraphQL, and MCP.**
 
 ```
 Human Author ──→ Admin SPA ──→ REST API ──┐
@@ -48,7 +48,7 @@ Flexible queries for frontend consumers who need to shape responses.
 ### MCP Server (Phase 2)
 
 Implements the [Model Context Protocol](https://modelcontextprotocol.io/), allowing AI agents to:
-- Discover Gion's content types and capabilities
+- Discover Taichu's content types and capabilities
 - Read, create, and update content through standardized tool calls
 - Subscribe to content change notifications
 
@@ -66,7 +66,7 @@ Implements the [Model Context Protocol](https://modelcontextprotocol.io/), allow
 
 ```json
 {
-  "name": "gion",
+  "name": "taichu",
   "tools": [
     {
       "name": "list_content",
@@ -114,7 +114,7 @@ Implements the [Model Context Protocol](https://modelcontextprotocol.io/), allow
 - Agents auto-discover capabilities via MCP — no manual API doc reading
 - Content is genuinely multi-channel — web, RSS, agent are all first-class
 - Admin SPA is decoupled — can evolve independently of the API
-- MCP integration makes Gion a natural fit for AI agent workflows
+- MCP integration makes Taichu a natural fit for AI agent workflows
 
 ### Negative
 - Three API surfaces to maintain and document

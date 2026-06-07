@@ -7,7 +7,7 @@
  */
 
 export function parseBody(req) {
-  const MAX_BODY_SIZE = parseInt(process.env.GION_MAX_BODY_SIZE) || 5 * 1024 * 1024; // default 5MB
+  const MAX_BODY_SIZE = parseInt(process.env.TAICHU_MAX_BODY_SIZE) || 5 * 1024 * 1024; // default 5MB
 
   return new Promise((resolve, reject) => {
     const contentType = req.headers['content-type'] || '';

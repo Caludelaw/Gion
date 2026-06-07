@@ -1,9 +1,9 @@
-# Gion CMS — Docker 镜像
+# Taichu CMS — Docker 镜像
 #
-# 构建: docker build -t gion .
-# 运行: docker run -p 3120:3120 -v gion-data:/app/.gion gion
+# 构建: docker build -t taichu .
+# 运行: docker run -p 3120:3120 -v taichu-data:/app/.taichu taichu
 #
-# 默认使用 SQLite 存储，数据持久化到 .gion/ 目录。
+# 默认使用 SQLite 存储，数据持久化到 .taichu/ 目录。
 
 FROM node:22-alpine AS builder
 
@@ -37,13 +37,13 @@ COPY --from=builder /app/packages/server ./packages/server
 COPY --from=builder /app/packages/mcp ./packages/mcp
 
 ENV NODE_ENV=production
-ENV GION_STORAGE=sqlite
-ENV GION_PORT=3120
-ENV GION_HOST=0.0.0.0
+ENV TAICHU_STORAGE=sqlite
+ENV TAICHU_PORT=3120
+ENV TAICHU_HOST=0.0.0.0
 
 EXPOSE 3120
 
-VOLUME ["/app/.gion"]
+VOLUME ["/app/.taichu"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
   CMD wget -qO- http://localhost:3120/api/health || exit 1

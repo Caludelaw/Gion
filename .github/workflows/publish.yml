@@ -21,10 +21,10 @@ jobs:
       - uses: actions/checkout@v4
       - name: Build & Push Docker
         run: |
-          docker build -t caludelaw/gion:latest -t caludelaw/gion:${{ github.ref_name }} .
+          docker build -t caludelaw/taichu:latest -t caludelaw/taichu:${{ github.ref_name }} .
           echo "${{ secrets.DOCKER_TOKEN }}" | docker login -u caludelaw --password-stdin
-          docker push caludelaw/gion:latest
-          docker push caludelaw/gion:${{ github.ref_name }}
+          docker push caludelaw/taichu:latest
+          docker push caludelaw/taichu:${{ github.ref_name }}
 
   docker-aliyun:
     runs-on: ubuntu-latest
@@ -32,7 +32,7 @@ jobs:
     steps:
       - name: Mirror to Alibaba Cloud ACR (China)
         run: |
-          docker pull caludelaw/gion:latest
-          docker tag caludelaw/gion:latest registry.cn-hangzhou.aliyuncs.com/caludelaw/gion:latest
+          docker pull caludelaw/taichu:latest
+          docker tag caludelaw/taichu:latest registry.cn-hangzhou.aliyuncs.com/caludelaw/taichu:latest
           echo "${{ secrets.ALIYUN_ACR_TOKEN }}" | docker login --username=${{ secrets.ALIYUN_ACR_USER }} --password-stdin registry.cn-hangzhou.aliyuncs.com
-          docker push registry.cn-hangzhou.aliyuncs.com/caludelaw/gion:latest
+          docker push registry.cn-hangzhou.aliyuncs.com/caludelaw/taichu:latest

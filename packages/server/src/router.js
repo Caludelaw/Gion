@@ -1,5 +1,5 @@
 /**
- * Router — Gion 路由分发
+ * Router — Taichu 路由分发
  *
  * 基于 URL 模式匹配的轻量路由。
  * 支持：
@@ -133,7 +133,7 @@ export async function router(ctx) {
     ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
     ctx.res.end(JSON.stringify({
       status: 'ok',
-      name: 'gion',
+      name: 'taichu',
       version: cfg.version,
       uptime: Math.floor(process.uptime()),
       node: process.version,

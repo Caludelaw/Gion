@@ -37,8 +37,8 @@ CREATE INDEX IF NOT EXISTS idx_documents_type_status ON documents(type, status);
  * Create a SQLiteStore instance.
  *
  * @param {object} config
- * @param {string} [config.dataDir] — 数据目录路径，默认 `.gion/data`
- * @param {string} [config.dbPath] — 数据库文件路径，默认 `{dataDir}/gion.db`
+ * @param {string} [config.dataDir] — 数据目录路径，默认 `.taichu/data`
+ * @param {string} [config.dbPath] — 数据库文件路径，默认 `{dataDir}/taichu.db`
  * @returns {Promise<Store>}
  */
 export async function createSQLiteStore(config = {}) {
@@ -50,12 +50,12 @@ export async function createSQLiteStore(config = {}) {
   let dbPath = null;
   let dirty = false;
   let flushTimer = null;
-  const FLUSH_INTERVAL = process.env.GION_SQLITE_FLUSH_MS ? parseInt(process.env.GION_SQLITE_FLUSH_MS) : 5000;
+  const FLUSH_INTERVAL = process.env.TAICHU_SQLITE_FLUSH_MS ? parseInt(process.env.TAICHU_SQLITE_FLUSH_MS) : 5000;
 
   async function init() {
     SQL = await sqlModule.default();
-    const dataDir = config.dataDir || join(process.cwd(), '.gion', 'data');
-    dbPath = config.dbPath || join(dataDir, 'gion.db');
+    const dataDir = config.dataDir || join(process.cwd(), '.taichu', 'data');
+    dbPath = config.dbPath || join(dataDir, 'taichu.db');
 
     // Ensure data directory exists
     if (!existsSync(dataDir)) {

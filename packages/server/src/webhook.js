@@ -113,9 +113,9 @@ class WebhookManager {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
-            'X-Gion-Webhook-Event': event,
-            'X-Gion-Webhook-Signature': `sha256=${signature}`,
-            'X-Gion-Webhook-Id': deliveryId
+            'X-Taichu-Webhook-Event': event,
+            'X-Taichu-Webhook-Signature': `sha256=${signature}`,
+            'X-Taichu-Webhook-Id': deliveryId
           },
           body,
           signal: controller.signal

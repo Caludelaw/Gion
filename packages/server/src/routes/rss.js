@@ -28,7 +28,7 @@ export async function rssSitemapRoutes(ctx) {
       const xml = `<?xml version="1.0" encoding="UTF-8"?>
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
 <channel>
-<title>${esc(site.siteName || 'Gion CMS')}</title>
+<title>${esc(site.siteName || 'Taichu CMS')}</title>
 <link>${ctx.url.protocol}//${ctx.url.host}</link>
 <description>${esc(site.siteDescription || '')}</description>
 <language>${site.language || 'zh-CN'}</language>

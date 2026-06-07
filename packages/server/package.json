@@ -1,7 +1,7 @@
 {
-  "name": "@gion/server",
+  "name": "@taichu/server",
   "version": "0.1.0",
-  "description": "Gion CMS HTTP server — REST API and static file serving",
+  "description": "Taichu CMS HTTP server — REST API and static file serving",
   "main": "src/index.js",
   "type": "module",
   "scripts": {
@@ -9,7 +9,7 @@
     "start": "node src/index.js"
   },
   "dependencies": {
-    "@gion/core": "0.1.0",
+    "@taichu/core": "0.1.0",
     "graphql": "^16.14.1",
     "sharp": "^0.34.5"
   }

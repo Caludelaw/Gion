@@ -1,7 +1,7 @@
 const BASE = '/api'
 
 async function request(path, options = {}) {
-  const token = localStorage.getItem('gion_token')
+  const token = localStorage.getItem('taichu_token')
   const headers = { 'Content-Type': 'application/json', ...options.headers }
   if (token) headers['Authorization'] = `Bearer ${token}`
   const res = await fetch(BASE + path, { ...options, headers })
@@ -37,7 +37,7 @@ export const api = {
 
   // Media
   uploadMedia: async (file) => {
-    const token = localStorage.getItem('gion_token')
+    const token = localStorage.getItem('taichu_token')
     const form = new FormData()
     form.append('file', file)
     const res = await fetch(BASE + '/media/upload', {

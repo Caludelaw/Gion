@@ -1,25 +1,25 @@
 #!/usr/bin/env node
 
 /**
- * Gion MCP Server v0.3.0 — 20+ Agent Tools
+ * Taichu MCP Server v0.3.0 — 20+ Agent Tools
  *
- * 让任何支持 MCP 的 AI Agent 直接操控 Gion CMS 的内容。
+ * 让任何支持 MCP 的 AI Agent 直接操控 Taichu CMS 的内容。
  *
  * 使用方式：
  *   node packages/mcp/src/index.js                    # stdio transport
- *   GION_API=http://localhost:3120 node ...             # 指定 API 地址
- *   GION_AGENT_KEY=gion_xxx node ...                   # Agent API Key
+ *   TAICHU_API=http://localhost:3120 node ...             # 指定 API 地址
+ *   TAICHU_AGENT_KEY=taichu_xxx node ...                   # Agent API Key
  */
 
 import { McpServer } from '@modelcontextprotocol/sdk/server/index.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 
-const API_BASE = process.env.GION_API || 'http://localhost:3120';
-const API_KEY = process.env.GION_AGENT_KEY || '';
+const API_BASE = process.env.TAICHU_API || 'http://localhost:3120';
+const API_KEY = process.env.TAICHU_AGENT_KEY || '';
 
 async function request(path, options = {}) {
   const headers = { 'Content-Type': 'application/json', ...options.headers };
-  if (API_KEY) headers['X-Gion-Agent-Key'] = API_KEY;
+  if (API_KEY) headers['X-Taichu-Agent-Key'] = API_KEY;
   const url = `${API_BASE}/api${path}`;
   const res = await fetch(url, { ...options, headers });
   if (!res.ok) {
@@ -272,9 +272,9 @@ async function getContentRelations(args) {
 // ─────────────────────────────────────────────────────────────
 
 const server = new McpServer({
-  name: 'gion',
+  name: 'taichu',
   version: '0.3.0',
-  description: 'Gion CMS — AI Agent-Native Content Infrastructure. Provides 24 tools for full content lifecycle management.'
+  description: 'Taichu CMS — AI Agent-Native Content Infrastructure. Provides 24 tools for full content lifecycle management.'
 });
 
 function reg(name, desc, schema, fn) {
@@ -286,7 +286,7 @@ reg('get_content',           'Get a single document by its type and ID, includin
 reg('create_content',        'Create a new document. You can create articles, pages, categories, or any registered content type.',                                   { type:'object', properties:{ type:{ type:'string' }, data:{ type:'object' }, status:{ type:'string', enum:['draft','published'] } }, required:['type','data'] }, createContent);
 reg('update_content',        'Update an existing document. Only the fields you provide will be updated (partial merge).',                                            { type:'object', properties:{ type:{ type:'string' }, id:{ type:'string' }, data:{ type:'object' } }, required:['type','id','data'] }, updateContent);
 reg('delete_content',        'Delete a document permanently. Use with caution — this cannot be undone.',                                                              { type:'object', properties:{ type:{ type:'string' }, id:{ type:'string' } }, required:['type','id'] }, deleteContent);
-reg('list_content_types',    'List all available content types and their field definitions. Use this to discover what kind of content Gion supports.',                { type:'object', properties:{} }, listContentTypes);
+reg('list_content_types',    'List all available content types and their field definitions. Use this to discover what kind of content Taichu supports.',                { type:'object', properties:{} }, listContentTypes);
 reg('search_content',        'Semantic search across all content using TF-IDF vector similarity. Returns results sorted by relevance score.',                        { type:'object', properties:{ query:{ type:'string' }, type:{ type:'string' }, limit:{ type:'number' } }, required:['query'] }, searchContent);
 reg('get_content_type_schema','Get the complete field schema for a specific content type, including field types, validation rules, and semantic mappings.',          { type:'object', properties:{ type:{ type:'string' } }, required:['type'] }, getContentTypeSchema);
 reg('count_content',         'Count the number of documents of a given type. Useful for statistics and pagination.',                                                  { type:'object', properties:{ type:{ type:'string' }, status:{ type:'string' } }, required:['type'] }, countContent);
@@ -297,12 +297,12 @@ reg('batch_update_content',  'Update multiple documents of the same type in one 
 reg('clear_content',         'Delete ALL documents of a given type. Use with extreme caution.',                                                                     { type:'object', properties:{ type:{ type:'string' } }, required:['type'] }, clearContent);
 reg('list_media',            'List uploaded media files with URLs, sizes, and dimensions.',                                                                         { type:'object', properties:{ limit:{ type:'number' } } }, listMedia);
 reg('get_stats',             'Get system statistics: content type counts, total documents, server uptime.',                                                          { type:'object', properties:{} }, getStats);
-reg('health_check',          'Check if the Gion server is running and get its version, status, and uptime.',                                                         { type:'object', properties:{} }, healthCheck);
+reg('health_check',          'Check if the Taichu server is running and get its version, status, and uptime.',                                                         { type:'object', properties:{} }, healthCheck);
 reg('get_content_by_field',  'Find documents where a specific field matches a given value. Useful for looking up content by slug, author, etc.',                    { type:'object', properties:{ type:{ type:'string' }, field:{ type:'string' }, value:{ type:'string' } }, required:['type','field','value'] }, getContentByField);
 reg('export_content',        'Export all documents of a given type as structured JSON.',                                                                             { type:'object', properties:{ type:{ type:'string' }, format:{ type:'string', enum:['json'] } }, required:['type'] }, exportContent);
 reg('import_content',        'Bulk import documents from an array of data objects.',                                                                                 { type:'object', properties:{ type:{ type:'string' }, docs:{ type:'array', items:{ type:'object', properties:{ data:{ type:'object' }, status:{ type:'string' } }, required:['data'] } } }, required:['type','docs'] }, importContent);
 reg('get_api_keys',          'List all API keys associated with your account.',                                                                                      { type:'object', properties:{} }, getApiKeys);
-reg('create_api_key',        'Create a new API key for an AI agent to access Gion. The raw key is only returned once.',                                             { type:'object', properties:{ label:{ type:'string' } } }, createApiKey);
+reg('create_api_key',        'Create a new API key for an AI agent to access Taichu. The raw key is only returned once.',                                             { type:'object', properties:{ label:{ type:'string' } } }, createApiKey);
 reg('rebuild_search_index',  'Rebuild the TF-IDF search index from all existing content. Use this after importing or migrating content.',                           { type:'object', properties:{} }, rebuildSearchIndex);
 reg('get_content_relations', 'Discover content related to a document by analyzing field references and text similarity.',                                           { type:'object', properties:{ type:{ type:'string' }, id:{ type:'string' } }, required:['type','id'] }, getContentRelations);
 
@@ -343,7 +343,7 @@ reg('list_pipelines',        'List available content processing pipelines (trans
 
 async function main() {
   const transport = new StdioServerTransport();
-  console.error(`Gion MCP Server v0.3.0`);
+  console.error(`Taichu MCP Server v0.3.0`);
   console.error(`API: ${API_BASE} | Auth: ${API_KEY ? 'API Key' : 'none'} | Tools: 24`);
   console.error(`Ready for agent connections via stdio`);
   await server.connect(transport);

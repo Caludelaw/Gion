@@ -3,7 +3,7 @@
  *
  * 双通道认证：
  *   JWT     → 人类用户（登录后签发，Bearer Token）
- *   API Key → AI Agent（预生成，X-Gion-Agent-Key Header）
+ *   API Key → AI Agent（预生成，X-Taichu-Agent-Key Header）
  *
  * 所有实现基于 Node.js 内置 crypto 模块，零外部依赖。
  */
@@ -130,19 +130,19 @@ export function verifyJWT(token, secret) {
 
 /**
  * 生成 API Key
- * 格式：gion_<32字节随机hex>
+ * 格式：taichu_<32字节随机hex>
  *
  * @param {string} [label] — 标签（备忘用，如 "My Super Niuma Agent"）
  * @returns {{ key: string, prefix: string, label: string, createdAt: string }}
  */
 export function generateAPIKey(label = '') {
-  const key = `gion_${crypto.randomBytes(32).toString('hex')}`;
-  const prefix = key.substring(0, 11); // "gion_a1b2c3"
+  const key = `taichu_${crypto.randomBytes(32).toString('hex')}`;
+  const prefix = key.substring(0, 14); // "taichu_a1b2c3"
   // Store the hash, not the raw key
   const hash = crypto.createHash('sha256').update(key).digest('hex');
   return {
     key,      // 仅生成时返回一次
-    prefix,   // 用于 UI 展示 "gion_a1b2***"
+    prefix,   // 用于 UI 展示 "taichu_a1b2***"
     hash,     // 存储到数据库
     label,
     createdAt: new Date().toISOString()

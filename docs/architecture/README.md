@@ -1,6 +1,6 @@
 # Architecture Decision Records
 
-This directory contains Architecture Decision Records (ADRs) for Gion.
+This directory contains Architecture Decision Records (ADRs) for Taichu.
 
 ## What is an ADR?
 

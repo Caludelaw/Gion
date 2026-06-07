@@ -1,4 +1,4 @@
-# Gion Development Roadmap
+# Taichu Development Roadmap
 
 ## Phase 1: Core CMS ✅ COMPLETE
 
@@ -6,20 +6,20 @@
 
 | Feature | Status | Package |
 |---------|--------|---------|
-| Content Type Schema Definition | ✅ Done | `@gion/core` |
-| Typed Field Validation | ✅ Done | `@gion/core` |
-| Memory Store (dev/testing) | ✅ Done | `@gion/core` |
-| Hook System (lifecycle hooks) | ✅ Done | `@gion/core` |
-| Structured Error Types | ✅ Done | `@gion/core` |
-| Zero-Dependency HTTP Server | ✅ Done | `@gion/server` |
-| REST API (CRUD + list) | ✅ Done | `@gion/server` |
-| CORS Middleware | ✅ Done | `@gion/server` |
-| JSON Body Parser | ✅ Done | `@gion/server` |
+| Content Type Schema Definition | ✅ Done | `@taichu/core` |
+| Typed Field Validation | ✅ Done | `@taichu/core` |
+| Memory Store (dev/testing) | ✅ Done | `@taichu/core` |
+| Hook System (lifecycle hooks) | ✅ Done | `@taichu/core` |
+| Structured Error Types | ✅ Done | `@taichu/core` |
+| Zero-Dependency HTTP Server | ✅ Done | `@taichu/server` |
+| REST API (CRUD + list) | ✅ Done | `@taichu/server` |
+| CORS Middleware | ✅ Done | `@taichu/server` |
+| JSON Body Parser | ✅ Done | `@taichu/server` |
 | Architecture Decision Records | ✅ Done | `docs/` |
-| SQLite Store (sql.js WASM) | ✅ Done | `@gion/core` |
-| Authentication (JWT + API Key) | ✅ Done | `@gion/core` |
-| Vue 3 Admin SPA | ✅ Done | `@gion/admin` |
-| Static File Serving | ✅ Done | `@gion/server` |
+| SQLite Store (sql.js WASM) | ✅ Done | `@taichu/core` |
+| Authentication (JWT + API Key) | ✅ Done | `@taichu/core` |
+| Vue 3 Admin SPA | ✅ Done | `@taichu/admin` |
+| Static File Serving | ✅ Done | `@taichu/server` |
 
 ## Phase 2: AI-Native ✅ COMPLETE
 
@@ -54,7 +54,7 @@
 
 ## Long-Term Vision
 
-- **Gion as content backbone for AI agent ecosystems** — every agent in a workflow uses Gion as its shared content infrastructure
-- **Federated content networks** — Gion instances discover and share content via ActivityPub
+- **Taichu as content backbone for AI agent ecosystems** — every agent in a workflow uses Taichu as its shared content infrastructure
+- **Federated content networks** — Taichu instances discover and share content via ActivityPub
 - **Agent marketplace** — developers publish agent capabilities as installable extensions
 - **Zero-config HA** — SQLite + Litestream for production-grade durability with single-binary simplicity

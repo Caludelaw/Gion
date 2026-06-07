@@ -148,7 +148,7 @@ export function createMemoryStore() {
  * @returns {Promise<Store>}
  */
 export async function createStore(config = {}) {
-  const engine = (config.engine || process.env.GION_STORAGE || 'memory').toLowerCase();
+  const engine = (config.engine || process.env.TAICHU_STORAGE || 'memory').toLowerCase();
 
   switch (engine) {
     case 'memory':

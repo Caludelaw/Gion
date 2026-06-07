@@ -5,9 +5,9 @@
  * 实际对接微信开放平台 API，需要用户自行申请 AppID/AppSecret。
  *
  * 环境变量：
- *   GION_WECHAT_APPID     — 微信公众号 AppID
- *   GION_WECHAT_SECRET    — 公众号 AppSecret
- *   GION_WECHAT_TOKEN     — 服务器配置 Token（消息推送验证）
+ *   TAICHU_WECHAT_APPID     — 微信公众号 AppID
+ *   TAICHU_WECHAT_SECRET    — 公众号 AppSecret
+ *   TAICHU_WECHAT_TOKEN     — 服务器配置 Token（消息推送验证）
  */
 
 import { requireAuth } from '../middleware/auth.js';
@@ -21,9 +21,9 @@ let _tokenExpiry = 0;
 async function getAccessToken() {
   if (_accessToken && Date.now() < _tokenExpiry) return _accessToken;
 
-  const appId = process.env.GION_WECHAT_APPID;
-  const secret = process.env.GION_WECHAT_SECRET;
-  if (!appId || !secret) throw new Error('WeChat not configured (GION_WECHAT_APPID/SECRET)');
+  const appId = process.env.TAICHU_WECHAT_APPID;
+  const secret = process.env.TAICHU_WECHAT_SECRET;
+  if (!appId || !secret) throw new Error('WeChat not configured (TAICHU_WECHAT_APPID/SECRET)');
 
   const res = await fetch(`https://api.weixin.qq.com/cgi-bin/token?grant_type=client_credential&appid=${appId}&secret=${secret}`);
   const data = await res.json();
@@ -77,9 +77,9 @@ export async function wechatRoutes(ctx) {
   try {
     // GET /api/wechat/status
     if (pathname === '/api/wechat/status' && method === 'GET') {
-      const configured = !!(process.env.GION_WECHAT_APPID && process.env.GION_WECHAT_SECRET);
+      const configured = !!(process.env.TAICHU_WECHAT_APPID && process.env.TAICHU_WECHAT_SECRET);
       ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
-      ctx.res.end(JSON.stringify({ configured, appId: process.env.GION_WECHAT_APPID?.substring(0, 8) + '...' || '' }));
+      ctx.res.end(JSON.stringify({ configured, appId: process.env.TAICHU_WECHAT_APPID?.substring(0, 8) + '...' || '' }));
       return;
     }
 

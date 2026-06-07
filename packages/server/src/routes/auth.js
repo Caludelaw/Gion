@@ -172,7 +172,7 @@ export async function authRoutes(ctx) {
   }
 
   // DELETE /api/auth/apikeys/:prefix — Revoke API Key (requires auth)
-  const keyMatch = pathname.match(/^\/api\/auth\/apikeys\/(gion_[a-f0-9]+)$/);
+  const keyMatch = pathname.match(/^\/api\/auth\/apikeys\/(taichu_[a-f0-9]+)$/);
   if (keyMatch && method === 'DELETE') {
     const authResult = await requireAuth(ctx);
     if (!authResult.authenticated) {

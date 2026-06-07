@@ -54,7 +54,7 @@ export async function apiRoutes(ctx) {
     ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
     ctx.res.end(JSON.stringify({
       status: 'ok',
-      name: 'gion',
+      name: 'taichu',
       version: '0.1.0',
       uptime: process.uptime()
     }));
@@ -119,8 +119,8 @@ export async function apiRoutes(ctx) {
   // /api/content/:type
   const listMatch = pathname.match(/^\/api\/content\/([a-z][a-z0-9_]*)$/);
   if (listMatch && method === 'GET') {
-    // Auth required by default; set GION_PUBLIC_READ=1 to allow anonymous GET
-    if (!process.env.GION_PUBLIC_READ) {
+    // Auth required by default; set TAICHU_PUBLIC_READ=1 to allow anonymous GET
+    if (!process.env.TAICHU_PUBLIC_READ) {
       const authResult = await requireAuth(ctx);
       if (!authResult.authenticated) {
         ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
@@ -184,7 +184,7 @@ export async function apiRoutes(ctx) {
     const [, type, id] = itemMatch;
 
     if (method === 'GET') {
-      if (!process.env.GION_PUBLIC_READ) {
+      if (!process.env.TAICHU_PUBLIC_READ) {
         const authResult = await requireAuth(ctx);
         if (!authResult.authenticated) {
           ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });

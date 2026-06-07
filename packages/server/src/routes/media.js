@@ -52,7 +52,7 @@ export async function mediaRoutes(ctx) {
       for (const file of files) {
         const saved = await mediaStore.save(file.buffer, file.filename, file.mimetype);
 
-        // Store metadata in Gion's content system
+        // Store metadata in Taichu's content system
         const doc = await store.create({
           type: 'media',
           data: {

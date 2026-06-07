@@ -1,7 +1,7 @@
 <template>
   <div class="login-page">
     <div class="login-card">
-      <h1>⚡ Gion Admin</h1>
+      <h1>⚡ Taichu Admin</h1>
       <p class="sub">AI Agent-Native CMS</p>
 
       <div class="tabs">

@@ -1,5 +1,5 @@
 /**
- * @gion/server — Gion HTTP Server
+ * @taichu/server — Taichu HTTP Server
  *
  * 零外部依赖的 HTTP 服务。
  * 负责：
@@ -134,7 +134,7 @@ export async function start(configOverrides = {}) {
       ' ╚██████╔╝██║╚██████╔╝██║ ╚████║',
       '  ╚═════╝ ╚═╝ ╚═════╝ ╚═╝  ╚═══╝',
       '',
-      `  Gion CMS v${version}`,
+      `  Taichu CMS v${version}`,
       `  AI Agent-Native Content Infrastructure`,
       `  Store:     ${storeType}`,
       '',
@@ -173,7 +173,7 @@ export async function start(configOverrides = {}) {
 
   server.on('error', (err) => {
     if (err.code === 'EADDRINUSE') {
-      console.error(`Port ${port} is already in use. Try: GION_PORT=${port + 1} npm start`);
+      console.error(`Port ${port} is already in use. Try: TAICHU_PORT=${port + 1} npm start`);
     } else {
       console.error('Server error:', err.message);
     }

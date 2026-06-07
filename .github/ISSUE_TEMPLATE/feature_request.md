@@ -1,6 +1,6 @@
 ---
 name: Feature Request
-about: Suggest a new feature for Gion
+about: Suggest a new feature for Taichu
 title: '[Feature] '
 labels: ['enhancement', 'triage']
 assignees: []

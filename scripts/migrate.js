@@ -1,15 +1,15 @@
 /**
  * Migration — 数据迁移工具
  *
- * 支持从 WordPress (WXR)、Markdown 目录批量导入到 Gion。
+ * 支持从 WordPress (WXR)、Markdown 目录批量导入到 Taichu。
  *
  * 使用：
  *   node scripts/migrate.js --from=wordpress --file=dump.xml
  *   node scripts/migrate.js --from=markdown --dir=./posts
  *
  * 选项：
- *   --api    Gion API 地址（默认 http://localhost:3120）
- *   --token  JWT Token 或环境变量 GION_TOKEN
+ *   --api    Taichu API 地址（默认 http://localhost:3120）
+ *   --token  JWT Token 或环境变量 TAICHU_TOKEN
  *   --type   目标内容类型（默认 article）
  *   --dry-run  预览模式，不实际写入
  */
@@ -116,9 +116,9 @@ function slugify(text) {
 // API Uploader
 // ════════════════════════════════════════════════════════════
 
-export async function uploadToGion(posts, config = {}) {
-  const api = config.api || process.env.GION_API || 'http://localhost:3120';
-  const token = config.token || process.env.GION_TOKEN;
+export async function uploadToTaichu(posts, config = {}) {
+  const api = config.api || process.env.TAICHU_API || 'http://localhost:3120';
+  const token = config.token || process.env.TAICHU_TOKEN;
   const type = config.type || 'article';
   const dryRun = !!config.dryRun;
 
@@ -170,24 +170,24 @@ if (args.length > 0) {
   const file = getArg('--file');
   const dir = getArg('--dir');
   const api = getArg('--api') || 'http://localhost:3120';
-  const token = getArg('--token') || process.env.GION_TOKEN;
+  const token = getArg('--token') || process.env.TAICHU_TOKEN;
   const type = getArg('--type') || 'article';
   const dryRun = args.includes('--dry-run');
 
   (async () => {
-    console.log('Gion Migration Tool v0.1.0\n');
+    console.log('Taichu Migration Tool v0.1.0\n');
 
     let result;
     if (from === 'wordpress' && file) {
       console.log(`Importing WordPress WXR: ${file}`);
       const data = parseWXR(file);
       console.log(`  Parsed ${data.total} posts`);
-      result = await uploadToGion(data.posts, { api, token, type, dryRun });
+      result = await uploadToTaichu(data.posts, { api, token, type, dryRun });
     } else if (from === 'markdown' && dir) {
       console.log(`Importing Markdown from: ${dir}`);
       const data = parseMarkdownDir(dir);
       console.log(`  Parsed ${data.total} posts`);
-      result = await uploadToGion(data.posts, { api, token, type, dryRun });
+      result = await uploadToTaichu(data.posts, { api, token, type, dryRun });
     } else {
       console.log('Usage:');
       console.log('  node scripts/migrate.js --from=wordpress --file=dump.xml [--api=...] [--token=...]');

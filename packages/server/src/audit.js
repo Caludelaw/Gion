@@ -10,7 +10,7 @@ import { createLogger } from './logger.js';
 
 const log = createLogger('audit');
 
-const RETENTION_DAYS = parseInt(process.env.GION_AUDIT_RETENTION_DAYS) || 180;
+const RETENTION_DAYS = parseInt(process.env.TAICHU_AUDIT_RETENTION_DAYS) || 180;
 
 /**
  * @param {object} entry

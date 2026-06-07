@@ -6,7 +6,7 @@
 
 ## Context
 
-Gion needs an extension system that allows both:
+Taichu needs an extension system that allows both:
 1. Traditional plugin-style functionality (similar to WordPress's `add_action`/`add_filter`)
 2. Agent-native capabilities (agents registering themselves in content pipelines)
 
@@ -17,7 +17,7 @@ The extension model must be simple enough for community contributors, yet powerf
 1. **Familiarity** — WordPress's hook system is the most successful plugin API in CMS history
 2. **Agent-compatibility** — hooks must support async operations (agents may call external LLMs)
 3. **Determinism** — priority ordering must be predictable
-4. **No global state** — hooks are scoped to a Gion instance, not global
+4. **No global state** — hooks are scoped to a Taichu instance, not global
 
 ## Options Considered
 
@@ -31,22 +31,22 @@ Proven model. But WordPress uses global state, which doesn't scale to multi-tena
 
 ### Option C: Instance-Scoped Lifecycle Hooks (our approach)
 
-Inspired by WordPress but scoped to a Gion instance. Named lifecycle hooks with priority ordering. Supports both side-effect hooks (action-like) and value-passing hooks (filter-like).
+Inspired by WordPress but scoped to a Taichu instance. Named lifecycle hooks with priority ordering. Supports both side-effect hooks (action-like) and value-passing hooks (filter-like).
 
 ## Decision
 
-**Gion uses an instance-scoped hook system with WordPress-compatible semantics.**
+**Taichu uses an instance-scoped hook system with WordPress-compatible semantics.**
 
 ```js
-const gion = createGion();
+const taichu = createTaichu();
 
 // Side-effect hook (action)
-gion.hooks.on('afterCreate', async (doc, ctx) => {
+taichu.hooks.on('afterCreate', async (doc, ctx) => {
   await searchIndex.index(doc);
 });
 
 // Value-passing hook (filter)
-gion.hooks.on('beforeRender', async (html, ctx) => {
+taichu.hooks.on('beforeRender', async (html, ctx) => {
   return addAnalytics(html);
 }, 5); // priority 5 — runs before default (10)
 ```

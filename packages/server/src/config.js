@@ -1,7 +1,7 @@
 /**
  * Config — 集中式配置管理
  *
- * 替代散落的 process.env.GION_* 读取，提供：
+ * 替代散落的 process.env.TAICHU_* 读取，提供：
  *   - Schema 验证（类型、必填、默认值、枚举）
  *   - 启动时一次性校验，拒绝无效配置
  *   - 不可变配置对象
@@ -9,37 +9,37 @@
 
 const schema = [
   // Server
-  { key: 'port',          env: 'GION_PORT',          type: 'number',  default: 3120,  min: 1, max: 65535 },
-  { key: 'host',          env: 'GION_HOST',          type: 'string',  default: '0.0.0.0' },
-  { key: 'version',       env: 'GION_VERSION',       type: 'string',  default: '0.4.0' },
+  { key: 'port',          env: 'TAICHU_PORT',          type: 'number',  default: 3120,  min: 1, max: 65535 },
+  { key: 'host',          env: 'TAICHU_HOST',          type: 'string',  default: '0.0.0.0' },
+  { key: 'version',       env: 'TAICHU_VERSION',       type: 'string',  default: '0.4.0' },
 
   // Storage
-  { key: 'storage',       env: 'GION_STORAGE',       type: 'enum',    default: 'memory',  values: ['memory', 'sqlite'] },
-  { key: 'dataDir',       env: 'GION_DATA_DIR',       type: 'string',  default: null },
-  { key: 'sqliteFlushMs', env: 'GION_SQLITE_FLUSH_MS',type: 'number', default: 5000, min: 1000, max: 60000 },
+  { key: 'storage',       env: 'TAICHU_STORAGE',       type: 'enum',    default: 'memory',  values: ['memory', 'sqlite'] },
+  { key: 'dataDir',       env: 'TAICHU_DATA_DIR',       type: 'string',  default: null },
+  { key: 'sqliteFlushMs', env: 'TAICHU_SQLITE_FLUSH_MS',type: 'number', default: 5000, min: 1000, max: 60000 },
 
   // Auth
-  { key: 'jwtSecret',     env: 'GION_JWT_SECRET',    type: 'string',  default: '__AUTO__' },
-  { key: 'jwtExpiresIn',  env: 'GION_JWT_EXPIRES_IN',type: 'string',  default: '7d' },
+  { key: 'jwtSecret',     env: 'TAICHU_JWT_SECRET',    type: 'string',  default: '__AUTO__' },
+  { key: 'jwtExpiresIn',  env: 'TAICHU_JWT_EXPIRES_IN',type: 'string',  default: '7d' },
 
   // Security
-  { key: 'publicRead',    env: 'GION_PUBLIC_READ',   type: 'boolean', default: false },
-  { key: 'maxBodySize',   env: 'GION_MAX_BODY_SIZE', type: 'number',  default: 5 * 1024 * 1024, min: 1024 },
-  { key: 'maxFileSize',   env: 'GION_MAX_FILE_SIZE', type: 'number',  default: 50 * 1024 * 1024, min: 1024 },
+  { key: 'publicRead',    env: 'TAICHU_PUBLIC_READ',   type: 'boolean', default: false },
+  { key: 'maxBodySize',   env: 'TAICHU_MAX_BODY_SIZE', type: 'number',  default: 5 * 1024 * 1024, min: 1024 },
+  { key: 'maxFileSize',   env: 'TAICHU_MAX_FILE_SIZE', type: 'number',  default: 50 * 1024 * 1024, min: 1024 },
 
   // Uploads
-  { key: 'uploadDir',     env: 'GION_UPLOAD_DIR',    type: 'string',  default: null },
+  { key: 'uploadDir',     env: 'TAICHU_UPLOAD_DIR',    type: 'string',  default: null },
 
   // Logging
-  { key: 'logLevel',      env: 'GION_LOG_LEVEL',     type: 'enum',    default: 'info',    values: ['debug', 'info', 'warn', 'error'] },
-  { key: 'logFormat',     env: 'GION_LOG_FORMAT',    type: 'enum',    default: 'pretty',  values: ['pretty', 'json'] },
+  { key: 'logLevel',      env: 'TAICHU_LOG_LEVEL',     type: 'enum',    default: 'info',    values: ['debug', 'info', 'warn', 'error'] },
+  { key: 'logFormat',     env: 'TAICHU_LOG_FORMAT',    type: 'enum',    default: 'pretty',  values: ['pretty', 'json'] },
 
   // Environment
   { key: 'nodeEnv',       env: 'NODE_ENV',           type: 'enum',    default: 'development', values: ['development', 'production', 'test'] },
 ];
 
 /**
- * @typedef {object} GionConfig
+ * @typedef {object} TaichuConfig
  */
 
 let _config = null;
@@ -49,7 +49,7 @@ let _warnings = [];
  * Load and validate configuration.
  * Call once at startup. Returns frozen config object.
  *
- * @returns {GionConfig}
+ * @returns {TaichuConfig}
  */
 export function loadConfig() {
   if (_config) return _config;
@@ -127,7 +127,7 @@ export function getConfig() {
 export function configSummary() {
   const c = getConfig();
   return [
-    `  Storage:   ${c.storage === 'sqlite' ? `sqlite (${c.dataDir || '.gion/data/gion.db'})` : 'memory'}`,
+    `  Storage:   ${c.storage === 'sqlite' ? `sqlite (${c.dataDir || '.taichu/data/taichu.db'})` : 'memory'}`,
     `  Log:       ${c.logLevel} / ${c.logFormat}`,
     `  Public:    ${c.publicRead ? 'read enabled' : 'auth required'}`,
     `  Uploads:   ${c.maxFileSize / 1024 / 1024}MB max`,

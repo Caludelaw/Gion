@@ -1,6 +1,6 @@
 ---
 name: Bug Report
-about: Report a bug in Gion
+about: Report a bug in Taichu
 title: '[Bug] '
 labels: ['bug', 'triage']
 assignees: []
@@ -21,7 +21,7 @@ A clear description of what you expected to happen.
 **Environment:**
 - Node.js version: `node --version`
 - OS: [e.g. Windows 11, macOS 14, Ubuntu 24.04]
-- Gion version/commit: [e.g. v0.1.0 or commit hash]
+- Taichu version/commit: [e.g. v0.1.0 or commit hash]
 
 **Additional context**
 Add any other context about the problem here. Screenshots, error logs, or minimal reproduction code are very helpful.

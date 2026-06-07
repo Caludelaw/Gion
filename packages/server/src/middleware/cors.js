@@ -4,7 +4,7 @@
 
 const DEFAULT_ORIGIN = '*';
 const DEFAULT_METHODS = 'GET,POST,PUT,PATCH,DELETE,OPTIONS';
-const DEFAULT_HEADERS = 'Content-Type,Authorization,X-Gion-Agent-Key,X-Gion-Agent-Id';
+const DEFAULT_HEADERS = 'Content-Type,Authorization,X-Taichu-Agent-Key,X-Taichu-Agent-Id';
 const DEFAULT_MAX_AGE = '86400';
 
 export function corsMiddleware(req, res) {

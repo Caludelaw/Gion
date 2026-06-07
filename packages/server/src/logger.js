@@ -10,8 +10,8 @@
  *   error: 3 — 错误
  *
  * 环境变量：
- *   GION_LOG_LEVEL  — 最小输出级别（默认 info）
- *   GION_LOG_FORMAT — "json" | "pretty"（默认 pretty）
+ *   TAICHU_LOG_LEVEL  — 最小输出级别（默认 info）
+ *   TAICHU_LOG_FORMAT — "json" | "pretty"（默认 pretty）
  */
 
 const LEVELS = { debug: 0, info: 1, warn: 2, error: 3 };
@@ -28,8 +28,8 @@ const COLORS = {
   bold:  '\x1b[1m'
 };
 
-const minLevel = LEVELS[process.env.GION_LOG_LEVEL || 'info'] ?? 1;
-const format = process.env.GION_LOG_FORMAT || 'pretty';
+const minLevel = LEVELS[process.env.TAICHU_LOG_LEVEL || 'info'] ?? 1;
+const format = process.env.TAICHU_LOG_FORMAT || 'pretty';
 
 /**
  * @param {string} level

@@ -77,7 +77,7 @@ async function createWebhook() {
   try {
     await fetch('/api/webhooks', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` },
       body: JSON.stringify({ url: form.value.url, label: form.value.label, events: form.value.events, types: form.value.types })
     })
     showForm.value = false
@@ -88,7 +88,7 @@ async function createWebhook() {
 }
 async function deleteHook(id) {
   if (!confirm('确认删除？')) return
-  await fetch(`/api/webhooks/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` } })
+  await fetch(`/api/webhooks/${id}`, { method: 'DELETE', headers: { 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` } })
   await load()
 }
 </script>

@@ -3,11 +3,11 @@
 ## Docker
 
 ```bash
-docker pull registry.cn-hangzhou.aliyuncs.com/caludelaw/gion:latest
-docker run -d -p 3120:3120 -v gion-data:/app/.gion \
-  -e GION_STORAGE=sqlite \
-  --name gion \
-  registry.cn-hangzhou.aliyuncs.com/caludelaw/gion:latest
+docker pull registry.cn-hangzhou.aliyuncs.com/caludelaw/taichu:latest
+docker run -d -p 3120:3120 -v taichu-data:/app/.taichu \
+  -e TAICHU_STORAGE=sqlite \
+  --name taichu \
+  registry.cn-hangzhou.aliyuncs.com/caludelaw/taichu:latest
 ```
 
 ## 阿里云 ECS
@@ -18,20 +18,20 @@ curl -fsSL https://deb.nodesource.com/setup_22.x | sudo -E bash -
 sudo apt-get install -y nodejs
 
 # 克隆并启动
-git clone https://gitee.com/Caludelaw/Gion.git
-cd Gion
+git clone https://gitee.com/Caludelaw/Taichu.git
+cd Taichu
 
 # 配置环境变量
 cat > .env << EOF
-GION_STORAGE=sqlite
-GION_PORT=3120
-GION_HOST=0.0.0.0
-GION_JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
+TAICHU_STORAGE=sqlite
+TAICHU_PORT=3120
+TAICHU_HOST=0.0.0.0
+TAICHU_JWT_SECRET=$(node -e "console.log(require('crypto').randomBytes(32).toString('hex'))")
 EOF
 
 # 持久化运行
 npm install -g pm2
-pm2 start packages/server/src/index.js --name gion
+pm2 start packages/server/src/index.js --name taichu
 pm2 save
 pm2 startup
 ```
@@ -40,8 +40,8 @@ pm2 startup
 
 ```bash
 # 同阿里云 ECS 步骤，替换 clone URL 为 Gitee 镜像
-git clone https://gitee.com/Caludelaw/Gion.git
-cd Gion && npm start
+git clone https://gitee.com/Caludelaw/Taichu.git
+cd Taichu && npm start
 ```
 
 ## Nginx 反向代理
@@ -67,9 +67,9 @@ server {
 
 ## 备份策略
 
-SQLite 数据库文件位于 `.gion/data/gion.db`，建议：
+SQLite 数据库文件位于 `.taichu/data/taichu.db`，建议：
 
 ```bash
 # 定时备份（crontab，每天凌晨 3 点）
-0 3 * * * cp /path/to/gion/.gion/data/gion.db /backup/gion-$(date +\%Y\%m\%d).db
+0 3 * * * cp /path/to/taichu/.taichu/data/taichu.db /backup/taichu-$(date +\%Y\%m\%d).db
 ```

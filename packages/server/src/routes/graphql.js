@@ -7,7 +7,7 @@
  * POST /api/graphql — GraphQL 端点
  * GET  /api/graphql — GraphiQL 交互式 IDE（开发环境）
  *
- * 支持 Bearer JWT 或 X-Gion-Agent-Key 认证。
+ * 支持 Bearer JWT 或 X-Taichu-Agent-Key 认证。
  */
 
 import { buildSchema, graphql } from 'graphql';
@@ -141,7 +141,7 @@ const resolvers = {
     },
 
     health() {
-      return `Gion CMS v0.2.0 — uptime: ${Math.floor(process.uptime())}s`;
+      return `Taichu CMS v0.2.0 — uptime: ${Math.floor(process.uptime())}s`;
     }
   },
 
@@ -230,7 +230,7 @@ export async function graphqlRoutes(ctx) {
     }
 
     // Validate query depth (prevent DoS via deeply nested queries)
-    const maxDepth = parseInt(process.env.GION_GRAPHQL_MAX_DEPTH) || 5;
+    const maxDepth = parseInt(process.env.TAICHU_GRAPHQL_MAX_DEPTH) || 5;
     if (estimateQueryDepth(query) > maxDepth) {
       ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
       ctx.res.end(JSON.stringify({ errors: [{ message: `Query depth exceeds maximum of ${maxDepth}` }] }));
@@ -274,7 +274,7 @@ function estimateQueryDepth(query) {
 const GRAPHIQL_HTML = `<!DOCTYPE html>
 <html>
 <head>
-  <title>Gion GraphiQL</title>
+  <title>Taichu GraphiQL</title>
   <style>
     * { margin:0; padding:0; box-sizing:border-box; }
     body { font-family: -apple-system, sans-serif; background: #0F172A; color: #E2E8F0; height:100vh; display:flex; flex-direction:column; }
@@ -294,7 +294,7 @@ const GRAPHIQL_HTML = `<!DOCTYPE html>
   </style>
 </head>
 <body>
-<header><h1>⚡ Gion GraphiQL</h1><span>GraphQL Explorer</span></header>
+<header><h1>⚡ Taichu GraphiQL</h1><span>GraphQL Explorer</span></header>
 <main>
   <div class="bar">
     <button onclick="run()">▶ 执行</button>

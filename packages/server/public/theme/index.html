@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title data-gion="siteName">Gion CMS</title>
+<title data-taichu="siteName">Taichu CMS</title>
 <meta name="description" content="">
 <link rel="stylesheet" href="/theme/style.css">
 <link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed">
@@ -11,7 +11,7 @@
 <body>
 <header class="site-header">
   <div class="header-inner">
-    <a href="/" class="site-logo">Gion</a>
+    <a href="/" class="site-logo">Taichu</a>
     <nav class="site-nav" id="nav"></nav>
   </div>
 </header>
@@ -20,19 +20,19 @@
 
 <footer class="site-footer">
   <div class="footer-inner">
-    <p>Powered by <a href="https://github.com/Caludelaw/Gion" target="_blank">Gion CMS</a></p>
+    <p>Powered by <a href="https://github.com/Caludelaw/Taichu" target="_blank">Taichu CMS</a></p>
     <p class="icp" id="icp"></p>
   </div>
 </footer>
 
 <script>
 (function() {
-var G = window.__GION__ || {};
+var G = window.__TAICHU__ || {};
 
 // ── Init ──────────────────────────────────────────────────
-document.title = G.site?.name || 'Gion CMS';
+document.title = G.site?.name || 'Taichu CMS';
 document.documentElement.lang = G.site?.language || 'zh-CN';
-document.querySelectorAll('[data-gion=siteName]').forEach(function(el){ el.textContent = G.site?.name || 'Gion' });
+document.querySelectorAll('[data-taichu=siteName]').forEach(function(el){ el.textContent = G.site?.name || 'Taichu' });
 
 // ICP
 var icpEl = document.getElementById('icp');
@@ -125,7 +125,7 @@ function renderPost(slug) {
     var doc = docs.find(function(d){ return d.data?.slug === slug });
     if (!doc) { render404(); return; }
     main.innerHTML = '<article class="post-single"><h1>'+escHtml(doc.data?.title||'')+'</h1><time>'+fmtDate(doc.updatedAt)+'</time><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
-    document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Gion');
+    document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Taichu');
     // CTA
     if (doc.data?.status !== 'published') {
       main.innerHTML += '<p class="cta-note">此内容未发布。</p>';
@@ -143,7 +143,7 @@ function renderPage(slug) {
     var doc = docs.find(function(d){ return d.data?.slug === slug });
     if (!doc) { render404(); return; }
     main.innerHTML = '<article class="post-single"><h1>'+escHtml(doc.data?.title||'')+'</h1><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
-    document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Gion');
+    document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Taichu');
   }).catch(function(e){ main.innerHTML = '<p class="error">加载失败</p>'; });
 }
 

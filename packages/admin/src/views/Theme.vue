@@ -1,7 +1,7 @@
 <template>
   <div>
     <h1 class="page-title">🎨 外观主题</h1>
-    <p class="desc">Gion 是 Headless CMS，前端主题由您的静态站点生成器或框架处理。此处配置全局样式变量，供 API 输出使用。</p>
+    <p class="desc">Taichu 是 Headless CMS，前端主题由您的静态站点生成器或框架处理。此处配置全局样式变量，供 API 输出使用。</p>
 
     <div class="cards">
       <div class="card">
@@ -88,7 +88,7 @@
 
     <div class="note">
       <h3>💡 提示</h3>
-      <p>这些配置通过 <code>GET /api/site-settings</code> 的 <code>theme</code> 字段输出，您的前端框架（Next.js / Nuxt / Hugo 等）可以直接读取使用。Gion 不会渲染前端页面，只提供内容 API。</p>
+      <p>这些配置通过 <code>GET /api/site-settings</code> 的 <code>theme</code> 字段输出，您的前端框架（Next.js / Nuxt / Hugo 等）可以直接读取使用。Taichu 不会渲染前端页面，只提供内容 API。</p>
     </div>
   </div>
 </template>
@@ -123,7 +123,7 @@ async function save() {
   try {
     await fetch('/api/site-settings', {
       method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('gion_token')}` },
+      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` },
       body: JSON.stringify({ theme: theme.value })
     })
     saved.value = true

@@ -9,7 +9,7 @@
 
 import { randomUUID } from 'node:crypto';
 
-const MAX_FILE_SIZE = parseInt(process.env.GION_MAX_FILE_SIZE) || 50 * 1024 * 1024;
+const MAX_FILE_SIZE = parseInt(process.env.TAICHU_MAX_FILE_SIZE) || 50 * 1024 * 1024;
 const MAX_TOTAL_SIZE = MAX_FILE_SIZE + 5 * 1024 * 1024;
 
 /**

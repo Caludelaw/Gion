@@ -6,7 +6,7 @@
 
 ## Context
 
-We need to choose the dependency strategy for Gion's core runtime (`@gion/core` and `@gion/server`). The options range from full-framework (Express/Fastify + ORM + etc.) to zero-dependency (Node.js built-ins only).
+We need to choose the dependency strategy for Taichu's core runtime (`@taichu/core` and `@taichu/server`). The options range from full-framework (Express/Fastify + ORM + etc.) to zero-dependency (Node.js built-ins only).
 
 ## Decision Drivers
 
@@ -37,7 +37,7 @@ We need to choose the dependency strategy for Gion's core runtime (`@gion/core` 
 
 **We choose Option C: Zero Dependencies for the core runtime.**
 
-The core packages (`@gion/core`, `@gion/server`) use only Node.js built-in modules. Optional dependencies (SQLite driver, vector store) are isolated in separate packages.
+The core packages (`@taichu/core`, `@taichu/server`) use only Node.js built-in modules. Optional dependencies (SQLite driver, vector store) are isolated in separate packages.
 
 ## Consequences
 
@@ -58,4 +58,4 @@ The core packages (`@gion/core`, `@gion/server`) use only Node.js built-in modul
 
 - Clear JSDoc documentation for all public APIs
 - The API design is intentionally similar to familiar patterns (middleware stack, context object)
-- Complex features that truly need external deps are in separate packages (e.g., `@gion/driver-sqlite`)
+- Complex features that truly need external deps are in separate packages (e.g., `@taichu/driver-sqlite`)

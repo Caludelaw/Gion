@@ -13,5 +13,5 @@ jobs:
 
       - name: Push to Gitee
         run: |
-          git remote add gitee https://Caludelaw:${{ secrets.GITEE_TOKEN }}@gitee.com/Caludelaw/Gion.git
+          git remote add gitee https://Caludelaw:${{ secrets.GITEE_TOKEN }}@gitee.com/Caludelaw/Taichu.git
           git push gitee main --force --tags
