@@ -8,11 +8,14 @@
           <router-link :to="`/content/${t.name}`" class="nav-item">{{ t.label }}</router-link>
         </template>
         <router-link to="/media" class="nav-item">🖼️ 媒体库</router-link>
+        <router-link to="/categories" class="nav-item">📂 栏目管理</router-link>
 
         <div class="nav-section">管理</div>
+        <router-link to="/users" class="nav-item">👥 用户管理</router-link>
         <router-link to="/apikeys" class="nav-item">🔑 API Keys</router-link>
         <router-link to="/webhooks" class="nav-item">🔗 Webhooks</router-link>
         <router-link to="/settings" class="nav-item">⚙️ 站点配置</router-link>
+        <router-link to="/theme" class="nav-item">🎨 外观主题</router-link>
 
         <div class="nav-section">安全</div>
         <router-link to="/audit" class="nav-item">📋 审计日志</router-link>

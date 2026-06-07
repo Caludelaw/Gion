@@ -13,6 +13,9 @@ import Webhooks from '../views/Webhooks.vue'
 import Pipelines from '../views/Pipelines.vue'
 import Workflow from '../views/Workflow.vue'
 import Revisions from '../views/Revisions.vue'
+import Users from '../views/Users.vue'
+import Categories from '../views/Categories.vue'
+import Theme from '../views/Theme.vue'
 
 const routes = [
   { path: '/login', component: Login, meta: { public: true } },
@@ -28,7 +31,10 @@ const routes = [
   { path: '/audit', component: AuditLog },
   { path: '/webhooks', component: Webhooks },
   { path: '/pipelines', component: Pipelines },
-  { path: '/workflow', component: Workflow }
+  { path: '/workflow', component: Workflow },
+  { path: '/users', component: Users },
+  { path: '/categories', component: Categories },
+  { path: '/theme', component: Theme }
 ]
 
 const router = createRouter({
