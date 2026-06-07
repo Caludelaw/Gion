@@ -22,9 +22,13 @@
           <option v-for="v in f.values" :key="v" :value="v">{{ v }}</option>
         </select>
 
-        <textarea v-else-if="f.type === 'json'"
+        <textarea v-else-if="f.type === 'json' && f.name !== 'body'"
           v-model="formData[f.name]"
           rows="12" placeholder="JSON 内容..."></textarea>
+
+        <RichEditor v-else-if="f.type === 'json' && f.name === 'body'"
+          v-model="formData[f.name]"
+          :placeholder="'输入正文...'" />
 
         <input v-else v-model="formData[f.name]"
           type="text"
@@ -41,6 +45,7 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '../api/index.js'
+import RichEditor from '../components/RichEditor.vue'
 
 const props = defineProps({ type: String, id: String, types: Array })
 const route = useRoute()

@@ -34,6 +34,7 @@ export const api = {
 
   // Content Types
   listTypes: () => request('/content-types'),
+  getContentTypeSchema: (name) => request(`/content-types/${name}`),
 
   // Media
   uploadMedia: async (file) => {

@@ -1,0 +1,126 @@
+<template>
+  <div class="editor-wrapper" v-if="editor">
+    <div class="toolbar">
+      <button @click="editor.chain().focus().toggleBold().run()" :class="{ active: editor.isActive('bold') }" title="粗体 (Ctrl+B)"><b>B</b></button>
+      <button @click="editor.chain().focus().toggleItalic().run()" :class="{ active: editor.isActive('italic') }" title="斜体 (Ctrl+I)"><i>I</i></button>
+      <button @click="editor.chain().focus().toggleStrike().run()" :class="{ active: editor.isActive('strike') }" title="删除线"><s>S</s></button>
+      <button @click="editor.chain().focus().toggleCode().run()" :class="{ active: editor.isActive('code') }" title="行内代码">&lt;/&gt;</button>
+      <span class="sep"></span>
+      <button @click="editor.chain().focus().toggleHeading({ level: 1 }).run()" :class="{ active: editor.isActive('heading', { level: 1 }) }">H1</button>
+      <button @click="editor.chain().focus().toggleHeading({ level: 2 }).run()" :class="{ active: editor.isActive('heading', { level: 2 }) }">H2</button>
+      <button @click="editor.chain().focus().toggleHeading({ level: 3 }).run()" :class="{ active: editor.isActive('heading', { level: 3 }) }">H3</button>
+      <span class="sep"></span>
+      <button @click="editor.chain().focus().toggleBulletList().run()" :class="{ active: editor.isActive('bulletList') }" title="无序列表">• 列表</button>
+      <button @click="editor.chain().focus().toggleOrderedList().run()" :class="{ active: editor.isActive('orderedList') }" title="有序列表">1. 列表</button>
+      <button @click="editor.chain().focus().toggleBlockquote().run()" :class="{ active: editor.isActive('blockquote') }" title="引用">❝</button>
+      <button @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ active: editor.isActive('codeBlock') }" title="代码块">&lt;code/&gt;</button>
+      <span class="sep"></span>
+      <button @click="addImage" title="插入图片">🖼️</button>
+      <button @click="editor.chain().focus().setHorizontalRule().run()" title="分割线">—</button>
+      <button @click="editor.chain().focus().undo().run()" title="撤销 (Ctrl+Z)">↩</button>
+      <button @click="editor.chain().focus().redo().run()" title="重做 (Ctrl+Y)">↪</button>
+    </div>
+    <editor-content :editor="editor" class="editor-content" />
+  </div>
+</template>
+
+<script setup>
+import { ref, watch, onBeforeUnmount } from 'vue'
+import { useEditor, EditorContent } from '@tiptap/vue-3'
+import StarterKit from '@tiptap/starter-kit'
+import Image from '@tiptap/extension-image'
+import Link from '@tiptap/extension-link'
+import Placeholder from '@tiptap/extension-placeholder'
+
+const props = defineProps({
+  modelValue: { type: Object, default: () => ({}) },
+  placeholder: { type: String, default: '开始输入...' }
+})
+
+const emit = defineEmits(['update:modelValue'])
+
+const editor = useEditor({
+  content: props.modelValue,
+  extensions: [
+    StarterKit.configure({
+      heading: { levels: [1, 2, 3] }
+    }),
+    Image.configure({ inline: false, allowBase64: true }),
+    Link.configure({ openOnClick: false }),
+    Placeholder.configure({ placeholder: props.placeholder })
+  ],
+  onUpdate: ({ editor }) => {
+    emit('update:modelValue', editor.getJSON())
+  }
+})
+
+// Watch for external model changes (e.g. loading existing content)
+watch(() => props.modelValue, (val) => {
+  if (editor.value && val) {
+    const current = JSON.stringify(editor.value.getJSON())
+    const incoming = JSON.stringify(val)
+    if (current !== incoming) {
+      editor.value.commands.setContent(val)
+    }
+  }
+})
+
+function addImage() {
+  const url = prompt('图片 URL:')
+  if (url) {
+    editor.value?.chain().focus().setImage({ src: url }).run()
+  }
+}
+
+onBeforeUnmount(() => {
+  editor.value?.destroy()
+})
+</script>
+
+<style scoped>
+.editor-wrapper {
+  border: 1px solid var(--border); border-radius: var(--radius);
+  background: var(--surface); overflow: hidden;
+}
+.toolbar {
+  display: flex; flex-wrap: wrap; gap: 2px; padding: 6px 8px;
+  background: var(--bg); border-bottom: 1px solid var(--border);
+}
+.toolbar button {
+  padding: 4px 8px; border: 1px solid transparent; border-radius: 4px;
+  background: transparent; cursor: pointer; font-size: 13px; color: var(--text-secondary);
+  white-space: nowrap; min-width: 28px; text-align: center;
+}
+.toolbar button:hover { background: var(--surface); border-color: var(--border); color: var(--text); }
+.toolbar button.active { background: var(--primary); color: white; border-color: var(--primary); }
+.sep { width: 1px; background: var(--border); margin: 0 4px; align-self: stretch; }
+.editor-content {
+  padding: 16px; min-height: 300px; outline: none;
+}
+.editor-content :deep(p) { margin: 0 0 8px; line-height: 1.7; }
+.editor-content :deep(h1) { font-size: 24px; margin: 16px 0 8px; }
+.editor-content :deep(h2) { font-size: 20px; margin: 14px 0 6px; }
+.editor-content :deep(h3) { font-size: 16px; margin: 12px 0 4px; }
+.editor-content :deep(blockquote) {
+  border-left: 3px solid var(--primary); padding: 4px 12px; margin: 8px 0;
+  color: var(--text-secondary); background: var(--bg);
+}
+.editor-content :deep(code) {
+  background: #F1F5F9; padding: 2px 4px; border-radius: 3px; font-size: 13px;
+}
+.editor-content :deep(pre) {
+  background: #1E293B; color: #E2E8F0; padding: 12px 16px; border-radius: 6px;
+  overflow-x: auto; margin: 8px 0;
+}
+.editor-content :deep(pre code) { background: none; padding: 0; color: inherit; }
+.editor-content :deep(ul), .editor-content :deep(ol) { padding-left: 24px; margin: 8px 0; }
+.editor-content :deep(li) { margin-bottom: 4px; }
+.editor-content :deep(img) { max-width: 100%; border-radius: 6px; margin: 8px 0; }
+.editor-content :deep(hr) { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+/* Placeholder */
+.editor-content :deep(.is-editor-empty:first-child::before) {
+  content: attr(data-placeholder); float: left; color: #94A3B8;
+  pointer-events: none; height: 0;
+}
+</style>
