@@ -26,17 +26,4 @@ jobs:
         run: |
           npm test
 
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 22
-
-      - name: Run lint
-        run: |
-          npm run lint
+  # lint job removed — will be added back when ESLint is configured
