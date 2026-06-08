@@ -1,0 +1,40 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 580 120">
+  <defs>
+    <radialGradient id="sphere-hi" cx="0.36" cy="0.30" r="0.68" fx="0.36" fy="0.30">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.40"/>
+      <stop offset="35%" stop-color="#ffffff" stop-opacity="0.10"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.20"/>
+    </radialGradient>
+    <radialGradient id="rim" cx="0.5" cy="0.5" r="0.5">
+      <stop offset="82%" stop-color="#000000" stop-opacity="0"/>
+      <stop offset="100%" stop-color="#000000" stop-opacity="0.22"/>
+    </radialGradient>
+    <clipPath id="ball-sm">
+      <circle cx="60" cy="60" r="52"/>
+    </clipPath>
+  </defs>
+
+  <!-- Tai Chi ball icon -->
+  <g clip-path="url(#ball-sm)">
+    <circle cx="60" cy="60" r="52" fill="#1E1B4B"/>
+    <path d="M60,8 A52,52 0 0,0 60,112" fill="#EDE9FE"/>
+    <circle cx="60" cy="34" r="26" fill="#EDE9FE"/>
+    <circle cx="60" cy="86" r="26" fill="#1E1B4B"/>
+    <circle cx="60" cy="34" r="8" fill="#1E1B4B"/>
+    <circle cx="60" cy="86" r="8" fill="#EDE9FE"/>
+  </g>
+  <circle cx="60" cy="60" r="52" fill="url(#sphere-hi)"/>
+  <circle cx="60" cy="60" r="52" fill="url(#rim)"/>
+
+  <!-- TAICHU text -->
+  <text x="130" y="52"
+        font-family="'Inter','SF Pro Display','Helvetica Neue',Arial,sans-serif"
+        font-size="42" font-weight="700" letter-spacing="6"
+        fill="#1E1B4B">TAICHU</text>
+
+  <!-- 太初 text -->
+  <text x="130" y="96"
+        font-family="'Noto Serif SC','Source Han Serif SC','SimSun','STSong',serif"
+        font-size="28" font-weight="400" letter-spacing="8"
+        fill="#6D28D9">太初</text>
+</svg>

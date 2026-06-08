@@ -1,9 +1,6 @@
 <p align="center">
-  <img src="https://via.placeholder.com/120x120/10B981/FFFFFF?text=G" alt="Taichu" width="120" height="120" />
+  <img src="docs/logo.svg" alt="Taichu" width="360" />
 </p>
-
-<h1 align="center">Taichu CMS</h1>
-<p align="center"><strong>AI Agent-Native Content Infrastructure</strong></p>
 
 <p align="center">
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-brightgreen.svg" alt="License: MIT" /></a>
