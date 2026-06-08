@@ -57,11 +57,15 @@ export async function mediaRoutes(ctx) {
           type: 'media',
           data: {
             filename: saved.filename,
+            originalName: saved.originalName,
             mimeType: saved.mimetype,
             size: saved.size,
             url: saved.url,
             width: saved.width || null,
             height: saved.height || null,
+            compressed: saved.compressed || false,
+            webp: saved.webp || null,
+            thumbnails: saved.thumbnails || {},
             altText: fields.alt || '',
             caption: fields.caption || '',
             uploadedBy: ctx.actor.id
