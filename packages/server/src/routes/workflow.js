@@ -20,9 +20,10 @@ import { createLogger } from '../logger.js';
 
 const log = createLogger('workflow');
 
-const DEFAULT_STATES = ['draft', 'pending_review', 'approved', 'published', 'rejected', 'archived'];
+const DEFAULT_STATES = ['draft', 'scheduled', 'pending_review', 'approved', 'published', 'rejected', 'archived'];
 const VALID_TRANSITIONS = {
-  'draft':          ['pending_review', 'published', 'archived'],
+  'draft':          ['scheduled', 'pending_review', 'published', 'archived'],
+  'scheduled':      ['draft', 'published'],
   'pending_review': ['approved', 'rejected'],
   'approved':       ['published', 'rejected'],
   'published':      ['archived'],

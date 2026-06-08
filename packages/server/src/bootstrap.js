@@ -22,7 +22,7 @@ export function bootstrap() {
       featuredImage: { type: 'media', semantic: 'image' },
       tags:        { type: 'array',   items: { type: 'string' }, semantic: 'keywords' },
       category:    { type: 'relation', target: 'category' },
-      status:      { type: 'enum',    values: ['draft', 'published', 'archived'] },
+      status:      { type: 'enum',    values: ['draft', 'scheduled', 'published', 'archived'] },
       publishedAt: { type: 'datetime' }
     }
   }));
@@ -36,7 +36,7 @@ export function bootstrap() {
       title:  { type: 'string', required: true, maxLength: 200 },
       slug:   { type: 'string', required: true },
       body:   { type: 'json',   required: true },
-      status: { type: 'enum',   values: ['draft', 'published', 'archived'] },
+      status: { type: 'enum',   values: ['draft', 'scheduled', 'published', 'archived'] },
       order:  { type: 'number' }
     }
   }));

@@ -14,7 +14,8 @@
  * @property {string} id — 唯一标识符（UUID）
  * @property {string} type — 内容类型名称
  * @property {object} data — 结构化内容数据
- * @property {string} status — 'draft' | 'published' | 'archived'
+ * @property {string} status — 'draft' | 'scheduled' | 'published' | 'archived'
+ * @property {string|null} publishedAt — 定时发布时间 (ISO 8601)
  * @property {string} createdAt — ISO 8601
  * @property {string} updatedAt — ISO 8601
  * @property {string} [createdBy] — 创建者 ID（人类或 Agent）
@@ -60,6 +61,7 @@ export function createMemoryStore() {
         type: doc.type || 'default',
         data: doc.data || {},
         status: doc.status || 'draft',
+        publishedAt: doc.publishedAt || null,
         createdAt: doc.createdAt || now,
         updatedAt: now,
         createdBy: doc.createdBy || null,
@@ -115,6 +117,7 @@ export function createMemoryStore() {
         ...doc,
         data: patch.data ? { ...doc.data, ...patch.data } : doc.data,
         status: patch.status !== undefined ? patch.status : doc.status,
+        publishedAt: patch.publishedAt !== undefined ? patch.publishedAt : doc.publishedAt,
         meta: patch.meta ? { ...doc.meta, ...patch.meta } : doc.meta,
         updatedAt: new Date().toISOString()
       };

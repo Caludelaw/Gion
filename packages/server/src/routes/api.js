@@ -164,8 +164,24 @@ export async function apiRoutes(ctx) {
       return;
     }
 
+    // Scheduled publishing: validate publishedAt when status='scheduled'
+    const requestedStatus = ctx.body.status;
+    if (requestedStatus === 'scheduled') {
+      const pubAt = ctx.body.publishedAt || ctx.body.data?.publishedAt;
+      if (!pubAt) {
+        ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+        ctx.res.end(JSON.stringify({ error: 'VALIDATION_ERROR', message: 'publishedAt is required when status is "scheduled"' }));
+        return;
+      }
+      if (new Date(pubAt) <= new Date()) {
+        ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+        ctx.res.end(JSON.stringify({ error: 'VALIDATION_ERROR', message: 'publishedAt must be in the future for scheduled content' }));
+        return;
+      }
+    }
+
     // Run beforeCreate hooks
-    let payload = { type, data: ctx.body.data, status: ctx.body.status };
+    let payload = { type, data: ctx.body.data, status: ctx.body.status, publishedAt: ctx.body.publishedAt || null };
     payload = await ctx.hooks.run('beforeCreate', payload, ctx);
 
     const doc = await ctx.store.create(payload);
@@ -216,7 +232,23 @@ export async function apiRoutes(ctx) {
       }
       ctx.actor = authResult.actor;
 
-      let payload = { id, type, data: ctx.body.data, status: ctx.body.status };
+      // Scheduled publishing: validate publishedAt when status='scheduled'
+      const requestedStatus = ctx.body.status;
+      if (requestedStatus === 'scheduled') {
+        const pubAt = ctx.body.publishedAt || ctx.body.data?.publishedAt;
+        if (!pubAt) {
+          ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+          ctx.res.end(JSON.stringify({ error: 'VALIDATION_ERROR', message: 'publishedAt is required when status is "scheduled"' }));
+          return;
+        }
+        if (new Date(pubAt) <= new Date()) {
+          ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+          ctx.res.end(JSON.stringify({ error: 'VALIDATION_ERROR', message: 'publishedAt must be in the future for scheduled content' }));
+          return;
+        }
+      }
+
+      let payload = { id, type, data: ctx.body.data, status: ctx.body.status, publishedAt: ctx.body.publishedAt || undefined };
       payload = await ctx.hooks.run('beforeUpdate', payload, ctx);
 
       const doc = await ctx.store.update(id, payload);

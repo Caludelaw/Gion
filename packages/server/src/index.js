@@ -31,6 +31,7 @@ import { rateLimit } from './middleware/rate-limit.js';
 import { record as auditRecord } from './audit.js';
 import { snapshotRevision } from './revisions.js';
 import { notify } from './notify.js';
+import { startScheduler, stopScheduler } from './scheduler.js';
 
 export async function start(configOverrides = {}) {
   const config = loadConfig();
@@ -48,6 +49,9 @@ export async function start(configOverrides = {}) {
 
   // Init webhook manager
   const webhooks = getWebhookManager(ctx.store);
+
+  // Init scheduled publishing scheduler
+  startScheduler(ctx.hooks);
 
   // Register content change broadcasts via hooks
   for (const event of ['afterCreate', 'afterUpdate', 'afterDelete']) {
@@ -154,6 +158,7 @@ export async function start(configOverrides = {}) {
   // Graceful shutdown
   const shutdown = async (signal) => {
     logger.info(`${signal} received. Shutting down...`);
+    stopScheduler();
     wss.close();
     server.close(() => {
       logger.info('HTTP server closed');

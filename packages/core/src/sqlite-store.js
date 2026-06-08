@@ -17,20 +17,26 @@ import { dirname, join } from 'node:path';
 
 const SCHEMA_SQL = `
 CREATE TABLE IF NOT EXISTS documents (
-  id          TEXT PRIMARY KEY,
-  type        TEXT NOT NULL,
-  data        TEXT NOT NULL DEFAULT '{}',
-  status      TEXT NOT NULL DEFAULT 'draft',
-  created_by  TEXT,
-  created_at  TEXT NOT NULL,
-  updated_at  TEXT NOT NULL,
-  meta        TEXT NOT NULL DEFAULT '{}'
+  id           TEXT PRIMARY KEY,
+  type         TEXT NOT NULL,
+  data         TEXT NOT NULL DEFAULT '{}',
+  status       TEXT NOT NULL DEFAULT 'draft',
+  published_at TEXT,
+  created_by   TEXT,
+  created_at   TEXT NOT NULL,
+  updated_at   TEXT NOT NULL,
+  meta         TEXT NOT NULL DEFAULT '{}'
 );
 
 CREATE INDEX IF NOT EXISTS idx_documents_type ON documents(type);
 CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status);
 CREATE INDEX IF NOT EXISTS idx_documents_updated_at ON documents(updated_at);
 CREATE INDEX IF NOT EXISTS idx_documents_type_status ON documents(type, status);
+CREATE INDEX IF NOT EXISTS idx_documents_scheduled ON documents(status, published_at);
+`;
+
+const MIGRATION_SQL = `
+ALTER TABLE documents ADD COLUMN published_at TEXT;
 `;
 
 /**
@@ -72,6 +78,20 @@ export async function createSQLiteStore(config = {}) {
 
     // Run schema migration
     db.run(SCHEMA_SQL);
+
+    // Run column migration for existing databases (published_at column)
+    try {
+      db.run(MIGRATION_SQL);
+    } catch (e) {
+      // Column already exists — ignore
+      if (!e.message?.includes('duplicate column')) throw e;
+    }
+
+    // Ensure scheduled index exists (idempotent for new + migrated DBs)
+    try {
+      db.run('CREATE INDEX IF NOT EXISTS idx_documents_scheduled ON documents(status, published_at)');
+    } catch (e) { /* ignore */ }
+
     await saveToDisk();
 
     return db;
@@ -105,10 +125,11 @@ export async function createSQLiteStore(config = {}) {
       type: row[1],
       data: JSON.parse(row[2]),
       status: row[3],
-      createdBy: row[4],
-      createdAt: row[5],
-      updatedAt: row[6],
-      meta: JSON.parse(row[7])
+      publishedAt: row[4] || null,
+      createdBy: row[5],
+      createdAt: row[6],
+      updatedAt: row[7],
+      meta: JSON.parse(row[8])
     };
   }
 
@@ -131,19 +152,20 @@ export async function createSQLiteStore(config = {}) {
       const type = doc.type || 'default';
       const data = JSON.stringify(doc.data || {});
       const status = doc.status || 'draft';
+      const publishedAt = doc.publishedAt || null;
       const createdBy = doc.createdBy || null;
       const createdAt = doc.createdAt || now;
       const meta = JSON.stringify(doc.meta || {});
 
       db.run(
-        `INSERT INTO documents (id, type, data, status, created_by, created_at, updated_at, meta)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, type, data, status, createdBy, createdAt, now, meta]
+        `INSERT INTO documents (id, type, data, status, published_at, created_by, created_at, updated_at, meta)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, type, data, status, publishedAt, createdBy, createdAt, now, meta]
       );
 
       markDirty();
 
-      return { id, type, data: JSON.parse(data), status, createdBy, createdAt, updatedAt: now, meta: JSON.parse(meta) };
+      return { id, type, data: JSON.parse(data), status, publishedAt, createdBy, createdAt, updatedAt: now, meta: JSON.parse(meta) };
     },
 
     async get(id) {
@@ -225,6 +247,15 @@ export async function createSQLiteStore(config = {}) {
         existing.status = patch.status;
       }
 
+      // publishedAt: explicit null clears it, string value sets it
+      if (patch.publishedAt !== undefined) {
+        const val = patch.publishedAt || null;
+        db.run('UPDATE documents SET published_at = ?, updated_at = ? WHERE id = ?', [
+          val, now, id
+        ]);
+        existing.publishedAt = val;
+      }
+
       if (patch.meta) {
         const merged = { ...existing.meta, ...patch.meta };
         db.run('UPDATE documents SET meta = ?, updated_at = ? WHERE id = ?', [
@@ -298,6 +329,7 @@ function rowToDocFromObj(row) {
     type: row.type,
     data: JSON.parse(row.data),
     status: row.status,
+    publishedAt: row.published_at || null,
     createdBy: row.created_by || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,
