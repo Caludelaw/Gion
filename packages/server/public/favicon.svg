@@ -1,0 +1,46 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" fill="none">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#0F0D2E"/>
+      <stop offset="100%" stop-color="#1A1650"/>
+    </linearGradient>
+    <linearGradient id="glow" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#A78BFA"/>
+      <stop offset="100%" stop-color="#7C3AED"/>
+    </linearGradient>
+    <filter id="blur">
+      <feGaussianBlur stdDeviation="12"/>
+    </filter>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="248" fill="url(#bg)"/>
+  <circle cx="256" cy="256" r="248" stroke="#1E1B4B" stroke-width="2" fill="none"/>
+
+  <!-- Ambient glow behind the mark -->
+  <ellipse cx="256" cy="300" rx="120" ry="60" fill="#7C3AED" opacity="0.15" filter="url(#blur)"/>
+
+  <!-- The Mark: stylized "太" + "T" — a central pillar emerging from the void -->
+  <!-- Horizontal bar (天/heaven) -->
+  <rect x="156" y="146" width="200" height="16" rx="8" fill="url(#glow)"/>
+
+  <!-- Vertical pillar (connection between heaven and earth) -->
+  <rect x="240" y="146" width="32" height="220" rx="16" fill="url(#glow)"/>
+
+  <!-- Left descending stroke (人/human) -->
+  <path d="M156 146 L236 310" stroke="url(#glow)" stroke-width="16" stroke-linecap="round" opacity="0.7"/>
+
+  <!-- Right descending stroke (agent/AI) -->
+  <path d="M356 146 L276 310" stroke="url(#glow)" stroke-width="16" stroke-linecap="round" opacity="0.5"/>
+
+  <!-- Center luminous core -->
+  <circle cx="256" cy="200" r="28" fill="#DDD6FE" opacity="0.9"/>
+  <circle cx="256" cy="200" r="16" fill="white" opacity="0.6"/>
+
+  <!-- Orbiting dots (agents/content) -->
+  <circle cx="176" cy="170" r="6" fill="#C4B5FD"/>
+  <circle cx="336" cy="180" r="5" fill="#A78BFA"/>
+  <circle cx="196" cy="250" r="4" fill="#8B5CF6"/>
+  <circle cx="316" cy="260" r="4.5" fill="#7C3AED"/>
+  <circle cx="256" cy="340" r="3.5" fill="#6D28D9"/>
+</svg>
