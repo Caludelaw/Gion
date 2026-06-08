@@ -73,7 +73,8 @@
 | Email Notification Channel | P2 | ✅ Done |
 | Content Relationship Graph | P2 | ✅ Done |
 | Multi-Tenant Support | P2 | ✅ Done |
-| Plugin Marketplace (frontend + CLI install) | P2 | Todo |
+| Plugin Marketplace (frontend + CLI install) | P2 | ✅ Done |
+| ActivityPub Federation | P2 | ✅ Done |
 | ActivityPub Federation | P2 | Todo |
 
 ## Long-Term Vision

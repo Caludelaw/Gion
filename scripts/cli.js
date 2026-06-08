@@ -68,6 +68,10 @@ TAICHU_LOG_LEVEL=info
     await import('./migrate.js');
     break;
 
+  case 'plugin':
+    await import('./plugin-cli.js');
+    break;
+
   default:
     console.log(`
   ⚡ Taichu CMS CLI
@@ -76,6 +80,7 @@ TAICHU_LOG_LEVEL=info
     npx taichu init [dir]     Create a new Taichu project
     npx taichu dev            Start development server
     npx taichu migrate        Import content (WP/Markdown)
+    npx taichu plugin         Browse & install plugins
 
   Environment:
     TAICHU_PORT=3120          Server port

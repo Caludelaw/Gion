@@ -16,6 +16,8 @@ import { collabRoutes } from './routes/collab.js';
 import { webhookRoutes } from './routes/webhook.js';
 import { auditRoutes, revisionRoutes } from './routes/audit.js';
 import { relationshipRoutes } from './routes/relationships.js';
+import { pluginMarketplaceRoutes } from './routes/plugin-marketplace.js';
+import { activityPubRoutes } from './routes/activitypub.js';
 import { workflowRoutes } from './routes/workflow.js';
 import { wechatRoutes } from './routes/wechat.js';
 import { ssoRoutes } from './routes/sso.js';
@@ -40,6 +42,11 @@ export async function router(ctx) {
   // Auth routes
   if (pathname.startsWith('/api/auth')) {
     return authRoutes(ctx);
+  }
+
+  // ActivityPub & WebFinger (no auth required for federation)
+  if (pathname.startsWith('/api/activitypub') || pathname.startsWith('/.well-known/')) {
+    return activityPubRoutes(ctx);
   }
 
   // GraphQL API
@@ -97,6 +104,11 @@ export async function router(ctx) {
   const relMatch = pathname.match(/^\/api\/content\/([a-z][a-z0-9_]*)\/([\w-]+)\/(relationships|graph)/);
   if (relMatch) {
     return relationshipRoutes(ctx);
+  }
+
+  // Plugin marketplace routes
+  if (pathname.startsWith('/api/plugins')) {
+    return pluginMarketplaceRoutes(ctx);
   }
 
   // Content API routes

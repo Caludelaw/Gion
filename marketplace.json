@@ -1,0 +1,78 @@
+{
+  "version": 1,
+  "name": "Taichu Plugin Marketplace",
+  "description": "Official plugin registry for Taichu CMS",
+  "lastUpdated": "2026-06-08T14:00:00Z",
+  "plugins": [
+    {
+      "name": "@taichu/plugin-seo",
+      "version": "0.1.0",
+      "description": "自动生成 meta tags、OG 标签、结构化数据，提升搜索引擎可见性",
+      "author": "Taichu Team",
+      "repository": "https://github.com/Caludelaw/taichu-plugin-seo",
+      "license": "MIT",
+      "keywords": ["seo", "meta", "opengraph", "structured-data", "sitemap"],
+      "category": "seo"
+    },
+    {
+      "name": "@taichu/plugin-sitemap",
+      "version": "0.1.0",
+      "description": "自动生成 XML sitemap，提交至 Google/Bing 搜索引擎",
+      "author": "Taichu Team",
+      "repository": "https://github.com/Caludelaw/taichu-plugin-sitemap",
+      "license": "MIT",
+      "keywords": ["sitemap", "seo", "google", "bing"],
+      "category": "seo"
+    },
+    {
+      "name": "@taichu/plugin-analytics",
+      "version": "0.1.0",
+      "description": "集成 Google Analytics、百度统计等分析工具到前端主题",
+      "author": "Taichu Team",
+      "repository": "https://github.com/Caludelaw/taichu-plugin-analytics",
+      "license": "MIT",
+      "keywords": ["analytics", "google-analytics", "baidu", "tracking"],
+      "category": "analytics"
+    },
+    {
+      "name": "@taichu/plugin-comments",
+      "version": "0.1.0",
+      "description": "评论系统集成：支持 Giscus、Disqus、Waline 等多种评论引擎",
+      "author": "Taichu Team",
+      "repository": "https://github.com/Caludelaw/taichu-plugin-comments",
+      "license": "MIT",
+      "keywords": ["comments", "giscus", "disqus", "waline"],
+      "category": "interaction"
+    },
+    {
+      "name": "@taichu/plugin-ai-writer",
+      "version": "0.1.0",
+      "description": "AI 写作助手：接入 OpenAI/Claude 等 LLM，辅助内容创作与优化",
+      "author": "Taichu Team",
+      "repository": "https://github.com/Caludelaw/taichu-plugin-ai-writer",
+      "license": "MIT",
+      "keywords": ["ai", "writing", "llm", "openai", "claude", "content"],
+      "category": "ai"
+    },
+    {
+      "name": "@taichu/plugin-image-optimizer",
+      "version": "0.1.0",
+      "description": "图片自动优化：上传时自动压缩、转 WebP、生成响应式尺寸",
+      "author": "Taichu Team",
+      "repository": "https://github.com/Caludelaw/taichu-plugin-image-optimizer",
+      "license": "MIT",
+      "keywords": ["image", "optimization", "webp", "compression"],
+      "category": "media"
+    },
+    {
+      "name": "@taichu/plugin-i18n",
+      "version": "0.1.0",
+      "description": "多语言内容管理：翻译工作流、语言切换、URL 本地化",
+      "author": "Taichu Team",
+      "repository": "https://github.com/Caludelaw/taichu-plugin-i18n",
+      "license": "MIT",
+      "keywords": ["i18n", "translation", "localization", "multilingual"],
+      "category": "content"
+    }
+  ]
+}
