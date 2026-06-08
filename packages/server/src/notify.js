@@ -1,21 +1,28 @@
 /**
- * Notification — 企业 IM 通知模板（飞书/钉钉/企业微信）
+ * Notification — 多渠道通知（飞书/钉钉/企业微信 + 邮件）
  *
- * 通过 Webhook 发送消息卡、Markdown 通知。
+ * 通过 Webhook 发送 IM 消息 + SMTP 发送邮件。
  * 环境变量：
  *   TAICHU_NOTIFY_FEISHU     — 飞书机器人 Webhook URL
  *   TAICHU_NOTIFY_DINGTALK   — 钉钉机器人 Webhook URL
  *   TAICHU_NOTIFY_WECOM      — 企业微信机器人 Webhook URL
+ *   TAICHU_SMTP_HOST         — SMTP 服务器（启用邮件通知）
+ *   TAICHU_SMTP_PORT         — SMTP 端口（默认 587）
+ *   TAICHU_SMTP_USER         — SMTP 用户名
+ *   TAICHU_SMTP_PASS         — SMTP 密码
+ *   TAICHU_SMTP_FROM         — 发件人地址
+ *   TAICHU_SMTP_TO           — 默认收件人
  */
 
 import { createLogger } from './logger.js';
+import { sendEmail, buildEmailHtml } from './email.js';
 
 const log = createLogger('notify');
 
 /**
- * Send notification to configured IM platforms.
- * @param {string} event — "content_created" | "content_updated" | "content_deleted" | "review_requested" | "agent_action"
- * @param {object} data — event payload
+ * Send notification to all configured channels.
+ * @param {string} event — event type
+ * @param {object} data  — event payload
  */
 export async function notify(event, data) {
   const promises = [];
@@ -29,8 +36,30 @@ export async function notify(event, data) {
   if (process.env.TAICHU_NOTIFY_WECOM) {
     promises.push(sendWecom(process.env.TAICHU_NOTIFY_WECOM, event, data));
   }
+  if (process.env.TAICHU_SMTP_HOST) {
+    promises.push(sendEmailNotify(event, data));
+  }
 
   await Promise.allSettled(promises);
+}
+
+/**
+ * Send email notification via configured SMTP.
+ */
+async function sendEmailNotify(event, data) {
+  const { title } = normalize(data);
+  const html = buildEmailHtml(event, data);
+
+  const result = await sendEmail({
+    subject: `[Taichu] ${eventLabel(event)}: ${title}`,
+    html
+  });
+
+  if (result.success) {
+    log.info(`Email sent: ${event} — ${title}`);
+  } else {
+    log.warn(`Email failed: ${result.error}`);
+  }
 }
 
 /** 飞书消息卡片 */
