@@ -133,7 +133,12 @@ export async function apiRoutes(ctx) {
     }
 
     const type = listMatch[1];
-    const docs = await ctx.store.list({ type, ...Object.fromEntries(ctx.url.searchParams) });
+    const queryOpts = Object.fromEntries(ctx.url.searchParams);
+    // Multi-tenant: enforce tenant filter unless admin explicitly overrides
+    if (ctx.multiTenant && !queryOpts.tenantId) {
+      queryOpts.tenantId = ctx.tenantId;
+    }
+    const docs = await ctx.store.list({ type, ...queryOpts });
     ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
     ctx.res.end(JSON.stringify({ docs, total: docs.length }));
     return;
@@ -181,7 +186,7 @@ export async function apiRoutes(ctx) {
     }
 
     // Run beforeCreate hooks
-    let payload = { type, data: ctx.body.data, status: ctx.body.status, publishedAt: ctx.body.publishedAt || null };
+    let payload = { type, data: ctx.body.data, status: ctx.body.status, publishedAt: ctx.body.publishedAt || null, tenantId: ctx.tenantId };
     payload = await ctx.hooks.run('beforeCreate', payload, ctx);
 
     const doc = await ctx.store.create(payload);

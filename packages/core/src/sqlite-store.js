@@ -22,6 +22,7 @@ CREATE TABLE IF NOT EXISTS documents (
   data         TEXT NOT NULL DEFAULT '{}',
   status       TEXT NOT NULL DEFAULT 'draft',
   published_at TEXT,
+  tenant_id    TEXT NOT NULL DEFAULT 'default',
   created_by   TEXT,
   created_at   TEXT NOT NULL,
   updated_at   TEXT NOT NULL,
@@ -33,11 +34,18 @@ CREATE INDEX IF NOT EXISTS idx_documents_status ON documents(status);
 CREATE INDEX IF NOT EXISTS idx_documents_updated_at ON documents(updated_at);
 CREATE INDEX IF NOT EXISTS idx_documents_type_status ON documents(type, status);
 CREATE INDEX IF NOT EXISTS idx_documents_scheduled ON documents(status, published_at);
+CREATE INDEX IF NOT EXISTS idx_documents_tenant ON documents(tenant_id);
 `;
 
-const MIGRATION_SQL = `
-ALTER TABLE documents ADD COLUMN published_at TEXT;
-`;
+const MIGRATION_SQL = [
+  `ALTER TABLE documents ADD COLUMN published_at TEXT;`,
+  `ALTER TABLE documents ADD COLUMN tenant_id TEXT NOT NULL DEFAULT 'default';`
+];
+
+const INDEX_MIGRATIONS = [
+  'CREATE INDEX IF NOT EXISTS idx_documents_scheduled ON documents(status, published_at)',
+  'CREATE INDEX IF NOT EXISTS idx_documents_tenant ON documents(tenant_id)'
+];
 
 /**
  * Create a SQLiteStore instance.
@@ -79,18 +87,19 @@ export async function createSQLiteStore(config = {}) {
     // Run schema migration
     db.run(SCHEMA_SQL);
 
-    // Run column migration for existing databases (published_at column)
-    try {
-      db.run(MIGRATION_SQL);
-    } catch (e) {
-      // Column already exists — ignore
-      if (!e.message?.includes('duplicate column')) throw e;
+    // Run column migrations for existing databases
+    for (const mig of MIGRATION_SQL) {
+      try {
+        db.run(mig);
+      } catch (e) {
+        if (!e.message?.includes('duplicate column')) throw e;
+      }
     }
 
-    // Ensure scheduled index exists (idempotent for new + migrated DBs)
-    try {
-      db.run('CREATE INDEX IF NOT EXISTS idx_documents_scheduled ON documents(status, published_at)');
-    } catch (e) { /* ignore */ }
+    // Ensure indices exist (idempotent for new + migrated DBs)
+    for (const idx of INDEX_MIGRATIONS) {
+      try { db.run(idx); } catch (e) { /* ignore */ }
+    }
 
     await saveToDisk();
 
@@ -126,10 +135,11 @@ export async function createSQLiteStore(config = {}) {
       data: JSON.parse(row[2]),
       status: row[3],
       publishedAt: row[4] || null,
-      createdBy: row[5],
-      createdAt: row[6],
-      updatedAt: row[7],
-      meta: JSON.parse(row[8])
+      tenantId: row[5] || 'default',
+      createdBy: row[6],
+      createdAt: row[7],
+      updatedAt: row[8],
+      meta: JSON.parse(row[9])
     };
   }
 
@@ -153,19 +163,20 @@ export async function createSQLiteStore(config = {}) {
       const data = JSON.stringify(doc.data || {});
       const status = doc.status || 'draft';
       const publishedAt = doc.publishedAt || null;
+      const tenantId = doc.tenantId || 'default';
       const createdBy = doc.createdBy || null;
       const createdAt = doc.createdAt || now;
       const meta = JSON.stringify(doc.meta || {});
 
       db.run(
-        `INSERT INTO documents (id, type, data, status, published_at, created_by, created_at, updated_at, meta)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [id, type, data, status, publishedAt, createdBy, createdAt, now, meta]
+        `INSERT INTO documents (id, type, data, status, published_at, tenant_id, created_by, created_at, updated_at, meta)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [id, type, data, status, publishedAt, tenantId, createdBy, createdAt, now, meta]
       );
 
       markDirty();
 
-      return { id, type, data: JSON.parse(data), status, publishedAt, createdBy, createdAt, updatedAt: now, meta: JSON.parse(meta) };
+      return { id, type, data: JSON.parse(data), status, publishedAt, tenantId, createdBy, createdAt, updatedAt: now, meta: JSON.parse(meta) };
     },
 
     async get(id) {
@@ -192,6 +203,10 @@ export async function createSQLiteStore(config = {}) {
       if (options.status) {
         conditions.push('status = ?');
         params.push(options.status);
+      }
+      if (options.tenantId) {
+        conditions.push('tenant_id = ?');
+        params.push(options.tenantId);
       }
       if (options.search) {
         conditions.push("(data LIKE ? OR type LIKE ?)");
@@ -330,6 +345,7 @@ function rowToDocFromObj(row) {
     data: JSON.parse(row.data),
     status: row.status,
     publishedAt: row.published_at || null,
+    tenantId: row.tenant_id || 'default',
     createdBy: row.created_by || null,
     createdAt: row.created_at,
     updatedAt: row.updated_at,

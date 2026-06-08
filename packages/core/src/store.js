@@ -16,6 +16,7 @@
  * @property {object} data — 结构化内容数据
  * @property {string} status — 'draft' | 'scheduled' | 'published' | 'archived'
  * @property {string|null} publishedAt — 定时发布时间 (ISO 8601)
+ * @property {string} tenantId — 租户 ID (默认 'default')
  * @property {string} createdAt — ISO 8601
  * @property {string} updatedAt — ISO 8601
  * @property {string} [createdBy] — 创建者 ID（人类或 Agent）
@@ -26,6 +27,7 @@
  * @typedef {object} QueryOptions
  * @property {string} [type] — 按内容类型过滤
  * @property {string} [status] — 按状态过滤
+ * @property {string} [tenantId] — 按租户 ID 过滤
  * @property {string} [search] — 全文搜索关键词
  * @property {number} [limit] — 返回数量上限
  * @property {number} [offset] — 分页偏移
@@ -62,6 +64,7 @@ export function createMemoryStore() {
         data: doc.data || {},
         status: doc.status || 'draft',
         publishedAt: doc.publishedAt || null,
+        tenantId: doc.tenantId || 'default',
         createdAt: doc.createdAt || now,
         updatedAt: now,
         createdBy: doc.createdBy || null,
@@ -85,6 +88,9 @@ export function createMemoryStore() {
       }
       if (options.status) {
         results = results.filter(d => d.status === options.status);
+      }
+      if (options.tenantId) {
+        results = results.filter(d => d.tenantId === options.tenantId);
       }
       if (options.search) {
         const q = options.search.toLowerCase();
