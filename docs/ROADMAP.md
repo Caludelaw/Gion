@@ -29,28 +29,51 @@
 |---------|--------|
 | Agent API Key Authentication | ✅ Done |
 | JWT Authentication (Human) | ✅ Done |
-| MCP Server (stdio transport) | ✅ Done |
+| MCP Server (stdio transport, 29 tools) | ✅ Done |
 | TF-IDF Vector Search | ✅ Done |
 | Content Auto-Indexing (hook-based) | ✅ Done |
-| GraphQL API | Todo |
-| Content Pipeline Engine | Todo |
-| Agent Permission Scopes | Todo |
+| GraphQL API | ✅ Done |
+| Content Pipeline Engine (3 built-in templates) | ✅ Done |
+| Agent Permission Scopes | ✅ Done |
+| Content Localization (ZHHK/EN/JP) | ✅ Done |
+| SSO Framework (OIDC + LDAP) | ✅ Done |
+| Webhook System | ✅ Done |
+| Audit Logging (append-only) | ✅ Done |
 
-## Phase 3: Ecosystem (Planned)
+## Phase 3: Ecosystem ✅ COMPLETE
 
-**Goal**: A thriving developer ecosystem with extensions, themes, and multi-agent workflows.
+**Goal**: Developer ecosystem with extensions, themes, and real-time collaboration.
 
-| Feature | Priority |
-|---------|----------|
-| Extension Marketplace | P0 |
-| Multi-Agent Collaboration (conflict resolution) | P0 |
-| WebSocket Real-Time Updates | P1 |
-| ActivityPub Federation | P1 |
-| Content Relationship Graph | P1 |
-| Adaptive API (auto-detect client type) | P2 |
-| Multi-Tenant Support | P2 |
-| Plugin SDK & Documentation | P2 |
-| Theme System (for public frontend) | P2 |
+| Feature | Status |
+|---------|--------|
+| WebSocket Real-Time Updates | ✅ Done |
+| Multi-Agent Collaboration Engine | ✅ Done |
+| Plugin Manager (backend) | ✅ Done |
+| Theme System (custom upload, __TAICHU__ injection) | ✅ Done |
+| Admin SPA (18 pages, 3 locales) | ✅ Done |
+| Content Revisions (field-level diff, max 100) | ✅ Done |
+| Rate Limiting (token bucket, 3 dimensions) | ✅ Done |
+| Notification Channels (Feishu/DingTalk/WeCom) | ✅ Done |
+| CLI (init/dev/migrate) | ✅ Done |
+| Docker Support | ✅ Done |
+| CI/CD (GitHub Actions + Gitee mirror) | ✅ Done |
+| ESLint Code Quality | ✅ Done |
+
+## v0.4.0 → v0.5.0 (Current)
+
+| Feature | Priority | Status |
+|---------|----------|--------|
+| Server Integration Tests | P0 | ✅ Done |
+| ROADMAP & Docs Update | P0 | ✅ Done |
+| Scheduled Publishing | P1 | Todo |
+| Revision Diff UI (Admin) | P1 | Todo |
+| Docker Compose | P1 | Todo |
+| Media Library Enhancement (WebP, resize) | P1 | Todo |
+| Email Notification Channel | P2 | Todo |
+| Plugin Marketplace (frontend + CLI install) | P2 | Todo |
+| ActivityPub Federation | P2 | Todo |
+| Multi-Tenant Support | P2 | Todo |
+| Content Relationship Graph | P2 | Todo |
 
 ## Long-Term Vision
 
