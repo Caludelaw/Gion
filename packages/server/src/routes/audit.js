@@ -113,6 +113,7 @@ import { getRevisions, diffObjects, restoreRevision } from '../revisions.js';
 /**
  * Handle revision routes.
  * GET  /api/content/:type/:id/revisions
+ * GET  /api/content/:type/:id/revisions/diff?from=revId1&to=revId2
  * POST /api/content/:type/:id/revisions/:revId/restore
  */
 export async function revisionRoutes(ctx, type, id) {
@@ -126,7 +127,59 @@ export async function revisionRoutes(ctx, type, id) {
     return;
   }
 
-  // GET revisions
+  // GET revisions diff between two versions
+  const diffMatch = pathname.match(/\/revisions\/diff$/);
+  if (diffMatch && method === 'GET') {
+    const fromId = ctx.url.searchParams.get('from');
+    const toId = ctx.url.searchParams.get('to');
+
+    if (!fromId || !toId) {
+      ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: 'VALIDATION_ERROR', message: 'Both "from" and "to" revision IDs are required' }));
+      return;
+    }
+
+    const store = getStore();
+    const fromRev = await store.get(fromId);
+    const toRev = await store.get(toId);
+
+    if (!fromRev || fromRev.type !== 'revision' || fromRev.data.docId !== id) {
+      ctx.res.writeHead(404, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: 'NOT_FOUND', message: 'Source revision not found' }));
+      return;
+    }
+    if (!toRev || toRev.type !== 'revision' || toRev.data.docId !== id) {
+      ctx.res.writeHead(404, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: 'NOT_FOUND', message: 'Target revision not found' }));
+      return;
+    }
+
+    const dataDiff = diffObjects(fromRev.data.data, toRev.data.data);
+    const statusChanged = fromRev.data.status !== toRev.data.status;
+
+    ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
+    ctx.res.end(JSON.stringify({
+      from: {
+        id: fromRev.id,
+        timestamp: fromRev.data.timestamp || fromRev.createdAt,
+        status: fromRev.data.status,
+        author: fromRev.data.author
+      },
+      to: {
+        id: toRev.id,
+        timestamp: toRev.data.timestamp || toRev.createdAt,
+        status: toRev.data.status,
+        author: toRev.data.author
+      },
+      statusChanged,
+      statusDiff: statusChanged ? { from: fromRev.data.status, to: toRev.data.status } : null,
+      fieldsChanged: dataDiff.length,
+      diff: dataDiff
+    }));
+    return;
+  }
+
+  // GET revisions list
   if (pathname.endsWith('/revisions') && method === 'GET') {
     const revs = await getRevisions(id);
     const result = revs.map((r, i, arr) => ({
