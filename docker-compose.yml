@@ -1,0 +1,42 @@
+# Taichu CMS — Docker Compose 一键部署
+#
+# 使用方法：
+#   开发环境：docker compose up
+#   生产环境：docker compose up -d
+#
+# 环境变量配置：
+#   TAICHU_PORT       — 服务端口，默认 3120
+#   TAICHU_SECRET     — JWT 签名密钥（生产环境必改）
+#   TAICHU_ADMIN_USER — 初始管理员用户名
+#   TAICHU_ADMIN_PASS — 初始管理员密码
+
+services:
+  taichu:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: taichu-cms
+    ports:
+      - "${TAICHU_PORT:-3120}:3120"
+    environment:
+      - NODE_ENV=production
+      - TAICHU_STORAGE=sqlite
+      - TAICHU_PORT=3120
+      - TAICHU_HOST=0.0.0.0
+      - TAICHU_PUBLIC_READ=1
+      - TAICHU_SECRET=${TAICHU_SECRET:-change-me-in-production}
+      - TAICHU_ADMIN_USER=${TAICHU_ADMIN_USER:-admin}
+      - TAICHU_ADMIN_PASS=${TAICHU_ADMIN_PASS:-admin123}
+    volumes:
+      - taichu-data:/app/.taichu
+    healthcheck:
+      test: ["CMD", "wget", "-qO-", "http://localhost:3120/api/health"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    restart: unless-stopped
+
+volumes:
+  taichu-data:
+    driver: local

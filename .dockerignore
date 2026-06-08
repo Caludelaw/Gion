@@ -1,0 +1,13 @@
+node_modules
+.git
+.taichu
+*.md
+!README.md
+.vscode
+.idea
+*.log
+coverage
+.nyc_output
+dist
+.DS_Store
+Thumbs.db
