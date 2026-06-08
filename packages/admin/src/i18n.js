@@ -36,7 +36,7 @@ function detectLang() {
   try {
     const stored = localStorage.getItem('taichu_lang');
     if (stored && messages[stored]) return stored;
-  } catch {}
+  } catch { /* localStorage not available */ }
   if (typeof window !== 'undefined' && window.__TAICHU_LANG__ && messages[window.__TAICHU_LANG__]) return window.__TAICHU_LANG__;
   if (typeof navigator !== 'undefined') {
     const browser = navigator.language?.toLowerCase();

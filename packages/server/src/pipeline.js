@@ -89,7 +89,7 @@ class PipelineEngine {
     if (!template) throw new Error(`Pipeline template "${templateName}" not found`);
 
     const results = [];
-    let currentDoc = doc;
+    const currentDoc = doc;
 
     for (const step of template.steps) {
       try {

@@ -241,8 +241,8 @@ export async function apiRoutes(ctx) {
       }
       ctx.actor = authResult.actor;
 
-      let payload = { id, type };
-      payload = await ctx.hooks.run('beforeDelete', payload, ctx);
+      const basePayload = { id, type };
+      const payload = await ctx.hooks.run('beforeDelete', basePayload, ctx);
 
       const deleted = await ctx.store.delete(id);
       if (!deleted) {

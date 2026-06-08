@@ -49,6 +49,7 @@ TAICHU_LOG_LEVEL=info
       docker run -p 3120:3120 -v $(pwd)/.taichu:/app/.taichu caludelaw/taichu
 `);
     process.exit(0);
+    break;
   }
 
   case 'dev': {

@@ -93,5 +93,5 @@ function icon(e) {
 }
 
 function escapeMd(text) {
-  return String(text).replace(/[*_~`>#\[\]()\\]/g, '\\$&');
+  return String(text).replace(/[*_~`>#[\]()\\]/g, '\\$&');
 }

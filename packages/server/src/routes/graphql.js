@@ -172,8 +172,8 @@ const resolvers = {
       const store = getStore();
       const hooks = getHooks();
 
-      let payload = { id, type };
-      payload = await hooks.run('beforeDelete', payload, { store });
+      const basePayload = { id, type };
+      const payload = await hooks.run('beforeDelete', basePayload, { store });
       const deleted = await store.delete(id);
       if (deleted) await hooks.run('afterDelete', { id, type }, { store });
       return deleted;

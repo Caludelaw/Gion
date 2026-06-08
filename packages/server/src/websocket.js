@@ -245,7 +245,7 @@ class WebSocket {
       const maskLen = masked ? 4 : 0;
       if (this._buffer.length < offset + maskLen + payloadLen) return;
 
-      let payload = this._buffer.subarray(offset + maskLen, offset + maskLen + payloadLen);
+      const payload = this._buffer.subarray(offset + maskLen, offset + maskLen + payloadLen);
       if (masked) {
         const mask = this._buffer.subarray(offset, offset + 4);
         for (let i = 0; i < payload.length; i++) {
