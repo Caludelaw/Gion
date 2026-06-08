@@ -13,7 +13,6 @@
  *   TAICHU_AP_PORT  — 公开端口（默认 3120）
  */
 
-import { createHash, createVerify } from 'node:crypto';
 import { createLogger } from './logger.js';
 import { getStore } from './context.js';
 
@@ -115,14 +114,15 @@ export async function processInboxActivity(activity, headers) {
     return { accepted: false, reason: 'invalid_signature' };
   }
 
-  const { type, actor, object } = activity;
+  const { type, actor } = activity;
 
   switch (type) {
-    case 'Follow':
+    case 'Follow': {
       log.info(`Follow request from ${actor}`);
       // Auto-accept follows
       const accept = createActivity('Accept', activity);
       return { accepted: true, type: 'Follow', response: accept };
+    }
 
     case 'Create':
     case 'Announce':

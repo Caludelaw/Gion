@@ -38,7 +38,7 @@ async function ensureStore(config) {
  * Extract tenant ID from request context.
  * Priority: API Key scope > X-Taichu-Tenant header > default
  */
-function extractTenantId(req, url) {
+function extractTenantId(req) {
   if (!MULTI_TENANT) return 'default';
 
   // Check X-Taichu-Tenant header (admin override)
@@ -61,7 +61,7 @@ export async function createContext({ req, res, url, body, config = {} }) {
     _hooks = createHookSystem();
   }
 
-  const tenantId = extractTenantId(req, url);
+  const tenantId = extractTenantId(req);
 
   return {
     req,

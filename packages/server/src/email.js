@@ -17,7 +17,7 @@
 
 import { createConnection } from 'node:net';
 import { connect } from 'node:tls';
-import { randomBytes, createHash } from 'node:crypto';
+import { randomBytes } from 'node:crypto';
 import { createLogger } from './logger.js';
 
 const log = createLogger('email');
@@ -78,7 +78,6 @@ function smtpSend(cfg) {
       : createConnection({ host: cfg.host, port: cfg.port, timeout: CONNECT_TIMEOUT });
 
     let buffer = '';
-    let step = 0; // 0=banner,1=ehlo,2=starttls/ehlo,3=auth,4=mailfrom,5=rcptto,6=data,7=quit
     let authMethod = null;
 
     socket.setEncoding('utf8');
