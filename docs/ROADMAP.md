@@ -70,11 +70,11 @@
 | Version Diff API | P1 | ✅ Done |
 | Docker Compose One-Click Deploy | P1 | ✅ Done |
 | Media Library Enhancement (compress/WebP/thumbs) | P1 | ✅ Done |
-| Email Notification Channel | P2 | Todo |
+| Email Notification Channel | P2 | ✅ Done |
+| Content Relationship Graph | P2 | ✅ Done |
+| Multi-Tenant Support | P2 | ✅ Done |
 | Plugin Marketplace (frontend + CLI install) | P2 | Todo |
 | ActivityPub Federation | P2 | Todo |
-| Multi-Tenant Support | P2 | Todo |
-| Content Relationship Graph | P2 | Todo |
 
 ## Long-Term Vision
 
