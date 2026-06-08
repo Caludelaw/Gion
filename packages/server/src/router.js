@@ -15,6 +15,7 @@ import { mediaRoutes } from './routes/media.js';
 import { collabRoutes } from './routes/collab.js';
 import { webhookRoutes } from './routes/webhook.js';
 import { auditRoutes, revisionRoutes } from './routes/audit.js';
+import { relationshipRoutes } from './routes/relationships.js';
 import { workflowRoutes } from './routes/workflow.js';
 import { wechatRoutes } from './routes/wechat.js';
 import { ssoRoutes } from './routes/sso.js';
@@ -90,6 +91,12 @@ export async function router(ctx) {
   const revMatch = pathname.match(/^\/api\/content\/([a-z][a-z0-9_]*)\/([\w-]+)\/(revisions.*)$/);
   if (revMatch) {
     return revisionRoutes(ctx, revMatch[1], revMatch[2]);
+  }
+
+  // Relationship routes (must precede content routes)
+  const relMatch = pathname.match(/^\/api\/content\/([a-z][a-z0-9_]*)\/([\w-]+)\/(relationships|graph)/);
+  if (relMatch) {
+    return relationshipRoutes(ctx);
   }
 
   // Content API routes
