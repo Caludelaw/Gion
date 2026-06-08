@@ -94,4 +94,7 @@ export const api = {
   get create() { return this.createContent },
   get update() { return this.updateContent },
   get delete() { return this.deleteContent },
+
+  // Raw request (for plugins, marketplace, etc.)
+  request: (path, opts) => request(path, opts),
 }

@@ -5,6 +5,17 @@
       <button class="btn" @click="$router.push(`/content/${type}/new`)">+ 新建</button>
     </div>
 
+    <div class="search-bar">
+      <input v-model="searchQuery" @input="debounceSearch" placeholder="搜索标题..." class="input" />
+      <select v-model="statusFilter" @change="load" class="input select-sm">
+        <option value="">全部状态</option>
+        <option value="draft">草稿</option>
+        <option value="scheduled">定时</option>
+        <option value="published">已发布</option>
+        <option value="archived">已归档</option>
+      </select>
+    </div>
+
     <table v-if="docs.length" class="table">
       <thead>
         <tr>
@@ -21,7 +32,7 @@
               {{ doc.data.title || doc.data.name || '(无标题)' }}
             </a>
           </td>
-          <td><span :class="`badge badge-${doc.status}`">{{ doc.status }}</span></td>
+          <td><span :class="`badge badge-${doc.status}`">{{ statusLabel(doc.status) }}</span></td>
           <td class="date">{{ fmtDate(doc.updatedAt) }}</td>
           <td>
             <button class="btn-sm" @click="$router.push(`/content/${type}/${doc.id}`)">编辑</button>
@@ -30,7 +41,14 @@
         </tr>
       </tbody>
     </table>
-    <p v-else class="empty">暂无{{ typeLabel }}内容</p>
+    <p v-else-if="!loading" class="empty">暂无{{ typeLabel }}内容</p>
+    <p v-else class="empty">加载中...</p>
+
+    <div v-if="totalPages > 1" class="pagination">
+      <button :disabled="page <= 1" @click="goPage(page - 1)" class="btn-page">‹ 上一页</button>
+      <span class="page-info">第 {{ page }} / {{ totalPages }} 页 (共 {{ total }} 条)</span>
+      <button :disabled="page >= totalPages" @click="goPage(page + 1)" class="btn-page">下一页 ›</button>
+    </div>
   </div>
 </template>
 
@@ -40,26 +58,52 @@ import { api } from '../api/index.js'
 
 const props = defineProps({ type: String, types: Array })
 const docs = ref([])
+const loading = ref(false)
+const page = ref(1)
+const total = ref(0)
+const searchQuery = ref('')
+const statusFilter = ref('')
+const pageSize = 20
+let searchTimer = null
 
 const typeLabel = computed(() => {
   const t = (props.types || []).find(t => t.name === props.type)
   return t ? t.label : props.type
 })
 
+const totalPages = computed(() => Math.max(1, Math.ceil(total.value / pageSize)))
+
 async function load() {
+  loading.value = true
   try {
-    const res = await api.list(props.type)
+    const params = { limit: pageSize, offset: (page.value - 1) * pageSize }
+    if (searchQuery.value) params.search = searchQuery.value
+    if (statusFilter.value) params.status = statusFilter.value
+    const res = await api.list(props.type, params)
     docs.value = res.docs || []
+    total.value = res.total || docs.value.length
   } catch (e) {
     console.error(e)
+  } finally {
+    loading.value = false
   }
+}
+
+function debounceSearch() {
+  clearTimeout(searchTimer)
+  searchTimer = setTimeout(() => { page.value = 1; load() }, 300)
+}
+
+function goPage(p) {
+  page.value = p
+  load()
 }
 
 async function remove(id) {
   if (!confirm('确认删除？')) return
   try {
     await api.delete(props.type, id)
-    docs.value = docs.value.filter(d => d.id !== id)
+    load()
   } catch (e) {
     alert(e.message)
   }
@@ -69,8 +113,13 @@ function fmtDate(d) {
   return d ? new Date(d).toLocaleString('zh-CN') : '-'
 }
 
+function statusLabel(s) {
+  const map = { draft: '草稿', scheduled: '定时', published: '已发布', archived: '已归档', active: '启用', revoked: '已撤销' }
+  return map[s] || s
+}
+
 onMounted(load)
-watch(() => props.type, load)
+watch(() => props.type, () => { page.value = 1; load() })
 </script>
 
 <style scoped>
@@ -97,4 +146,20 @@ watch(() => props.type, load)
 .btn-danger { color: var(--danger); }
 .btn-danger:hover { border-color: var(--danger); background: #FEF2F2; }
 .empty { color: var(--text-secondary); font-size: 14px; margin-top: 40px; text-align: center; }
+
+.search-bar { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }
+.input {
+  padding: 8px 12px; border: 1px solid var(--border); border-radius: var(--radius);
+  font-size: 14px; color: var(--text-primary); background: var(--surface);
+}
+.select-sm { max-width: 130px; }
+
+.pagination { display: flex; justify-content: center; align-items: center; gap: 16px; margin-top: 24px; padding: 16px; }
+.btn-page {
+  padding: 6px 16px; background: var(--surface); border: 1px solid var(--border);
+  border-radius: 6px; font-size: 13px; cursor: pointer; color: var(--text-secondary);
+}
+.btn-page:hover:not(:disabled) { border-color: var(--primary); color: var(--primary); }
+.btn-page:disabled { opacity: 0.4; cursor: default; }
+.page-info { font-size: 13px; color: var(--text-muted); }
 </style>
