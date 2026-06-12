@@ -15,12 +15,32 @@
       <button @click="editor.chain().focus().toggleBlockquote().run()" :class="{ active: editor.isActive('blockquote') }" title="引用">❝</button>
       <button @click="editor.chain().focus().toggleCodeBlock().run()" :class="{ active: editor.isActive('codeBlock') }" title="代码块">&lt;code/&gt;</button>
       <span class="sep"></span>
-      <button @click="addImage" title="插入图片">🖼️</button>
+      <button @click="openMediaBrowser" title="媒体库">🖼️</button>
+      <button @click="addImageByUrl" title="输入图片 URL">🔗</button>
       <button @click="editor.chain().focus().setHorizontalRule().run()" title="分割线">—</button>
       <button @click="editor.chain().focus().undo().run()" title="撤销 (Ctrl+Z)">↩</button>
       <button @click="editor.chain().focus().redo().run()" title="重做 (Ctrl+Y)">↪</button>
     </div>
     <editor-content :editor="editor" class="editor-content" />
+
+    <!-- Media Browser Modal -->
+    <div v-if="showMediaBrowser" class="modal-overlay" @click.self="showMediaBrowser = false">
+      <div class="media-browser">
+        <div class="mb-header">
+          <h3>🖼️ 媒体库</h3>
+          <button class="btn-close" @click="showMediaBrowser = false">✕</button>
+        </div>
+        <div v-if="mediaLoading" class="mb-loading">加载中...</div>
+        <div v-else-if="mediaError" class="mb-error">{{ mediaError }}</div>
+        <div v-else class="mb-grid">
+          <div v-for="m in mediaItems" :key="m.id" class="mb-item" @click="insertMedia(m)">
+            <img :src="m.thumbnails?.small || m.url" :alt="m.originalName" loading="lazy" />
+            <span class="mb-name">{{ m.originalName || m.filename }}</span>
+          </div>
+          <div v-if="!mediaItems.length" class="mb-empty">暂无媒体文件</div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -38,6 +58,11 @@ const props = defineProps({
 })
 
 const emit = defineEmits(['update:modelValue'])
+
+const showMediaBrowser = ref(false)
+const mediaItems = ref([])
+const mediaLoading = ref(false)
+const mediaError = ref('')
 
 const editor = useEditor({
   content: props.modelValue,
@@ -65,11 +90,36 @@ watch(() => props.modelValue, (val) => {
   }
 })
 
-function addImage() {
+function addImageByUrl() {
   const url = prompt('图片 URL:')
   if (url) {
-    editor.value?.chain().focus().setImage({ src: url }).run()
+    insertImage(url)
   }
+}
+
+function openMediaBrowser() {
+  showMediaBrowser.value = true
+  mediaLoading.value = true
+  mediaError.value = ''
+  fetch('/api/media?limit=100')
+    .then(r => r.json())
+    .then(data => {
+      mediaItems.value = (data.files || []).filter(f => f.mimetype?.startsWith('image/'))
+      mediaLoading.value = false
+    })
+    .catch(e => {
+      mediaError.value = '加载失败: ' + e.message
+      mediaLoading.value = false
+    })
+}
+
+function insertMedia(media) {
+  insertImage(media.url)
+  showMediaBrowser.value = false
+}
+
+function insertImage(src) {
+  editor.value?.chain().focus().setImage({ src }).run()
 }
 
 onBeforeUnmount(() => {
@@ -122,5 +172,40 @@ onBeforeUnmount(() => {
 .editor-content :deep(.is-editor-empty:first-child::before) {
   content: attr(data-placeholder); float: left; color: #94A3B8;
   pointer-events: none; height: 0;
+}
+
+/* Media Browser Modal */
+.modal-overlay {
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.4); z-index: 1000;
+  display: flex; align-items: center; justify-content: center;
+}
+.media-browser {
+  background: var(--surface); border-radius: 12px;
+  width: 90vw; max-width: 680px; max-height: 80vh; overflow-y: auto;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+}
+.mb-header {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 16px 20px; border-bottom: 1px solid var(--border);
+  position: sticky; top: 0; background: var(--surface); z-index: 1;
+}
+.mb-header h3 { font-size: 16px; margin: 0; }
+.btn-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-secondary); padding: 4px 8px; }
+.btn-close:hover { color: var(--text); }
+.mb-loading, .mb-error, .mb-empty { padding: 40px; text-align: center; color: var(--text-secondary); font-size: 14px; }
+.mb-error { color: var(--danger); }
+.mb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; padding: 20px; }
+.mb-item {
+  cursor: pointer; border: 2px solid var(--border); border-radius: 8px;
+  overflow: hidden; transition: border-color 0.15s; background: var(--bg);
+}
+.mb-item:hover { border-color: var(--primary); }
+.mb-item img {
+  width: 100%; height: 100px; object-fit: cover; display: block;
+}
+.mb-name {
+  display: block; padding: 4px 8px; font-size: 11px; color: var(--text-secondary);
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
 }
 </style>
