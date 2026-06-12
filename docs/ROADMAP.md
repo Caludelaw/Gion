@@ -85,7 +85,7 @@
 | Content Relationships Graph UI (admin visualization) | P1 | ✅ Done |
 | Media Selector in Rich Editor | P1 | ✅ Done |
 | Batch Operations (bulk delete/publish) | P2 | ✅ Done |
-| Second Official Theme (minimal/portfolio) | P2 | Todo |
+| Second Official Theme (minimal/portfolio) | P2 | ✅ Done |
 | SSO OIDC Callback Handler | P2 | Todo |
 | E2E Tests (Playwright, core flows) | P2 | Todo |
 | API Reference Documentation | P2 | Todo |

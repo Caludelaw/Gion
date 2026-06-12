@@ -49,10 +49,7 @@
 import { ref, onMounted } from 'vue'
 import { api } from '../api/index.js'
 
-const themes = ref([
-  { name: 'default', label: '默认博客主题', description: 'Taichu 内置的简洁博客主题，支持文章/页面/分类/搜索', active: true }
-])
-
+const themes = ref([])
 const themeName = ref('')
 const file = ref(null)
 const fileLabel = ref('选择文件')
@@ -80,17 +77,15 @@ const themeVarExample = `// window.__TAICHU__ 包含以下配置：
 
 onMounted(async () => {
   try {
-    const settings = await api.getSettings()
-    if (settings.theme?.activeTheme && settings.theme.activeTheme !== 'default') {
-      themes.value.push({
-        name: settings.theme.activeTheme,
-        label: settings.theme.activeTheme,
-        description: '自定义主题',
-        active: true
-      })
-      themes.value[0].active = false
-    }
-  } catch {}
+    const data = await api.request('/theme')
+    themes.value = data.themes || []
+  } catch (e) {
+    // Fallback
+    themes.value = [
+      { name: 'default', label: '默认博客主题', description: 'Taichu 内置简洁博客主题', active: true, builtin: true },
+      { name: 'theme-minimal', label: '极简主题', description: '衬线字体 + 留白布局', active: false, builtin: true }
+    ]
+  }
 })
 
 function handleFile(e) {
@@ -100,11 +95,7 @@ function handleFile(e) {
 
 async function activate(name) {
   try {
-    await fetch('/api/site-settings', {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${localStorage.getItem('taichu_token')}` },
-      body: JSON.stringify({ theme: { activeTheme: name } })
-    })
+    await api.request('/theme/activate/' + name, { method: 'POST' })
     themes.value.forEach(t => t.active = (t.name === name))
   } catch (e) { alert('切换失败: ' + e.message) }
 }

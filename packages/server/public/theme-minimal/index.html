@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title data-taichu="siteName">Taichu CMS</title>
+<meta name="description" content="">
+<link rel="stylesheet" href="/theme/style.css">
+<link rel="icon" type="image/svg+xml" href="/favicon.svg">
+<link rel="alternate" type="application/rss+xml" href="/rss.xml" title="RSS Feed">
+</head>
+<body>
+<header class="site-header">
+  <div class="header-inner">
+    <a href="/" class="site-logo">Taichu</a>
+    <nav class="site-nav" id="nav"></nav>
+  </div>
+</header>
+
+<main class="site-main" id="main"></main>
+
+<footer class="site-footer">
+  <div class="footer-inner">
+    <p>Powered by <a href="https://github.com/Caludelaw/Taichu" target="_blank">Taichu CMS</a></p>
+    <p class="icp" id="icp"></p>
+  </div>
+</footer>
+
+<script>
+(function() {
+var G = window.__TAICHU__ || {};
+document.title = G.site?.name || 'Taichu CMS';
+document.documentElement.lang = G.site?.language || 'zh-CN';
+document.querySelectorAll('[data-taichu=siteName]').forEach(function(el){ el.textContent = G.site?.name || 'Taichu' });
+
+var icpEl = document.getElementById('icp');
+if (icpEl && G.site?.icp) {
+  icpEl.innerHTML = '<a href="https://beian.miit.gov.cn" target="_blank">'+G.site.icp+'</a>' + (G.site.gongan ? ' | '+G.site.gongan : '');
+}
+
+var theme = G.theme || {};
+var rs = document.documentElement.style;
+if (theme.primaryColor) rs.setProperty('--accent', theme.primaryColor);
+if (theme.fontSize) rs.setProperty('--font-size', theme.fontSize);
+if (theme.customCSS) { var s = document.createElement('style'); s.textContent = theme.customCSS; document.head.appendChild(s); }
+
+function api(path) { return fetch('/api'+path).then(function(r){ return r.json() }); }
+function getPage() { var m = location.search.match(/page=(\d+)/); return m ? parseInt(m[1]) : 1; }
+var PAGE_SIZE = 10;
+
+function paginationHTML(page, total) {
+  var pages = Math.ceil(total / PAGE_SIZE);
+  if (pages <= 1) return '';
+  var html = '<nav class="pagination">';
+  if (page > 1) html += '<a href="?page='+(page-1)+'" class="btn-page">&larr; 前页</a>';
+  else html += '<span class="btn-page disabled">&larr; 前页</span>';
+  html += '<span class="page-info">'+page+' / '+pages+'</span>';
+  if (page < pages) html += '<a href="?page='+(page+1)+'" class="btn-page">后页 &rarr;</a>';
+  else html += '<span class="btn-page disabled">后页 &rarr;</span>';
+  html += '</nav>';
+  return html;
+}
+
+function route() {
+  var p = location.pathname;
+  if (p === '/' || p === '') return renderHome();
+  if (p.startsWith('/post/')) return renderPost(p.split('/post/')[1]);
+  if (p.startsWith('/page/')) return renderPage(p.split('/page/')[1]);
+  if (p === '/search') return renderSearch();
+  render404();
+}
+
+function buildNav(navItems, categories, pages) {
+  var nav = document.getElementById('nav');
+  var html = '<a href="/">首页</a>';
+  (navItems||[]).forEach(function(item){
+    html += '<a href="'+escAttr(item.data?.url||'#')+'"'+(item.data?.target==='_blank'?' target="_blank"':'')+'>'+escHtml(item.data?.title||'')+'</a>';
+  });
+  if (!navItems || !navItems.length) {
+    (categories||[]).forEach(function(c){
+      html += '<a href="/category/'+(c.data?.slug||c.data?.name||c.id)+'">'+escHtml(c.data?.name||c.data?.title||c.id)+'</a>';
+    });
+    (pages||[]).forEach(function(p){
+      html += '<a href="/page/'+(p.data?.slug||p.id)+'">'+escHtml(p.data?.title||p.id)+'</a>';
+    });
+  }
+  html += '<a href="/search">🔍</a>';
+  nav.innerHTML = html;
+}
+
+function renderHome() {
+  var main = document.getElementById('main');
+  var page = getPage();
+  var offset = (page - 1) * PAGE_SIZE;
+  main.innerHTML = '<div class="loading">加载中...</div>';
+
+  Promise.all([
+    api('/content/article?status=published&limit='+PAGE_SIZE+'&offset='+offset),
+    api('/content/article?status=published&limit=1'),
+    api('/content/navigation?limit=20'),
+    api('/content/category?limit=20')
+  ]).then(function(res){
+    var articles = res[0].docs || [];
+    var total = res[1].total || 0;
+    var navItems = (res[2].docs||[]).sort(function(a,b){ return (a.data?.order||0)-(b.data?.order||0) });
+    var categories = res[3].docs || [];
+    buildNav(navItems, categories, []);
+
+    if (!articles.length && page === 1) {
+      main.innerHTML = '<div class="hero"><h1>你好，我是 Taichu</h1><p>一个轻量、快速的 AI Agent-Native 内容管理系统。</p></div><div class="empty-blog"><p>还没有文章。去 <a href="/admin/">管理后台</a> 开始创作。</p></div>';
+      return;
+    }
+    var html = '<div class="post-list">';
+    articles.forEach(function(a){
+      var ex = excerpt(a.data?.body);
+      html += '<article class="post-card"><div class="post-meta"><time>'+fmtDate(a.updatedAt)+'</time></div><h2><a href="/post/'+(a.data?.slug||a.id)+'">'+escHtml(a.data?.title||'Untitled')+'</a></h2><p>'+ex+'</p></article>';
+    });
+    html += '</div>';
+    html += paginationHTML(page, total);
+    main.innerHTML = html;
+  }).catch(function(e){ main.innerHTML = '<p class="error">加载失败</p>'; });
+}
+
+function renderPost(slug) {
+  var main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">加载中...</div>';
+  api('/content/article?limit=100').then(function(data){
+    var docs = data.docs || [];
+    var doc = docs.find(function(d){ return d.data?.slug === slug });
+    if (!doc) { render404(); return; }
+    main.innerHTML = '<article class="post-single"><h1>'+escHtml(doc.data?.title||'')+'</h1><time>'+fmtDate(doc.updatedAt)+'</time><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
+    document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Taichu');
+  }).catch(function(){ main.innerHTML = '<p class="error">加载失败</p>'; });
+}
+
+function renderPage(slug) {
+  var main = document.getElementById('main');
+  main.innerHTML = '<div class="loading">加载中...</div>';
+  api('/content/page?limit=100').then(function(data){
+    var docs = data.docs || [];
+    var doc = docs.find(function(d){ return d.data?.slug === slug });
+    if (!doc) { render404(); return; }
+    main.innerHTML = '<article class="post-single"><h1>'+escHtml(doc.data?.title||'')+'</h1><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
+    document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Taichu');
+  }).catch(function(){ main.innerHTML = '<p class="error">加载失败</p>'; });
+}
+
+function renderSearch() {
+  var main = document.getElementById('main');
+  var q = (new URL(location.href)).searchParams.get('q') || '';
+  main.innerHTML = '<h1 class="page-title">搜索</h1><form onsubmit="event.preventDefault();location.href=\'/search?q=\'+encodeURIComponent(this.q.value)" class="search-form"><input name="q" value="'+escAttr(q)+'" class="search-input" placeholder="输入关键词..." autofocus><button class="btn-primary">搜索</button></form><div id="search-results"></div>';
+  if (!q) return;
+  document.getElementById('search-results').innerHTML = '<div class="loading">搜索中...</div>';
+  api('/search?q='+encodeURIComponent(q)).then(function(data){
+    var docs = data.docs || [];
+    var results = document.getElementById('search-results');
+    if (!docs.length) { results.innerHTML = '<p class="empty">未找到</p>'; return; }
+    var html = '<div class="post-list">';
+    docs.forEach(function(d){
+      html += '<article class="post-card"><h2><a href="/post/'+(d.data?.slug||d.id)+'">'+escHtml(d.data?.title||'')+'</a></h2><p>'+excerpt(d.data?.body)+'</p></article>';
+    });
+    html += '</div>';
+    results.innerHTML = html;
+  });
+}
+
+function render404() {
+  document.getElementById('main').innerHTML = '<div class="empty-page"><h1>404</h1><p>页面未找到</p><a href="/">返回首页</a></div>';
+}
+
+function renderBody(body) {
+  if (!body) return '';
+  if (typeof body === 'string') return '<p>'+escHtml(body)+'</p>';
+  if (body.type === 'doc' && Array.isArray(body.content)) return body.content.map(renderNode).join('');
+  if (body.text) return '<p>'+escHtml(String(body.text||body))+'</p>';
+  return '';
+}
+
+function renderNode(node) {
+  if (!node) return '';
+  var text = '';
+  if (node.content) text = node.content.map(renderNode).join('');
+  else if (node.text) text = escHtml(String(node.text));
+  if (node.marks) {
+    node.marks.forEach(function(m){
+      if (m.type === 'bold') text = '<strong>'+text+'</strong>';
+      if (m.type === 'italic') text = '<em>'+text+'</em>';
+      if (m.type === 'code') text = '<code>'+text+'</code>';
+      if (m.type === 'link') text = '<a href="'+escAttr(m.attrs?.href||'#')+'">'+text+'</a>';
+      if (m.type === 'strike') text = '<s>'+text+'</s>';
+    });
+  }
+  switch (node.type) {
+    case 'paragraph': return '<p>'+text+'</p>';
+    case 'heading': return '<h'+(node.attrs?.level||2)+'>'+text+'</h'+(node.attrs?.level||2)+'>';
+    case 'bulletList': return '<ul>'+text+'</ul>';
+    case 'orderedList': return '<ol>'+text+'</ol>';
+    case 'listItem': return '<li>'+text+'</li>';
+    case 'blockquote': return '<blockquote>'+text+'</blockquote>';
+    case 'codeBlock': return '<pre><code>'+text+'</code></pre>';
+    case 'horizontalRule': return '<hr>';
+    case 'image': return '<img src="'+escAttr(node.attrs?.src||'')+'" alt="'+escAttr(node.attrs?.alt||'')+'" loading="lazy">';
+    default: return text;
+  }
+}
+
+function excerpt(body) {
+  if (!body) return '';
+  if (typeof body === 'string') return body.replace(/<[^>]+>/g,'').substring(0,200);
+  if (body.text) return escHtml(String(body.text)).substring(0,200);
+  if (body.content) return body.content.map(function(n){ return n.text||'' }).join(' ').substring(0,200);
+  return '';
+}
+
+function fmtDate(d) { if (!d) return ''; return new Date(d).toLocaleDateString('zh-CN',{year:'numeric',month:'long',day:'numeric'}); }
+function escHtml(s) { return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;'); }
+function escAttr(s) { return String(s).replace(/&/g,'&amp;').replace(/"/g,'&quot;').replace(/'/g,'&#39;'); }
+
+route();
+})();
+</script>
+</body>
+</html>
