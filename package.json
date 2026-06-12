@@ -1,6 +1,6 @@
 {
   "name": "taichu",
-  "version": "0.4.0",
+  "version": "0.6.0",
   "private": false,
   "description": "AI Agent-Native CMS — content infrastructure built for the agent era",
   "workspaces": [
@@ -38,6 +38,21 @@
   ],
   "author": "Liu Huai'an",
   "license": "MIT",
+  "files": [
+    "scripts/cli.js",
+    "packages/core/src/",
+    "packages/server/src/",
+    "packages/server/public/",
+    "packages/mcp/src/",
+    "packages/llm-providers/src/",
+    "marketplace.json",
+    "Dockerfile",
+    "docker-compose.yml",
+    ".dockerignore",
+    "docs/",
+    "README.md",
+    "LICENSE"
+  ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
     "eslint": "^10.4.1"

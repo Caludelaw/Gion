@@ -1,0 +1,7 @@
+node_modules
+.github
+.git
+*.log
+.workbuddy
+.taichu
+deliverables

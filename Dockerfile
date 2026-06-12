@@ -46,6 +46,6 @@ EXPOSE 3120
 VOLUME ["/app/.taichu"]
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=5s --retries=3 \
-  CMD wget -qO- http://localhost:3120/api/health || exit 1
+  CMD node -e "require('http').get('http://localhost:3120/api/health',r=>{let d='';r.on('data',c=>d+=c);r.on('end',()=>process.exit(d.includes('ok')?0:1))})"
 
 CMD ["node", "packages/server/src/index.js"]
