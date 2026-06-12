@@ -11,6 +11,30 @@
 
     <div class="row">
       <div style="flex:1">
+        <h3 style="margin: 32px 0 12px; font-size: 16px;">内容概览</h3>
+        <div class="chart-bar" v-if="statusChart.data.length">
+          <div class="bar-row" v-for="item in statusChart.data" :key="item.label">
+            <span class="bar-label">{{ item.label }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" :style="{ width: statusChart.pct(item.count) + '%', background: item.color }"></div>
+            </div>
+            <span class="bar-count">{{ item.count }}</span>
+          </div>
+        </div>
+
+        <h3 style="margin: 32px 0 12px; font-size: 16px;">按类型分布</h3>
+        <div class="chart-bar" v-if="typeChart.data.length">
+          <div class="bar-row" v-for="item in typeChart.data" :key="item.label">
+            <span class="bar-label">{{ item.label }}</span>
+            <div class="bar-track">
+              <div class="bar-fill" :style="{ width: typeChart.pct(item.count) + '%', background: item.color }"></div>
+            </div>
+            <span class="bar-count">{{ item.count }}</span>
+          </div>
+        </div>
+      </div>
+
+      <div style="width:260px">
         <h3 style="margin: 32px 0 12px; font-size: 16px;">最近内容</h3>
         <div class="recent" v-if="recent.length">
           <div class="recent-item" v-for="doc in recent" :key="doc.id">
@@ -21,9 +45,7 @@
           </div>
         </div>
         <p v-else class="empty">暂无内容</p>
-      </div>
 
-      <div style="width:260px">
         <h3 style="margin: 32px 0 12px; font-size: 16px;">系统信息</h3>
         <div class="system-info" v-if="sys">
           <div class="sys-row"><span>版本</span><code>{{ sys.version }}</code></div>
@@ -39,12 +61,16 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 import { api } from '../api/index.js'
 
 const stats = ref([])
 const recent = ref([])
 const sys = ref(null)
+const statusChart = reactive({ data: [], pct: () => 0 })
+const typeChart = reactive({ data: [], pct: () => 0 })
+
+const COLORS = ['#6366F1', '#10B981', '#F59E0B', '#EF4444', '#8B5CF6', '#EC4899', '#06B6D4']
 
 onMounted(async () => {
   try {
@@ -54,16 +80,41 @@ onMounted(async () => {
       api.listContent('article', { limit: 10, status: 'published' })
     ])
 
-    const contentTypes = (types.types||[]).filter(t => !['user','api_key','webhook','audit_log'].includes(t.name))
+    const contentTypes = (types.types||[]).filter(t => !['user','api_key','webhook','audit_log','activitypub_activity','revision'].includes(t.name))
+
+    // Fetch counts per content type
     const counts = await Promise.all(contentTypes.map(async t => {
       try {
         const r = await api.listContent(t.name, { limit: 1 })
-        return { label: t.label, count: r.total || 0 }
-      } catch { return { label: t.label, count: 0 } }
+        return { label: t.label, count: r.total || 0, name: t.name }
+      } catch { return { label: t.label, count: 0, name: t.name } }
     }))
     stats.value = counts
 
-    recent.value = articles.docs || []
+    // Status distribution chart
+    const statuses = ['published', 'draft', 'scheduled', 'archived']
+    const statusLabels = { published: '已发布', draft: '草稿', scheduled: '定时', archived: '归档' }
+    const statusColors = { published: '#10B981', draft: '#F59E0B', scheduled: '#6366F1', archived: '#9CA3AF' }
+    const statusCounts = await Promise.all(statuses.map(async s => {
+      let total = 0
+      for (const t of contentTypes) {
+        try {
+          const r = await api.listContent(t.name, { limit: 1, status: s })
+          total += r.total || 0
+        } catch {}
+      }
+      return { label: statusLabels[s], count: total, color: statusColors[s] }
+    }))
+    const maxStatus = Math.max(1, ...statusCounts.map(s => s.count))
+    statusChart.data = statusCounts
+    statusChart.pct = (c) => Math.round((c / maxStatus) * 100)
+
+    // Type distribution chart
+    const maxType = Math.max(1, ...counts.map(c => c.count))
+    typeChart.data = counts.map((c, i) => ({ ...c, color: COLORS[i % COLORS.length] }))
+    typeChart.pct = (c) => Math.round((c / maxType) * 100)
+
+    recent.value = (articles.docs || []).slice(0, 8)
 
     if (health) {
       sys.value = {
@@ -105,4 +156,11 @@ function formatUptime(s) {
 .sys-row span { color: var(--text-secondary); }
 .sys-row code { color: var(--primary); font-size: 12px; }
 .empty { color: var(--text-secondary); font-size: 14px; }
+
+.chart-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
+.bar-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
+.bar-label { width: 50px; font-size: 13px; color: var(--text-secondary); text-align: right; flex-shrink: 0; }
+.bar-track { flex: 1; height: 20px; background: #F3F4F6; border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; min-width: 2px; }
+.bar-count { width: 32px; font-size: 13px; font-weight: 600; color: var(--text-primary); text-align: left; }
 </style>

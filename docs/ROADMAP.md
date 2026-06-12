@@ -75,7 +75,23 @@
 | Multi-Tenant Support | P2 | ✅ Done |
 | Plugin Marketplace (frontend + CLI install) | P2 | ✅ Done |
 | ActivityPub Federation | P2 | ✅ Done |
-| ActivityPub Federation | P2 | Todo |
+
+## v0.5.0 → v0.6.0 (Current)
+
+| Feature | Priority | Status |
+|---------|----------|--------|
+| Dashboard Charts (content stats, trend graphs) | P1 | Todo |
+| Theme Frontend Pagination (blog list pages) | P1 | Todo |
+| Content Relationships Graph UI (admin visualization) | P1 | Todo |
+| Media Selector in Rich Editor | P1 | Todo |
+| Batch Operations (bulk delete/publish) | P2 | Todo |
+| Second Official Theme (minimal/portfolio) | P2 | Todo |
+| SSO OIDC Callback Handler | P2 | Todo |
+| E2E Tests (Playwright, core flows) | P2 | Todo |
+| API Reference Documentation | P2 | Todo |
+| Custom Field Types (date, boolean, reference) | P3 | Todo |
+| Content Export (JSON, Markdown, CSV) | P3 | Todo |
+| Webhook Retry with Exponential Backoff | P3 | Todo |
 
 ## Long-Term Vision
 
