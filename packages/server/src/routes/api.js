@@ -147,14 +147,19 @@ export async function apiRoutes(ctx) {
 
   if (listMatch && method === 'POST') {
     // Require scoped auth for content creation
+    // Exception: comments can be submitted publicly
     const type = listMatch[1];
-    const authResult = await requireScopedAuth(ctx, `${type}:write`);
-    if (!authResult.authenticated) {
-      ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
-      ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
-      return;
+    if (type !== 'comment') {
+      const authResult = await requireScopedAuth(ctx, `${type}:write`);
+      if (!authResult.authenticated) {
+        ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
+        ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
+        return;
+      }
+      ctx.actor = authResult.actor;
+    } else {
+      await optionalAuth(ctx);
     }
-    ctx.actor = authResult.actor;
     const ct = _contentTypes.get(type);
     if (!ct) {
       ctx.res.writeHead(400, { 'Content-Type': 'application/json' });

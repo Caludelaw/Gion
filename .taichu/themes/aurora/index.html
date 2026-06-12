@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Aurora Blog</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700;800&family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/aurora/style.css">
+</head>
+<body>
+<div class="aurora-bg">
+  <div class="aurora-blob aurora-blob--1"></div>
+  <div class="aurora-blob aurora-blob--2"></div>
+  <div class="aurora-blob aurora-blob--3"></div>
+  <div class="aurora-blob aurora-blob--4"></div>
+</div>
+<div class="grid-texture"></div>
+
+<nav class="navbar navbar-scrolled" id="navbar">
+  <div class="container nav-inner">
+    <a href="/" class="nav-logo" id="navLogo">Blog</a>
+    <button class="nav-hamburger">☰</button>
+    <ul class="nav-links" id="navLinks"></ul>
+    <button class="theme-toggle" id="themeToggle" title="Theme">☾</button>
+    <button class="lang-switch" id="langSwitch">EN</button>
+  </div>
+</nav>
+
+<main id="app"></main>
+
+<footer class="footer" id="siteFooter">
+  <div class="container footer-inner">
+    <span id="footerCopyright"></span>
+    <a class="footer-icp" id="footerIcp" href="https://beian.miit.gov.cn/" target="_blank" rel="noopener noreferrer" style="display:none"></a>
+    <div class="footer-links">
+      <a href="/blog">Blog</a>
+      <a href="/about">About</a>
+      <a href="/niuma">Niuma</a>
+      <a href="/market">Market</a>
+    </div>
+  </div>
+</footer>
+
+<script>
+(function() {
+var G = window.__TAICHU__ || {};
+var API = G.apiBase || '/api';
+var LANG = 'zh';
+var CONFIG = {};
+var T = { zh: {}, en: {} };
+
+// ── i18n ──────────────────────────────────────────────────
+T.zh = {
+  home:'首页', blog:'Blog', niuma:'牛马', market:'市场', about:'关于',
+  hero_play:'点击播放视频',
+  read_more:'阅读更多', view_all:'查看全部',
+  no_posts:'暂无文章', no_apps:'暂无应用', no_agents:'暂无Agent',
+  comment:'评论', send:'发送', loading:'加载中...',
+  copyright:'© 2026',
+  switch_lang:'English'
+};
+T.en = {
+  home:'Home', blog:'Blog', niuma:'Niuma', market:'Market', about:'About',
+  hero_play:'Click to play',
+  read_more:'Read More', view_all:'View All',
+  no_posts:'No posts yet', no_apps:'No apps yet', no_agents:'No agents yet',
+  comment:'Comment', send:'Send', loading:'Loading...',
+  copyright:'© 2026',
+  switch_lang:'中文'
+};
+
+function TL(key) {
+  return (T[LANG] && T[LANG][key]) || key;
+}
+
+function loadI18n() {
+  var m = document.cookie.match(/lang=(\w+)/);
+  LANG = (m && m[1] === 'en') ? 'en' : 'zh';
+  document.getElementById('langSwitch').textContent = TL('switch_lang');
+}
+
+// ── API ───────────────────────────────────────────────────
+async function api(path) {
+  try {
+    var r = await fetch(API + path);
+    return r.ok ? r.json() : null;
+  } catch(e) { return null; }
+}
+
+// ── Router ────────────────────────────────────────────────
+var routes = {
+  '/': renderHome,
+  '/blog': renderBlog,
+  '/market': renderMarket,
+  '/niuma': renderNiuma,
+  '/about': renderAbout
+};
+
+function route() {
+  var path = location.pathname;
+  if (path.startsWith('/post/')) {
+    var slug = path.replace('/post/', '');
+    return renderPost(slug);
+  }
+  if (path.startsWith('/app/')) {
+    return renderAppDetail(path.replace('/app/', ''));
+  }
+  if (path.startsWith('/agent/')) {
+    return renderAgentDetail(path.replace('/agent/', ''));
+  }
+  var handler = routes[path] || renderHome;
+  return handler();
+}
+
+// ── Init ───────────────────────────────────────────────────
+async function init() {
+  loadI18n();
+  var cfg = await api('/content/site_settings');
+  if (cfg && cfg[0]) CONFIG = cfg[0].data;
+  document.title = CONFIG.siteName || 'Aurora Blog';
+  document.getElementById('navLogo').textContent = CONFIG.siteName || 'Blog';
+  document.getElementById('footerCopyright').textContent = TL('copyright') + ' ' + (CONFIG.siteName || 'Blog');
+
+  var icpEl = document.getElementById('footerIcp');
+  if (CONFIG.icpNumber) {
+    icpEl.textContent = CONFIG.icpNumber;
+    icpEl.style.display = '';
+  }
+
+  // Nav
+  var nav = document.getElementById('navLinks');
+  var items = [
+    ['/', TL('home')],
+    ['/blog', TL('blog')],
+    ['/niuma', TL('niuma')],
+    ['/market', TL('market')],
+    ['/about', TL('about')]
+  ];
+  nav.innerHTML = items.map(function(p) {
+    return '<li><a href="' + p[0] + '" class="' + (location.pathname === p[0] ? 'active' : '') + '">' + p[1] + '</a></li>';
+  }).join('');
+
+  // Theme
+  initTheme();
+  // Lang switch
+  document.getElementById('langSwitch').addEventListener('click', function() {
+    var next = LANG === 'zh' ? 'en' : 'zh';
+    document.cookie = 'lang=' + next + ';path=/;max-age=31536000';
+    location.reload();
+  });
+
+  // Nav links
+  document.querySelectorAll('.nav-links a').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      history.pushState(null, '', a.getAttribute('href'));
+      route();
+    });
+  });
+
+  window.addEventListener('popstate', route);
+
+  route();
+}
+
+// ── Theme ─────────────────────────────────────────────────
+function initTheme() {
+  var saved = localStorage.getItem('theme') || 'dark';
+  document.documentElement.setAttribute('data-theme', saved);
+  var btn = document.getElementById('themeToggle');
+  btn.textContent = saved === 'dark' ? '☾' : '☀';
+  btn.addEventListener('click', function() {
+    var current = document.documentElement.getAttribute('data-theme');
+    var next = current === 'dark' ? 'light' : 'dark';
+    document.documentElement.setAttribute('data-theme', next);
+    localStorage.setItem('theme', next);
+    btn.textContent = next === 'dark' ? '☾' : '☀';
+  });
+}
+
+// ── Render: Home ──────────────────────────────────────────
+async function renderHome() {
+  var html = '';
+  // Hero
+  html += '<section class="hero-video" id="heroVideo">';
+  html += '<div class="hero-video-frame">';
+  if (CONFIG.hero_style === 'video' && CONFIG.hero_video_url) {
+    html += '<video class="hero-video-el" id="heroVideoEl" src="' + CONFIG.hero_video_url + '" poster="' + (CONFIG.hero_video_poster || '') + '" autoplay muted loop playsinline data-speed-aware></video>';
+  } else if (CONFIG.hero_style === 'image' && CONFIG.hero_image_url) {
+    html += '<div class="hero-video-el" style="width:100%;height:100%;position:absolute;top:0;left:0;background:url(\'' + CONFIG.hero_image_url + '\') center/cover no-repeat"></div>';
+  } else {
+    html += '<div class="hero-video-el hero-bg-cover" style="width:100%;height:100%;position:absolute;top:0;left:0"></div>';
+  }
+  html += '</div>';
+  if (CONFIG.hero_headline) {
+    html += '<div class="hero-video-overlay" style="opacity:' + (CONFIG.hero_overlay_opacity || 0.5) + '">';
+    html += '<div class="hero-video-content">';
+    html += '<h1 class="hero-video-title">' + CONFIG.hero_headline + '</h1>';
+    if (CONFIG.hero_subtitle) html += '<p class="hero-video-sub">' + CONFIG.hero_subtitle + '</p>';
+    if (CONFIG.hero_cta_text) html += '<a href="' + (CONFIG.hero_cta_link || '#blog') + '" class="hero-video-scroll"><span>' + CONFIG.hero_cta_text + '</span></a>';
+    html += '</div></div>';
+  }
+  html += '</section>';
+
+  // Blog preview
+  var posts = await api('/content/article?limit=4&sort=-publishedAt');
+  if (posts && posts.length) {
+    html += '<section class="section" id="blog"><div class="container">';
+    html += '<div class="section-header-split"><div><h2 class="section-title">' + TL('blog') + '</h2></div><a href="/blog" class="section-more">' + TL('view_all') + '</a></div>';
+    html += '<div class="blog-grid-4">';
+    posts.forEach(function(p) {
+      var d = p.data;
+      var date = d.publishedAt ? new Date(d.publishedAt).toLocaleDateString('zh-CN') : '';
+      html += '<a href="/post/' + d.slug + '" class="blog-card"><time class="blog-card-date">' + date + '</time>';
+      html += '<h3 class="blog-card-title">' + d.title + '</h3>';
+      html += '<p class="blog-card-summary">' + (d.excerpt || '') + '</p></a>';
+    });
+    html += '</div></div></section>';
+  }
+
+  // Apps preview
+  var apps = await api('/content/app?limit=4&sort=-order');
+  if (apps && apps.length) {
+    html += '<section class="section"><div class="container">';
+    html += '<div class="section-header-split"><div><h2 class="section-title">Apps</h2></div><a href="/market" class="section-more">' + TL('view_all') + '</a></div>';
+    html += '<div class="blog-grid-4">';
+    apps.forEach(function(a) {
+      var d = a.data;
+      html += '<a href="/app/' + d.slug + '" class="blog-card"><h3 class="blog-card-title">' + d.name + '</h3>';
+      html += '<p class="blog-card-summary">' + (d.description || '') + '</p></a>';
+    });
+    html += '</div></div></section>';
+  }
+
+  // Agents preview
+  var agents = await api('/content/agent?limit=4&sort=-order');
+  if (agents && agents.length) {
+    html += '<section class="section"><div class="container">';
+    html += '<div class="section-header-split"><div><h2 class="section-title">Agents</h2></div><a href="/market" class="section-more">' + TL('view_all') + '</a></div>';
+    html += '<div class="blog-grid-4">';
+    agents.forEach(function(a) {
+      var d = a.data;
+      html += '<a href="/agent/' + d.slug + '" class="blog-card"><h3 class="blog-card-title">' + d.name + '</h3>';
+      html += '<p class="blog-card-summary">' + (d.description || '') + '</p></a>';
+    });
+    html += '</div></div></section>';
+  }
+
+  document.getElementById('app').innerHTML = html;
+
+  // Speed-aware video
+  initHeroVideo();
+  // Nav link intercept
+  interceptLinks();
+}
+
+// ── Render: Blog ──────────────────────────────────────────
+async function renderBlog() {
+  var posts = await api('/content/article?limit=20&sort=-publishedAt');
+  var html = '<section class="section"><div class="container">';
+  html += '<h2 class="section-title">' + TL('blog') + '</h2>';
+  if (!posts || !posts.length) { html += '<p>' + TL('no_posts') + '</p>'; }
+  else {
+    html += '<div class="blog-grid-4">';
+    posts.forEach(function(p) {
+      var d = p.data;
+      var date = d.publishedAt ? new Date(d.publishedAt).toLocaleDateString('zh-CN') : '';
+      html += '<a href="/post/' + d.slug + '" class="blog-card"><time class="blog-card-date">' + date + '</time>';
+      html += '<h3 class="blog-card-title">' + d.title + '</h3>';
+      html += '<p class="blog-card-summary">' + (d.excerpt || '') + '</p></a>';
+    });
+    html += '</div>';
+  }
+  html += '</div></section>';
+  document.getElementById('app').innerHTML = html;
+  interceptLinks();
+}
+
+// ── Render: Post Detail ───────────────────────────────────
+async function renderPost(slug) {
+  var posts = await api('/content/article?limit=100');
+  if (!posts) { document.getElementById('app').innerHTML = '<div class="section"><div class="container"><p>404</p></div></div>'; return; }
+  var p = posts.find(function(x) { return x.data.slug === slug; });
+  if (!p) { document.getElementById('app').innerHTML = '<div class="section"><div class="container"><p>404</p></div></div>'; return; }
+  var d = p.data;
+  var date = d.publishedAt ? new Date(d.publishedAt).toLocaleDateString('zh-CN') : '';
+  var body = '';
+  if (typeof d.body === 'string') { body = d.body; }
+  else if (d.body && d.body.content) {
+    body = d.body.content.map(function(n) { return n.text || ''; }).join('\n');
+  }
+  var html = '<article class="section"><div class="container">';
+  html += '<h1>' + d.title + '</h1>';
+  html += '<time>' + date + '</time>';
+  html += '<div class="post-body">' + body + '</div>';
+  html += '</div></article>';
+
+  // Comments
+  html += '<section class="section"><div class="container" id="comments-section">';
+  html += '<h3>' + TL('comment') + '</h3>';
+  html += '<div id="commentList">' + TL('loading') + '...</div>';
+  html += '<form id="commentForm" onsubmit="return submitComment(event)">';
+  html += '<input type="text" id="cmtName" placeholder="Name" required style="padding:10px;width:200px;margin-right:8px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-primary)">';
+  html += '<input type="email" id="cmtEmail" placeholder="Email" style="padding:10px;width:200px;margin-right:8px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-primary)">';
+  html += '<textarea id="cmtBody" placeholder="' + TL('comment') + '..." required style="display:block;width:100%;padding:10px;margin-top:8px;border-radius:8px;border:1px solid var(--glass-border);background:var(--glass-bg);color:var(--text-primary);min-height:80px"></textarea>';
+  html += '<button type="submit" style="margin-top:8px;padding:8px 20px;border-radius:8px;background:var(--grad-primary);color:#000;font-weight:700;border:none;cursor:pointer">' + TL('send') + '</button>';
+  html += '</form>';
+  html += '</div></section>';
+
+  document.getElementById('app').innerHTML = html;
+  window._postId = p._id;
+  loadComments(p._id);
+  interceptLinks();
+}
+
+// ── Render: Market ─────────────────────────────────────────
+async function renderMarket() {
+  var apps = await api('/content/app?limit=50');
+  var agents = await api('/content/agent?limit=50');
+  var html = '<section class="section"><div class="container">';
+  html += '<h2 class="section-title">Apps</h2>';
+  if (!apps || !apps.length) html += '<p>' + TL('no_apps') + '</p>';
+  else {
+    html += '<div class="blog-grid-4">';
+    apps.forEach(function(a) {
+      var d = a.data;
+      html += '<a href="/app/' + d.slug + '" class="blog-card"><h3 class="blog-card-title">' + d.name + '</h3>';
+      html += '<p class="blog-card-summary">' + (d.description || '') + '</p></a>';
+    });
+    html += '</div>';
+  }
+  html += '<h2 class="section-title" style="margin-top:48px">Agents</h2>';
+  if (!agents || !agents.length) html += '<p>' + TL('no_agents') + '</p>';
+  else {
+    html += '<div class="blog-grid-4">';
+    agents.forEach(function(a) {
+      var d = a.data;
+      html += '<a href="/agent/' + d.slug + '" class="blog-card"><h3 class="blog-card-title">' + d.name + '</h3>';
+      html += '<p class="blog-card-summary">' + (d.description || '') + '</p></a>';
+    });
+    html += '</div>';
+  }
+  html += '</div></section>';
+  document.getElementById('app').innerHTML = html;
+  interceptLinks();
+}
+
+// ── Render: Niuma ─────────────────────────────────────────
+async function renderNiuma() {
+  var agents = await api('/content/agent?limit=50');
+  var html = '<section class="section"><div class="container">';
+  html += '<h2 class="section-title">Niuma — Agents & Skills</h2>';
+  if (!agents || !agents.length) html += '<p>' + TL('no_agents') + '</p>';
+  else {
+    html += '<div class="blog-grid-4">';
+    agents.forEach(function(a) {
+      var d = a.data;
+      html += '<a href="/agent/' + d.slug + '" class="blog-card"><h3 class="blog-card-title">' + d.name + '</h3>';
+      html += '<p class="blog-card-summary">' + (d.description || '') + '</p></a>';
+    });
+    html += '</div>';
+  }
+  html += '</div></section>';
+  document.getElementById('app').innerHTML = html;
+  interceptLinks();
+}
+
+// ── Render: About ─────────────────────────────────────────
+async function renderAbout() {
+  var cfg = CONFIG;
+  var html = '<section class="section"><div class="container">';
+  html += '<h2 class="section-title">' + TL('about') + '</h2>';
+  html += '<div style="max-width:720px;line-height:1.8;color:var(--text-secondary)">';
+  html += '<p>' + (cfg.siteDescription || '') + '</p>';
+  if (cfg.author_name) html += '<p><strong>' + cfg.author_name + '</strong></p>';
+  if (cfg.author_bio) html += '<p>' + cfg.author_bio + '</p>';
+  html += '</div></div></section>';
+  document.getElementById('app').innerHTML = html;
+  interceptLinks();
+}
+
+// ── Render: App Detail ────────────────────────────────────
+async function renderAppDetail(slug) {
+  var apps = await api('/content/app?limit=100');
+  if (!apps) { document.getElementById('app').innerHTML = '<div class="section"><div class="container"><p>404</p></div></div>'; return; }
+  var a = apps.find(function(x) { return x.data.slug === slug; });
+  if (!a) { document.getElementById('app').innerHTML = '<div class="section"><div class="container"><p>404</p></div></div>'; return; }
+  var d = a.data;
+  var html = '<section class="section"><div class="container">';
+  html += '<h1>' + d.name + '</h1>';
+  html += '<p>' + (d.description || '') + '</p>';
+  if (d.url) html += '<a href="' + d.url + '" target="_blank" class="hero-video-scroll"><span>Visit</span></a>';
+  html += '</div></section>';
+  document.getElementById('app').innerHTML = html;
+  interceptLinks();
+}
+
+// ── Render: Agent Detail ──────────────────────────────────
+async function renderAgentDetail(slug) {
+  var agents = await api('/content/agent?limit=100');
+  if (!agents) { document.getElementById('app').innerHTML = '<div class="section"><div class="container"><p>404</p></div></div>'; return; }
+  var a = agents.find(function(x) { return x.data.slug === slug; });
+  if (!a) { document.getElementById('app').innerHTML = '<div class="section"><div class="container"><p>404</p></div></div>'; return; }
+  var d = a.data;
+  var html = '<section class="section"><div class="container">';
+  html += '<h1>' + d.name + '</h1>';
+  html += '<p>' + (d.description || '') + '</p>';
+  if (d.package_url) html += '<a href="' + d.package_url + '" class="hero-video-scroll"><span>Download</span></a>';
+  html += '</div></section>';
+  document.getElementById('app').innerHTML = html;
+  interceptLinks();
+}
+
+// ── Comments ──────────────────────────────────────────────
+async function loadComments(postId) {
+  var comments = await api('/content/comment?limit=100&sort=-createdAt');
+  if (!comments) { document.getElementById('commentList').innerHTML = ''; return; }
+  var related = comments.filter(function(c) { return c.data.postId === postId && c.data.status === 'approved'; });
+  var html = related.map(function(c) {
+    return '<div style="padding:12px;margin-bottom:8px;border-radius:8px;background:var(--glass-bg);border:1px solid var(--glass-border)"><strong>' + c.data.author + '</strong> <span style="color:var(--text-muted);font-size:0.72rem">' + new Date(c.createdAt).toLocaleDateString() + '</span><p style="margin-top:4px">' + c.data.body + '</p></div>';
+  }).join('');
+  document.getElementById('commentList').innerHTML = html || '<p style="color:var(--text-muted)">No comments yet</p>';
+}
+
+window.submitComment = async function(e) {
+  e.preventDefault();
+  var name = document.getElementById('cmtName').value.trim();
+  var body = document.getElementById('cmtBody').value.trim();
+  var email = document.getElementById('cmtEmail').value.trim();
+  if (!name || !body) return;
+  try {
+    var r = await fetch(API + '/content/comment', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ postId: window._postId, author: name, email: email, body: body, status: 'pending' })
+    });
+    if (r.ok) {
+      document.getElementById('cmtName').value = '';
+      document.getElementById('cmtBody').value = '';
+      document.getElementById('cmtEmail').value = '';
+      loadComments(window._postId);
+    }
+  } catch(e) {}
+  return false;
+};
+
+// ── Hero Video ────────────────────────────────────────────
+function initHeroVideo() {
+  var video = document.getElementById('heroVideoEl');
+  if (!video) return;
+  var conn = navigator.connection || navigator.mozConnection || navigator.webkitConnection;
+  var isSlow = false;
+  if (conn) {
+    isSlow = conn.effectiveType === 'slow-2g' || conn.effectiveType === '2g' || conn.effectiveType === '3g';
+    if (conn.downlink && conn.downlink < 1.5) isSlow = true;
+  }
+  if (isSlow) {
+    video.removeAttribute('autoplay');
+    video.pause();
+    var overlay = document.createElement('div');
+    overlay.className = 'hero-poster-overlay';
+    overlay.innerHTML = '<div class="hero-poster-play">▶</div><p class="hero-poster-hint">' + TL('hero_play') + '</p>';
+    overlay.onclick = function() { video.play(); overlay.remove(); };
+    video.parentNode.appendChild(overlay);
+  }
+}
+
+// ── Link Interceptor ──────────────────────────────────────
+function interceptLinks() {
+  document.querySelectorAll('#app a[href^="/"]').forEach(function(a) {
+    if (a.getAttribute('target') === '_blank') return;
+    a.addEventListener('click', function(e) {
+      e.preventDefault();
+      history.pushState(null, '', a.getAttribute('href'));
+      route();
+    });
+  });
+}
+
+// ── Hamburger ─────────────────────────────────────────────
+document.querySelector('.nav-hamburger').addEventListener('click', function() {
+  document.getElementById('navbar').classList.toggle('nav-open');
+});
+
+// ── Boot ──────────────────────────────────────────────────
+init();
+})();
+</script>
+</body>
+</html>

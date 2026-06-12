@@ -145,7 +145,7 @@ export function bootstrap() {
   // SiteSettings — 站点全局配置
   registerContentType(createContentType('site_settings', {
     label: '站点配置',
-    description: '全局站点配置：ICP备案号、公安备案、统计分析等',
+    description: '全局站点配置：站点信息、Hero区块、作者、备案等',
     fields: {
       siteName:        { type: 'string' },
       siteDescription: { type: 'string' },
@@ -156,7 +156,21 @@ export function bootstrap() {
       timezone:        { type: 'string' },
       seoTitle:        { type: 'string' },
       seoDescription:  { type: 'string' },
-      seoKeywords:     { type: 'array', items: { type: 'string' } }
+      seoKeywords:     { type: 'array', items: { type: 'string' } },
+      authorName:      { type: 'string' },
+      authorTitle:     { type: 'string' },
+      authorBio:       { type: 'string' },
+      authorAvatar:    { type: 'media' },
+      hero_style:      { type: 'string' },
+      hero_video_url:  { type: 'string' },
+      hero_video_poster: { type: 'string' },
+      hero_image_url:  { type: 'string' },
+      hero_headline:   { type: 'string' },
+      hero_subtitle:   { type: 'string' },
+      hero_cta_text:   { type: 'string' },
+      hero_cta_link:   { type: 'string' },
+      hero_overlay_opacity: { type: 'number' },
+      theme:           { type: 'json' }
     }
   }));
 
@@ -201,5 +215,58 @@ export function bootstrap() {
     }
   }));
 
-  console.log(`  Bootstrap: 13 content types registered`);
+  // Comment — 文章评论（支持嵌套回复）
+  registerContentType(createContentType('comment', {
+    label: '评论',
+    description: '文章评论，支持审核和嵌套回复',
+    schemaOrg: 'Comment',
+    fields: {
+      postId:   { type: 'relation', target: 'article', required: true },
+      author:   { type: 'string', required: true, maxLength: 100 },
+      email:    { type: 'string' },
+      body:     { type: 'string', required: true, maxLength: 5000 },
+      status:   { type: 'enum', values: ['pending', 'approved', 'spam'], default: 'pending' },
+      parentId: { type: 'relation', target: 'comment' }
+    }
+  }));
+
+  // App — 应用/工具展示
+  registerContentType(createContentType('app', {
+    label: '应用',
+    description: '应用或工具展示（Market页面）',
+    schemaOrg: 'SoftwareApplication',
+    fields: {
+      name:        { type: 'string', required: true, maxLength: 100 },
+      slug:        { type: 'string', required: true },
+      description: { type: 'string', maxLength: 1000 },
+      icon:        { type: 'media' },
+      cover:       { type: 'media' },
+      category:    { type: 'string' },
+      url:         { type: 'string' },
+      status:      { type: 'enum', values: ['live', 'dev', 'archived'], default: 'live' },
+      featured:    { type: 'boolean', default: false },
+      order:       { type: 'number' }
+    }
+  }));
+
+  // Agent — AI Agent/Skill 展示
+  registerContentType(createContentType('agent', {
+    label: 'Agent',
+    description: 'AI Agent 或 Skill 展示',
+    fields: {
+      name:        { type: 'string', required: true, maxLength: 100 },
+      slug:        { type: 'string', required: true },
+      description: { type: 'string', maxLength: 1000 },
+      icon:        { type: 'media' },
+      cover:       { type: 'media' },
+      category:    { type: 'string' },
+      type:        { type: 'string' },
+      package_url: { type: 'string' },
+      status:      { type: 'enum', values: ['live', 'dev', 'archived'], default: 'live' },
+      featured:    { type: 'boolean', default: false },
+      order:       { type: 'number' }
+    }
+  }));
+
+  console.log(`  Bootstrap: 16 content types registered`);
 }
