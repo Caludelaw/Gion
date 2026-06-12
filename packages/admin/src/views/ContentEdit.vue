@@ -80,12 +80,13 @@ const error = ref('')
 onMounted(async () => {
   let schemaLoaded = false
   try {
-    // Get content type schema from API
+    // Get content type schema from API (returns JSON Schema: { properties: { title: {...} } })
     const schema = await api.getContentTypeSchema(props.type)
-    if (schema && schema.fields) {
-      fields.value = Object.entries(schema.fields).map(([name, def]) => ({
+    const schemaFields = schema?.properties || schema?.fields
+    if (schemaFields) {
+      fields.value = Object.entries(schemaFields).map(([name, def]) => ({
         name,
-        label: def.label || name,
+        label: def.label || def.title || name,
         type: def.type || 'string',
         required: def.required || false,
         maxLength: def.maxLength

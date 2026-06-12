@@ -95,6 +95,7 @@ export async function apiRoutes(ctx) {
       label: ct.label,
       description: ct.description,
       schemaOrg: ct.schemaOrg,
+      fields: ct.fields,
       fieldCount: Object.keys(ct.fields).length
     }));
     ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
