@@ -54,6 +54,23 @@ if (theme.customCSS) { var s = document.createElement('style'); s.textContent = 
 
 // ── API ───────────────────────────────────────────────────
 function api(path) { return fetch('/api'+path).then(function(r){ return r.json() }); }
+function getPage() { var m = location.search.match(/page=(\d+)/); return m ? parseInt(m[1]) : 1; }
+var PAGE_SIZE = 10;
+
+// ── Pagination Controls ───────────────────────────────────
+function paginationHTML(page, total, linkPrefix) {
+  var pages = Math.ceil(total / PAGE_SIZE);
+  if (pages <= 1) return '';
+  var prefix = linkPrefix || '?';
+  var html = '<nav class="pagination">';
+  if (page > 1) html += '<a href="' + prefix + 'page=' + (page-1) + '" class="btn-page">&laquo; 上一页</a>';
+  else html += '<span class="btn-page disabled">&laquo; 上一页</span>';
+  html += '<span class="page-info">第 ' + page + ' / ' + pages + ' 页 (共 ' + total + ' 篇)</span>';
+  if (page < pages) html += '<a href="' + prefix + 'page=' + (page+1) + '" class="btn-page">下一页 &raquo;</a>';
+  else html += '<span class="btn-page disabled">下一页 &raquo;</span>';
+  html += '</nav>';
+  return html;
+}
 
 // ── Router ────────────────────────────────────────────────
 function route() {
@@ -89,20 +106,24 @@ function buildNav(navItems, categories, pages) {
 // ── Home ──────────────────────────────────────────────────
 function renderHome() {
   var main = document.getElementById('main');
+  var page = getPage();
+  var offset = (page - 1) * PAGE_SIZE;
   main.innerHTML = '<div class="loading">加载中...</div>';
 
   Promise.all([
-    api('/content/article?status=published&limit=10'),
+    api('/content/article?status=published&limit=' + PAGE_SIZE + '&offset=' + offset),
+    api('/content/article?status=published&limit=1'),
     api('/content/navigation?limit=20'),
     api('/content/category?limit=20')
   ]).then(function(res){
     var articles = res[0].docs || [];
-    var navItems = (res[1].docs||[]).sort(function(a,b){ return (a.data?.order||0)-(b.data?.order||0) });
-    var categories = res[2].docs || [];
+    var total = res[1].total || 0;
+    var navItems = (res[2].docs||[]).sort(function(a,b){ return (a.data?.order||0)-(b.data?.order||0) });
+    var categories = res[3].docs || [];
 
     buildNav(navItems, categories, []);
 
-    if (!articles.length) {
+    if (!articles.length && page === 1) {
       main.innerHTML = '<div class="empty-page"><h1>👋 欢迎</h1><p>还没有文章，去 <a href="/admin/">管理后台</a> 写第一篇。</p></div>';
       return;
     }
@@ -112,6 +133,7 @@ function renderHome() {
       html += '<article class="post-card"><h2><a href="/post/'+(a.data?.slug||a.id)+'">'+escHtml(a.data?.title||'Untitled')+'</a></h2><time>'+fmtDate(a.updatedAt)+'</time><p>'+ex+'</p></article>';
     });
     html += '</div>';
+    html += paginationHTML(page, total, '?');
     main.innerHTML = html;
   }).catch(function(e){ main.innerHTML = '<p class="error">加载失败: '+e.message+'</p>'; });
 }
