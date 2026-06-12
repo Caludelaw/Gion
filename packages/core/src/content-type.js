@@ -197,6 +197,16 @@ function validateField(fieldName, value, fieldDef) {
         errors.push(`Field "${fieldName}" must be a valid datetime string`);
       }
       break;
+    case 'date':
+      if (typeof value !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(value)) {
+        errors.push(`Field "${fieldName}" must be a valid date string (YYYY-MM-DD)`);
+      }
+      break;
+    case 'reference':
+      if (typeof value !== 'string' || !value) {
+        errors.push(`Field "${fieldName}" must be a valid reference ID`);
+      }
+      break;
     case 'media':
       // Media can be a string (id) or object (with url, alt, etc.)
       if (typeof value !== 'string' && typeof value !== 'object') {
@@ -222,9 +232,11 @@ function fieldToJSONSchema(fieldDef) {
     case 'number':   return { ...base, type: 'number' };
     case 'boolean':  return { ...base, type: 'boolean' };
     case 'enum':     return { ...base, type: 'string', enum: fieldDef.values };
+    case 'date':     return { ...base, type: 'string', format: 'date' };
+    case 'datetime': return { ...base, type: 'string', format: 'date-time' };
+    case 'reference': return { ...base, type: 'string', description: `Reference to ${fieldDef.refType || 'document'}` };
     case 'array':    return { ...base, type: 'array', items: fieldDef.items || { type: 'string' } };
     case 'json':     return { ...base };  // free-form
-    case 'datetime': return { ...base, type: 'string', format: 'date-time' };
     case 'media':    return { ...base, oneOf: [{ type: 'string' }, { type: 'object' }] };
     case 'relation': return { ...base, oneOf: [{ type: 'string' }, { type: 'array', items: { type: 'string' } }] };
     default:         return base;

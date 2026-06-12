@@ -16,8 +16,8 @@ import { createLogger } from './logger.js';
 
 const log = createLogger('webhook');
 
-const MAX_RETRIES = 3;
-const RETRY_BASE_MS = 1000; // 1s, 2s, 4s
+const MAX_RETRIES = parseInt(process.env.TAICHU_WEBHOOK_RETRIES) || 3;
+const RETRY_BASE_MS = parseInt(process.env.TAICHU_WEBHOOK_RETRY_BASE_MS) || 1000; // 1s, 2s, 4s
 
 class WebhookManager {
   constructor(store) {

@@ -17,6 +17,18 @@
           :type="f.type === 'number' ? 'number' : 'text'"
           :placeholder="f.description || f.label" />
 
+        <input v-else-if="f.type === 'date'"
+          v-model="formData[f.name]"
+          type="date" />
+
+        <label v-else-if="f.type === 'boolean'" class="checkbox-field">
+          <input type="checkbox" v-model="formData[f.name]" /> {{ f.label }}
+        </label>
+
+        <select v-else-if="f.type === 'reference' && f.refType" v-model="formData[f.name]">
+          <option value="">— 选择 —</option>
+        </select>
+
         <select v-else-if="f.type === 'enum' && f.values"
           v-model="formData[f.name]">
           <option v-for="v in f.values" :key="v" :value="v">{{ v }}</option>
