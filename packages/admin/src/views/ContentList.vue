@@ -16,9 +16,18 @@
       </select>
     </div>
 
+    <div v-if="selected.length" class="batch-bar">
+      <span>已选 {{ selected.length }} 项</span>
+      <button @click="batchAction('publish')" class="btn-sm btn-batch">📤 批量发布</button>
+      <button @click="batchAction('archive')" class="btn-sm btn-batch">📦 批量归档</button>
+      <button @click="batchAction('delete')" class="btn-sm btn-batch-danger">🗑️ 批量删除</button>
+      <button @click="selected = []" class="btn-sm">取消</button>
+    </div>
+
     <table v-if="docs.length" class="table">
       <thead>
         <tr>
+          <th style="width:40px"><input type="checkbox" @change="toggleAll" :checked="allSelected" /></th>
           <th>标题</th>
           <th>状态</th>
           <th>更新时间</th>
@@ -26,7 +35,8 @@
         </tr>
       </thead>
       <tbody>
-        <tr v-for="doc in docs" :key="doc.id">
+        <tr v-for="doc in docs" :key="doc.id" :class="{ selected: selected.includes(doc.id) }">
+          <td><input type="checkbox" :checked="selected.includes(doc.id)" @change="toggleSelect(doc.id)" /></td>
           <td>
             <a href="#" @click.prevent="$router.push(`/content/${type}/${doc.id}`)">
               {{ doc.data.title || doc.data.name || '(无标题)' }}
@@ -64,7 +74,10 @@ const total = ref(0)
 const searchQuery = ref('')
 const statusFilter = ref('')
 const pageSize = 20
+const selected = ref([])
 let searchTimer = null
+
+const allSelected = computed(() => docs.value.length > 0 && selected.value.length === docs.value.length)
 
 const typeLabel = computed(() => {
   const t = (props.types || []).find(t => t.name === props.type)
@@ -118,6 +131,31 @@ function statusLabel(s) {
   return map[s] || s
 }
 
+function toggleSelect(id) {
+  const i = selected.value.indexOf(id)
+  if (i >= 0) selected.value.splice(i, 1)
+  else selected.value.push(id)
+}
+
+function toggleAll(e) {
+  selected.value = e.target.checked ? docs.value.map(d => d.id) : []
+}
+
+async function batchAction(action) {
+  const label = { publish: '发布', archive: '归档', delete: '删除' }
+  if (!confirm(`确定批量${label[action]} ${selected.value.length} 条内容？`)) return
+  try {
+    await api.request(`/content/${props.type}/batch`, {
+      method: 'POST',
+      body: JSON.stringify({ action, ids: selected.value })
+    })
+    selected.value = []
+    load()
+  } catch (e) {
+    alert('批量操作失败: ' + e.message)
+  }
+}
+
 onMounted(load)
 watch(() => props.type, () => { page.value = 1; load() })
 </script>
@@ -134,6 +172,17 @@ watch(() => props.type, () => { page.value = 1; load() })
 .table th, .table td { padding: 10px 16px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border); }
 .table th { font-weight: 600; color: var(--text-secondary); background: var(--bg); }
 .table a { color: var(--primary); text-decoration: none; }
+tr.selected { background: #F0FDF4; }
+
+.batch-bar {
+  display: flex; align-items: center; gap: 8px; padding: 10px 16px;
+  background: #F0FDF4; border: 1px solid #10B981; border-radius: 8px; margin-bottom: 12px;
+  font-size: 13px; color: var(--text-secondary);
+}
+.btn-batch { color: #065F46; border-color: #10B981; background: #D1FAE5; }
+.btn-batch:hover { background: #A7F3D0; }
+.btn-batch-danger { color: #991B1B; border-color: #FCA5A5; background: #FEE2E2; }
+.btn-batch-danger:hover { background: #FECACA; }
 .badge { display: inline-block; padding: 2px 10px; border-radius: 12px; font-size: 12px; font-weight: 600; }
 .badge-published { background: #D1FAE5; color: #065F46; }
 .badge-draft { background: #FEF3C7; color: #92400E; }

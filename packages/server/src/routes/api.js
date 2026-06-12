@@ -199,6 +199,59 @@ export async function apiRoutes(ctx) {
     return;
   }
 
+  // /api/content/:type/batch — bulk operations
+  const batchMatch = pathname.match(/^\/api\/content\/([a-z][a-z0-9_]*)\/batch$/);
+  if (batchMatch && method === 'POST') {
+    const authResult = await requireScopedAuth(ctx, `${batchMatch[1]}:write`);
+    if (!authResult.authenticated) {
+      ctx.res.writeHead(authResult.status, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: authResult.error, message: authResult.message }));
+      return;
+    }
+    ctx.actor = authResult.actor;
+
+    const { action, ids } = ctx.body || {};
+    if (!action || !Array.isArray(ids) || !ids.length) {
+      ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: 'VALIDATION_ERROR', message: 'action and ids[] are required' }));
+      return;
+    }
+
+    const validActions = ['delete', 'publish', 'archive'];
+    if (!validActions.includes(action)) {
+      ctx.res.writeHead(400, { 'Content-Type': 'application/json' });
+      ctx.res.end(JSON.stringify({ error: 'VALIDATION_ERROR', message: `action must be one of: ${validActions.join(', ')}` }));
+      return;
+    }
+
+    const results = { success: 0, failed: 0, errors: [] };
+    for (const id of ids) {
+      try {
+        const doc = await ctx.store.get(id);
+        if (!doc || doc.type !== batchMatch[1]) {
+          results.failed++;
+          results.errors.push({ id, error: 'Not found or wrong type' });
+          continue;
+        }
+
+        if (action === 'delete') {
+          await ctx.store.delete(id);
+          await ctx.hooks.run('afterDelete', { id, type: batchMatch[1] }, ctx);
+        } else {
+          await ctx.store.update(id, { status: action === 'publish' ? 'published' : 'archived' });
+        }
+        results.success++;
+      } catch (e) {
+        results.failed++;
+        results.errors.push({ id, error: e.message });
+      }
+    }
+
+    ctx.res.writeHead(200, { 'Content-Type': 'application/json' });
+    ctx.res.end(JSON.stringify(results));
+    return;
+  }
+
   // /api/content/:type/:id
   const itemMatch = pathname.match(/^\/api\/content\/([a-z][a-z0-9_]*)\/([\w-]+)$/);
   if (itemMatch) {
