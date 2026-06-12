@@ -38,6 +38,8 @@
 
     <p v-if="error" class="error">{{ error }}</p>
     <p v-else-if="loading" class="info">保存中...</p>
+
+    <RelationshipsManager v-if="!isNew && route.params.id" :doc-id="route.params.id" :doc-type="props.type" />
   </div>
 </template>
 
@@ -46,6 +48,7 @@ import { ref, reactive, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '../api/index.js'
 import RichEditor from '../components/RichEditor.vue'
+import RelationshipsManager from '../components/RelationshipsManager.vue'
 
 const props = defineProps({ type: String, id: String, types: Array })
 const route = useRoute()
