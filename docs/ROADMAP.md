@@ -102,7 +102,7 @@
 | Code Quality Refactoring (extract utils, DRY) | P1 | ✅ Done |
 | Admin Dark Mode | P2 | ✅ Done |
 | Tag Management Admin UI | P2 | ✅ Done |
-| Content Draft Auto-Save | P2 | Todo |
+| Content Draft Auto-Save | P2 | ✅ Done |
 | API Reference Documentation (OpenAPI) | P2 | Todo |
 | Plugin Developer Guide | P2 | Todo |
 | Admin UI Responsive Polish (mobile) | P3 | Todo |

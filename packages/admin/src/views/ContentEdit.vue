@@ -1,7 +1,12 @@
 <template>
   <div>
     <div class="header">
-      <h2>{{ isNew ? '新建' : '编辑' }}{{ typeLabel }}</h2>
+      <div class="header-left">
+        <h2>{{ isNew ? '新建' : '编辑' }}{{ typeLabel }}</h2>
+        <span v-if="autoSaveStatus" class="autosave-indicator" :class="{ saving: autoSaveStatus === 'saving' }">
+          {{ autoSaveStatus === 'saving' ? '保存中...' : `已自动保存 ${autoSaveTime}` }}
+        </span>
+      </div>
       <div class="actions">
         <button class="btn" @click="save('draft')">保存草稿</button>
         <button class="btn btn-publish" @click="save('published')">发布</button>
@@ -56,7 +61,7 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onBeforeUnmount, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { api } from '../api/index.js'
 import RichEditor from '../components/RichEditor.vue'
@@ -77,7 +82,91 @@ const formData = reactive({})
 const loading = ref(false)
 const error = ref('')
 
+// ── Auto-Save ──────────────────────────────────────
+const draftKey = computed(() =>
+  isNew.value
+    ? `taichu-draft-${props.type}`
+    : `taichu-draft-${props.type}-${props.id}`
+)
+const autoSaveStatus = ref('')   // '' | 'saving' | 'saved'
+const autoSaveTime = ref('')
+const draftRestored = ref(false)
+let saveTimer = null
+
+function persistDraft() {
+  const data = JSON.parse(JSON.stringify(formData))
+  // Only save if there's actual content
+  const hasContent = Object.values(data).some(v => v !== '' && v !== null && v !== undefined)
+  if (!hasContent) return
+  try {
+    localStorage.setItem(draftKey.value, JSON.stringify({ time: Date.now(), data }))
+  } catch (e) {
+    // localStorage full or unavailable — silently skip
+  }
+}
+
+function debouncedSave() {
+  autoSaveStatus.value = 'saving'
+  clearTimeout(saveTimer)
+  saveTimer = setTimeout(() => {
+    persistDraft()
+    autoSaveStatus.value = 'saved'
+    autoSaveTime.value = new Date().toLocaleTimeString('zh-CN', { hour: '2-digit', minute: '2-digit' })
+    setTimeout(() => { if (autoSaveStatus.value === 'saved') autoSaveStatus.value = '' }, 3000)
+  }, 2000)
+}
+
+function clearDraft() {
+  clearTimeout(saveTimer)
+  try { localStorage.removeItem(draftKey.value) } catch {}
+  autoSaveStatus.value = ''
+}
+
+function restoreDraft() {
+  try {
+    const raw = localStorage.getItem(draftKey.value)
+    if (!raw) return false
+    const saved = JSON.parse(raw)
+    if (saved?.data && typeof saved.data === 'object') {
+      // Only restore fields that exist in current schema
+      for (const key of Object.keys(saved.data)) {
+        if (key in formData || fields.value.some(f => f.name === key)) {
+          formData[key] = saved.data[key]
+        }
+      }
+      draftRestored.value = true
+      return true
+    }
+  } catch {}
+  return false
+}
+
+// Watch all formData changes for auto-save
+watch(() => ({ ...formData }), () => {
+  if (!draftRestored.value && Object.keys(formData).length > 0) {
+    draftRestored.value = true
+  }
+  if (draftRestored.value) {
+    debouncedSave()
+  }
+}, { deep: true })
+
+// Warn on unsaved changes before leaving
+function beforeUnload(e) {
+  const hasContent = Object.values(formData).some(v => v !== '' && v !== null && v !== undefined)
+  if (hasContent && !loading.value) {
+    e.preventDefault()
+  }
+}
+
+onBeforeUnmount(() => {
+  clearTimeout(saveTimer)
+  window.removeEventListener('beforeunload', beforeUnload)
+})
+
 onMounted(async () => {
+  window.addEventListener('beforeunload', beforeUnload)
+
   let schemaLoaded = false
   try {
     // Get content type schema from API (returns JSON Schema: { properties: { title: {...} } })
@@ -117,9 +206,18 @@ onMounted(async () => {
       const doc = await api.get(props.type, props.id)
       if (doc) {
         Object.assign(formData, doc.data)
+        // After loading server data, check for newer local draft
+        restoreDraft()
       }
     } catch (e) {
       error.value = 'Failed to load document'
+    }
+  } else {
+    // New doc: restore draft if exists
+    if (restoreDraft()) {
+      autoSaveStatus.value = 'saved'
+      autoSaveTime.value = '已恢复'
+      setTimeout(() => { autoSaveStatus.value = '' }, 3000)
     }
   }
 })
@@ -165,6 +263,7 @@ async function save(status) {
       await api.update(props.type, props.id, data)
     }
 
+    clearDraft()
     router.push(`/content/${props.type}`)
   } catch (e) {
     error.value = e.message
@@ -176,7 +275,14 @@ async function save(status) {
 
 <style scoped>
 .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 24px; }
+.header-left { display: flex; align-items: center; gap: 12px; }
 h2 { font-size: 22px; }
+.autosave-indicator {
+  font-size: 12px; color: var(--text-muted);
+  padding: 2px 8px; background: var(--tag-bg); border-radius: 4px;
+  transition: opacity 0.3s;
+}
+.autosave-indicator.saving { color: var(--primary); }
 .actions { display: flex; gap: 8px; }
 .btn {
   padding: 8px 20px; background: var(--bg); border: 1px solid var(--border);
