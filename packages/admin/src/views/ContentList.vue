@@ -65,6 +65,7 @@
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue'
 import { api } from '../api/index.js'
+import { fmtDate, statusLabel, notifyError } from '../utils/format.js'
 
 const props = defineProps({ type: String, types: Array })
 const docs = ref([])
@@ -118,18 +119,11 @@ async function remove(id) {
     await api.delete(props.type, id)
     load()
   } catch (e) {
-    alert(e.message)
+    notifyError('删除', e)
   }
 }
 
-function fmtDate(d) {
-  return d ? new Date(d).toLocaleString('zh-CN') : '-'
-}
-
-function statusLabel(s) {
-  const map = { draft: '草稿', scheduled: '定时', published: '已发布', archived: '已归档', active: '启用', revoked: '已撤销' }
-  return map[s] || s
-}
+// fmtDate, statusLabel, notifyError — from ../utils/format.js
 
 function toggleSelect(id) {
   const i = selected.value.indexOf(id)
@@ -152,7 +146,7 @@ async function batchAction(action) {
     selected.value = []
     load()
   } catch (e) {
-    alert('批量操作失败: ' + e.message)
+    notifyError('批量操作', e)
   }
 }
 

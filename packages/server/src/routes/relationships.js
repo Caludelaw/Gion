@@ -16,7 +16,7 @@ import {
   addRelationship,
   removeRelationship,
   traverseGraph
-} from './relationships.js';
+} from '../relationships.js';
 import { getStore } from '../context.js';
 
 /** @param {import('./context.js').Context} ctx */
