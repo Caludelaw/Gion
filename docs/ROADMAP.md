@@ -97,7 +97,7 @@
 
 | Feature | Priority | Status |
 |---------|----------|--------|
-| E2E Tests — Playwright core flow coverage | P1 | Todo |
+| E2E Tests — Playwright core flow coverage | P1 | ✅ Done |
 | Git Hooks (pre-commit lint + test) | P1 | ✅ Done |
 | Code Quality Refactoring (extract utils, DRY) | P1 | ✅ Done |
 | Admin Dark Mode | P2 | ✅ Done |

@@ -15,6 +15,7 @@
     "build": "cd packages/admin && npx vite build",
     "test": "node --test packages/core/src/core.test.js packages/core/src/server.test.js",
     "test:integration": "node --test packages/server/src/server.test.js",
+    "test:e2e": "npx playwright test",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "setup": "node scripts/setup-hooks.js",
@@ -57,6 +58,7 @@
   ],
   "devDependencies": {
     "@eslint/js": "^10.0.1",
+    "@playwright/test": "^1.60.0",
     "eslint": "^10.4.1"
   }
 }
