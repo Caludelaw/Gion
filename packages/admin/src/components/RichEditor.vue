@@ -141,7 +141,7 @@ onBeforeUnmount(() => {
   background: transparent; cursor: pointer; font-size: 13px; color: var(--text-secondary);
   white-space: nowrap; min-width: 28px; text-align: center;
 }
-.toolbar button:hover { background: var(--surface); border-color: var(--border); color: var(--text); }
+.toolbar button:hover { background: var(--surface); border-color: var(--border); color: var(--text-primary); }
 .toolbar button.active { background: var(--primary); color: white; border-color: var(--primary); }
 .sep { width: 1px; background: var(--border); margin: 0 4px; align-self: stretch; }
 .editor-content {
@@ -192,7 +192,7 @@ onBeforeUnmount(() => {
 }
 .mb-header h3 { font-size: 16px; margin: 0; }
 .btn-close { background: none; border: none; font-size: 18px; cursor: pointer; color: var(--text-secondary); padding: 4px 8px; }
-.btn-close:hover { color: var(--text); }
+.btn-close:hover { color: var(--text-primary); }
 .mb-loading, .mb-error, .mb-empty { padding: 40px; text-align: center; color: var(--text-secondary); font-size: 14px; }
 .mb-error { color: var(--danger); }
 .mb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(120px, 1fr)); gap: 12px; padding: 20px; }

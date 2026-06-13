@@ -148,8 +148,8 @@ async function save() {
 .actions { margin-bottom: 24px; display: flex; align-items: center; gap: 12px; }
 .btn-primary { padding: 10px 24px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
 .saved { color: var(--primary); font-size: 13px; }
-.note { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 16px 20px; }
+.note { background: var(--primary-bg); border: 1px solid var(--primary); border-radius: 8px; padding: 16px 20px; }
 .note h3 { font-size: 14px; margin-bottom: 6px; }
 .note p { font-size: 13px; color: var(--text-secondary); line-height: 1.6; }
-code { background: #DCFCE7; padding: 1px 6px; border-radius: 3px; font-size: 12px; }
+code { background: var(--primary-bg); padding: 1px 6px; border-radius: 3px; font-size: 12px; }
 </style>

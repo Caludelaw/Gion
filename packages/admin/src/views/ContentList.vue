@@ -166,11 +166,11 @@ watch(() => props.type, () => { page.value = 1; load() })
 .table th, .table td { padding: 10px 16px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border); }
 .table th { font-weight: 600; color: var(--text-secondary); background: var(--bg); }
 .table a { color: var(--primary); text-decoration: none; }
-tr.selected { background: #F0FDF4; }
+tr.selected { background: var(--primary-bg); }
 
 .batch-bar {
   display: flex; align-items: center; gap: 8px; padding: 10px 16px;
-  background: #F0FDF4; border: 1px solid #10B981; border-radius: 8px; margin-bottom: 12px;
+  background: var(--primary-bg); border: 1px solid var(--primary); border-radius: 8px; margin-bottom: 12px;
   font-size: 13px; color: var(--text-secondary);
 }
 .btn-batch { color: #065F46; border-color: #10B981; background: #D1FAE5; }
@@ -187,7 +187,7 @@ tr.selected { background: #F0FDF4; }
 .btn-sm { padding: 4px 12px; font-size: 12px; border: 1px solid var(--border); background: var(--surface); border-radius: 4px; cursor: pointer; margin-right: 4px; }
 .btn-sm:hover { border-color: var(--primary); }
 .btn-danger { color: var(--danger); }
-.btn-danger:hover { border-color: var(--danger); background: #FEF2F2; }
+.btn-danger:hover { border-color: var(--danger); background: var(--danger-bg); }
 .empty { color: var(--text-secondary); font-size: 14px; margin-top: 40px; text-align: center; }
 
 .search-bar { display: flex; gap: 12px; margin-bottom: 16px; align-items: center; }

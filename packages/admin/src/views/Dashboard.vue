@@ -160,7 +160,7 @@ function formatUptime(s) {
 .chart-bar { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 16px; }
 .bar-row { display: flex; align-items: center; gap: 12px; padding: 6px 0; }
 .bar-label { width: 50px; font-size: 13px; color: var(--text-secondary); text-align: right; flex-shrink: 0; }
-.bar-track { flex: 1; height: 20px; background: #F3F4F6; border-radius: 4px; overflow: hidden; }
+.bar-track { flex: 1; height: 20px; background: var(--tag-bg); border-radius: 4px; overflow: hidden; }
 .bar-fill { height: 100%; border-radius: 4px; transition: width 0.6s ease; min-width: 2px; }
 .bar-count { width: 32px; font-size: 13px; font-weight: 600; color: var(--text-primary); text-align: left; }
 </style>

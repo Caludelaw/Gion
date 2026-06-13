@@ -10,13 +10,30 @@
     :root {
       --primary: #10B981;
       --primary-dark: #059669;
+      --primary-bg: rgba(16,185,129,0.08);
       --bg: #F9FAFB;
       --surface: #FFFFFF;
       --border: #E5E7EB;
-      --text: #111827;
+      --text-primary: #111827;
       --text-secondary: #6B7280;
+      --text-muted: #9CA3AF;
       --danger: #EF4444;
+      --danger-bg: #FEF2F2;
+      --tag-bg: #F3F4F6;
       --radius: 8px;
+      color-scheme: light;
+    }
+    [data-theme="dark"] {
+      --primary-bg: rgba(16,185,129,0.12);
+      --bg: #0F172A;
+      --surface: #1E293B;
+      --border: #334155;
+      --text-primary: #F1F5F9;
+      --text-secondary: #94A3B8;
+      --text-muted: #64748B;
+      --tag-bg: #334155;
+      --danger-bg: rgba(239,68,68,0.12);
+      color-scheme: dark;
     }
   </style>
 </head>

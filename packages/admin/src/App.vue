@@ -31,6 +31,9 @@
         <a href="/ws-test.html" target="_blank" class="nav-item">📡 WS 测试</a>
       </nav>
       <div class="sidebar-footer">
+        <button class="btn-theme" @click="toggleDark" :title="isDark ? '切换亮色模式' : '切换暗色模式'">
+          {{ isDark ? '☀️' : '🌙' }}
+        </button>
         <div class="lang-switch">
           <select v-model="locale" @change="switchLang" class="lang-select">
             <option v-for="l in i18n.supportedLocales" :key="l.code" :value="l.code">{{ l.flag }} {{ l.label }}</option>
@@ -58,8 +61,27 @@ const router = useRouter()
 const types = ref([])
 const i18n = useI18n()
 const locale = ref(i18n.locale.value)
+const isDark = ref(false)
+
+function applyTheme(dark) {
+  isDark.value = dark
+  document.documentElement.setAttribute('data-theme', dark ? 'dark' : '')
+  localStorage.setItem('taichu-theme', dark ? 'dark' : 'light')
+}
+
+function toggleDark() {
+  applyTheme(!isDark.value)
+}
 
 onMounted(async () => {
+  // Restore theme preference
+  const saved = localStorage.getItem('taichu-theme')
+  if (saved === 'dark') {
+    applyTheme(true)
+  } else if (!saved && window.matchMedia('(prefers-color-scheme: dark)').matches) {
+    applyTheme(true)
+  }
+  
   if (auth.isLoggedIn) {
     try {
       const res = await api.listTypes()
@@ -99,8 +121,14 @@ function logout() {
   display: block; padding: 8px 20px; color: var(--text-secondary); text-decoration: none;
   font-size: 13px; transition: all 0.15s;
 }
-.nav-item:hover, .nav-item.router-link-active { color: var(--primary); background: #F0FDF4; }
+.nav-item:hover, .nav-item.router-link-active { color: var(--primary); background: var(--primary-bg); }
 .sidebar-footer { margin-top: auto; padding: 16px 20px; border-top: 1px solid var(--border); }
+.btn-theme {
+  display: block; width: 100%; padding: 6px 0; margin-bottom: 8px;
+  background: var(--bg); border: 1px solid var(--border); border-radius: 6px;
+  font-size: 16px; cursor: pointer; transition: background 0.2s;
+}
+.btn-theme:hover { background: var(--primary-bg); }
 .lang-switch { margin-bottom: 8px; }
 .lang-select {
   width: 100%; padding: 4px 8px; background: var(--bg); border: 1px solid var(--border);

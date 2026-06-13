@@ -142,6 +142,6 @@ onMounted(load)
 .btn-sm { padding: 4px 10px; font-size: 11px; border: 1px solid var(--border); background: var(--surface); border-radius: 4px; cursor: pointer; }
 .btn-sm:hover { background: var(--bg); }
 .btn-danger { color: var(--danger); }
-.btn-danger:hover { border-color: var(--danger); background: #FEF2F2; }
+.btn-danger:hover { border-color: var(--danger); background: var(--danger-bg); }
 .empty { color: var(--text-secondary); font-size: 14px; margin-top: 40px; text-align: center; }
 </style>

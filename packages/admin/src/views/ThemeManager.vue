@@ -146,7 +146,7 @@ function removeTheme(name) {
 .btn-primary { padding: 10px 24px; background: var(--primary); color: #fff; border: none; border-radius: 6px; font-size: 14px; cursor: pointer; }
 .btn-primary:disabled { opacity: 0.6; }
 .btn-danger { padding: 6px 14px; background: var(--danger); color: #fff; border: none; border-radius: 4px; font-size: 12px; cursor: pointer; }
-.note { background: #F0FDF4; border: 1px solid #BBF7D0; border-radius: 8px; padding: 20px; }
+.note { background: var(--primary-bg); border: 1px solid var(--primary); border-radius: 8px; padding: 20px; }
 .note h3 { font-size: 14px; margin-bottom: 8px; }
 .note p { font-size: 13px; color: var(--text-secondary); margin-bottom: 4px; line-height: 1.8; }
 .mt-8 { margin-top: 12px; }

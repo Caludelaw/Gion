@@ -122,7 +122,7 @@ onMounted(load)
   border-radius: var(--radius); font-size: 14px; cursor: pointer; font-weight: 600;
 }
 .btn:hover { background: var(--primary-dark); }
-.btn-cancel { background: var(--bg); color: var(--text); border: 1px solid var(--border); }
+.btn-cancel { background: var(--bg); color: var(--text-primary); border: 1px solid var(--border); }
 .create-box {
   background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius);
   padding: 20px; margin-bottom: 20px;
@@ -134,14 +134,14 @@ onMounted(load)
 .create-actions { display: flex; gap: 8px; }
 .new-key-display { margin-top: 16px; padding: 12px; background: #FEF3C7; border-radius: var(--radius); }
 .warn { font-size: 13px; color: #92400E; margin-bottom: 8px; }
-code { font-size: 12px; word-break: break-all; color: var(--text); }
+code { font-size: 12px; word-break: break-all; color: var(--text-primary); }
 .table { width: 100%; background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); border-collapse: collapse; }
 .table th, .table td { padding: 10px 16px; text-align: left; font-size: 14px; border-bottom: 1px solid var(--border); }
 .table th { font-weight: 600; color: var(--text-secondary); background: var(--bg); }
 .date { color: var(--text-secondary); font-size: 13px; }
 .btn-sm { padding: 4px 12px; font-size: 12px; border: 1px solid var(--border); background: var(--surface); border-radius: 4px; cursor: pointer; }
 .btn-danger { color: var(--danger); }
-.btn-danger:hover { border-color: var(--danger); background: #FEF2F2; }
+.btn-danger:hover { border-color: var(--danger); background: var(--danger-bg); }
 .empty { color: var(--text-secondary); font-size: 14px; margin-top: 40px; text-align: center; }
 .scope-section { margin: 12px 0; }
 .scope-label { font-size: 13px; font-weight: 600; color: var(--text-secondary); display: block; margin-bottom: 8px; }

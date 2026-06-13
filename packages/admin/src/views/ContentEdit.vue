@@ -187,7 +187,7 @@ h2 { font-size: 22px; }
 .btn-publish:hover { background: var(--primary-dark); }
 .form { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 24px; }
 .field { margin-bottom: 16px; }
-.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text); }
+.field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--text-primary); }
 .req { color: var(--danger); }
 input, select, textarea {
   width: 100%; padding: 8px 12px; border: 1px solid var(--border);
