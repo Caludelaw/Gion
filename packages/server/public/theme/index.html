@@ -147,13 +147,70 @@ function renderPost(slug) {
     var docs = data.docs || [];
     var doc = docs.find(function(d){ return d.data?.slug === slug });
     if (!doc) { render404(); return; }
-    main.innerHTML = '<article class="post-single"><h1>'+escHtml(doc.data?.title||'')+'</h1><time>'+fmtDate(doc.updatedAt)+'</time><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
+    var html = '<article class="post-single"><h1>'+escHtml(doc.data?.title||'')+'</h1><time>'+fmtDate(doc.updatedAt)+'</time><div class="post-body">'+renderBody(doc.data?.body)+'</div></article>';
     document.title = (doc.data?.title||'') + ' — ' + (G.site?.name||'Taichu');
-    // CTA
+
+    // Comments Section
+    html += renderCommentsSection(doc.id);
+
     if (doc.data?.status !== 'published') {
-      main.innerHTML += '<p class="cta-note">此内容未发布。</p>';
+      html += '<p class="cta-note">此内容未发布。</p>';
     }
+    main.innerHTML = html;
   }).catch(function(e){ main.innerHTML = '<p class="error">加载失败</p>'; });
+}
+
+// ── Comments ──────────────────────────────────────────────
+function renderCommentsSection(postId) {
+  var html = '<section class="comments" id="comments"><h3>💬 评论</h3>';
+  html += '<div id="comments-list"><div class="loading">加载中...</div></div>';
+  html += '<form id="comment-form" class="comment-form" onsubmit="return submitComment(event, \''+postId+'\')">';
+  html += '<input name="author" placeholder="昵称 (必填)" required class="comment-input" maxlength="100">';
+  html += '<input name="email" placeholder="邮箱 (选填)" type="email" class="comment-input">';
+  html += '<textarea name="body" placeholder="写评论..." required class="comment-textarea" maxlength="5000"></textarea>';
+  html += '<button type="submit" class="btn-primary btn-sm">提交评论</button>';
+  html += '<p class="comment-hint" id="comment-hint"></p>';
+  html += '</form></section>';
+
+  setTimeout(function(){ loadComments(postId); }, 100);
+  return html;
+}
+
+function loadComments(postId) {
+  api('/content/comment?status=approved&limit=50').then(function(data){
+    var comments = (data.docs||[]).filter(function(c){ return c.data?.postId === postId && !c.data?.parentId });
+    var list = document.getElementById('comments-list');
+    if (!comments.length) { list.innerHTML = '<p class="comment-empty">暂无评论，来写第一条吧</p>'; return; }
+    var html = '';
+    comments.forEach(function(c){
+      html += '<div class="comment-item"><div class="comment-meta"><strong>'+escHtml(c.data?.author||'匿名')+'</strong> <time>'+fmtDate(c.createdAt)+'</time></div><div class="comment-body">'+escHtml(c.data?.body)+'</div></div>';
+    });
+    list.innerHTML = html;
+  }).catch(function(){});
+}
+
+function submitComment(event, postId) {
+  event.preventDefault();
+  var form = event.target;
+  var hint = document.getElementById('comment-hint');
+  hint.textContent = '提交中...';
+  var body = JSON.stringify({
+    postId: postId,
+    author: form.author.value.trim(),
+    email: form.email.value.trim(),
+    body: form.body.value.trim()
+  });
+  fetch('/api/content/comment', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: body
+  }).then(function(r){ return r.json() }).then(function(){
+    hint.textContent = '✅ 评论已提交，审核后显示';
+    form.reset();
+  }).catch(function(e){
+    hint.textContent = '❌ 提交失败: ' + e.message;
+  });
+  return false;
 }
 
 // ── Static Page ───────────────────────────────────────────

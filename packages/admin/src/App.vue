@@ -18,6 +18,7 @@
         <router-link to="/media" class="nav-item" @click="sidebarOpen = false">🖼️ 媒体库</router-link>
         <router-link to="/categories" class="nav-item" @click="sidebarOpen = false">📂 栏目管理</router-link>
         <router-link to="/tags" class="nav-item" @click="sidebarOpen = false">🏷️ 标签管理</router-link>
+        <router-link to="/comments" class="nav-item" @click="sidebarOpen = false">💬 评论管理</router-link>
         <router-link to="/navigation" class="nav-item" @click="sidebarOpen = false">🧭 导航菜单</router-link>
 
         <div class="nav-section">管理</div>

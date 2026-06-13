@@ -131,3 +131,20 @@ body {
   .post-card h2 { font-size: 18px; }
   .header-inner { flex-direction: column; align-items: flex-start; }
 }
+
+/* Comments */
+.comments { margin-top: 48px; padding-top: 32px; border-top: 1px solid var(--border); }
+.comments h3 { font-size: 18px; margin-bottom: 20px; }
+.comment-form { display: flex; flex-direction: column; gap: 10px; margin-bottom: 24px; }
+.comment-input, .comment-textarea {
+  padding: 10px 14px; border: 1px solid var(--border); border-radius: 8px;
+  font-size: 14px; font-family: inherit; background: var(--bg);
+}
+.comment-textarea { min-height: 80px; resize: vertical; }
+.comment-hint { font-size: 12px; color: var(--text-secondary); margin: 0; }
+.comment-item { padding: 16px 0; border-bottom: 1px solid var(--border); }
+.comment-item:last-child { border-bottom: none; }
+.comment-meta { margin-bottom: 6px; font-size: 13px; color: var(--text-secondary); }
+.comment-meta strong { color: var(--text); }
+.comment-body { font-size: 15px; line-height: 1.6; }
+.comment-empty { color: var(--text-secondary); font-size: 14px; padding: 16px 0; }
