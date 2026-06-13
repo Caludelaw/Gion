@@ -76,7 +76,7 @@
 | Plugin Marketplace (frontend + CLI install) | P2 | ✅ Done |
 | ActivityPub Federation | P2 | ✅ Done |
 
-## v0.5.0 → v0.6.0 (Current)
+## v0.5.0 → v0.6.0 ✅ RELEASED
 
 | Feature | Priority | Status |
 |---------|----------|--------|
@@ -86,12 +86,28 @@
 | Media Selector in Rich Editor | P1 | ✅ Done |
 | Batch Operations (bulk delete/publish) | P2 | ✅ Done |
 | Second Official Theme (minimal/portfolio) | P2 | ✅ Done |
-| SSO OIDC Callback Handler | P2 | Todo |
-| E2E Tests (Playwright, core flows) | P2 | Todo |
-| API Reference Documentation | P2 | Todo |
-| Custom Field Types (date, boolean, reference) | P3 | Todo |
-| Content Export (JSON, Markdown, CSV) | P3 | Todo |
-| Webhook Retry with Exponential Backoff | P3 | Todo |
+| SSO OIDC Callback Handler | P2 | ✅ Done |
+| Custom Field Types (date, boolean, reference) | P3 | ✅ Done |
+| Content Export (JSON, Markdown, CSV) | P3 | ✅ Done |
+| Webhook Retry with Exponential Backoff | P3 | ✅ Done |
+| E2E Tests (Playwright, core flows) | P2 | ➡️ v0.7.0 |
+| API Reference Documentation | P2 | ➡️ v0.7.0 |
+
+## v0.7.0 (Current)
+
+| Feature | Priority | Status |
+|---------|----------|--------|
+| E2E Tests — Playwright core flow coverage | P1 | Todo |
+| Git Hooks (pre-commit lint + test) | P1 | Todo |
+| Code Quality Refactoring (extract utils, DRY) | P1 | Todo |
+| Admin Dark Mode | P2 | Todo |
+| Tag Management Admin UI | P2 | Todo |
+| Content Draft Auto-Save | P2 | Todo |
+| API Reference Documentation (OpenAPI) | P2 | Todo |
+| Plugin Developer Guide | P2 | Todo |
+| Admin UI Responsive Polish (mobile) | P3 | Todo |
+| Performance Optimization (lazy load, chunk split) | P3 | Todo |
+| Aliyun Docker Mirror Auto-Publish | P3 | Todo |
 
 ## Long-Term Vision
 
