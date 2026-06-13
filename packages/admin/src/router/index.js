@@ -19,6 +19,7 @@ import Theme from '../views/Theme.vue'
 import ThemeManager from '../views/ThemeManager.vue'
 import Navigation from '../views/Navigation.vue'
 import PluginMarketplace from '../views/PluginMarketplace.vue'
+import Tags from '../views/Tags.vue'
 
 const routes = [
   { path: '/login', component: Login, meta: { public: true } },
@@ -40,7 +41,8 @@ const routes = [
   { path: '/theme', component: Theme },
   { path: '/theme-manager', component: ThemeManager },
   { path: '/navigation', component: Navigation },
-  { path: '/plugins', component: PluginMarketplace }
+  { path: '/plugins', component: PluginMarketplace },
+  { path: '/tags', component: Tags }
 ]
 
 const router = createRouter({
