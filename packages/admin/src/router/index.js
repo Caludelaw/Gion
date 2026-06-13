@@ -21,6 +21,7 @@ const ThemeManager = () => import('../views/ThemeManager.vue')
 const Navigation = () => import('../views/Navigation.vue')
 const PluginMarketplace = () => import('../views/PluginMarketplace.vue')
 const Tags = () => import('../views/Tags.vue')
+const ApiDocs = () => import('../views/ApiDocs.vue')
 
 const routes = [
   { path: '/login', component: Login, meta: { public: true } },
@@ -43,7 +44,8 @@ const routes = [
   { path: '/theme-manager', component: ThemeManager },
   { path: '/navigation', component: Navigation },
   { path: '/plugins', component: PluginMarketplace },
-  { path: '/tags', component: Tags }
+  { path: '/tags', component: Tags },
+  { path: '/api-docs', component: ApiDocs }
 ]
 
 const router = createRouter({

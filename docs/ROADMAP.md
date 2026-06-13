@@ -103,7 +103,7 @@
 | Admin Dark Mode | P2 | ✅ Done |
 | Tag Management Admin UI | P2 | ✅ Done |
 | Content Draft Auto-Save | P2 | ✅ Done |
-| API Reference Documentation (OpenAPI) | P2 | Todo |
+| API Reference Documentation (OpenAPI) | P2 | ✅ Done |
 | Plugin Developer Guide | P2 | Todo |
 | Admin UI Responsive Polish (mobile) | P3 | ✅ Done |
 | Performance Optimization (lazy load, chunk split) | P3 | ✅ Done |
