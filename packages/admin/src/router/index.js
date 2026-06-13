@@ -1,25 +1,26 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import { auth } from '../stores/auth.js'
 
-import Login from '../views/Login.vue'
-import Dashboard from '../views/Dashboard.vue'
-import ContentList from '../views/ContentList.vue'
-import ContentEdit from '../views/ContentEdit.vue'
-import ApiKeys from '../views/ApiKeys.vue'
-import Media from '../views/Media.vue'
-import Settings from '../views/Settings.vue'
-import AuditLog from '../views/AuditLog.vue'
-import Webhooks from '../views/Webhooks.vue'
-import Pipelines from '../views/Pipelines.vue'
-import Workflow from '../views/Workflow.vue'
-import Revisions from '../views/Revisions.vue'
-import Users from '../views/Users.vue'
-import Categories from '../views/Categories.vue'
-import Theme from '../views/Theme.vue'
-import ThemeManager from '../views/ThemeManager.vue'
-import Navigation from '../views/Navigation.vue'
-import PluginMarketplace from '../views/PluginMarketplace.vue'
-import Tags from '../views/Tags.vue'
+// Lazy-loaded views for automatic code splitting
+const Login = () => import('../views/Login.vue')
+const Dashboard = () => import('../views/Dashboard.vue')
+const ContentList = () => import('../views/ContentList.vue')
+const ContentEdit = () => import('../views/ContentEdit.vue')
+const ApiKeys = () => import('../views/ApiKeys.vue')
+const Media = () => import('../views/Media.vue')
+const Settings = () => import('../views/Settings.vue')
+const AuditLog = () => import('../views/AuditLog.vue')
+const Webhooks = () => import('../views/Webhooks.vue')
+const Pipelines = () => import('../views/Pipelines.vue')
+const Workflow = () => import('../views/Workflow.vue')
+const Revisions = () => import('../views/Revisions.vue')
+const Users = () => import('../views/Users.vue')
+const Categories = () => import('../views/Categories.vue')
+const Theme = () => import('../views/Theme.vue')
+const ThemeManager = () => import('../views/ThemeManager.vue')
+const Navigation = () => import('../views/Navigation.vue')
+const PluginMarketplace = () => import('../views/PluginMarketplace.vue')
+const Tags = () => import('../views/Tags.vue')
 
 const routes = [
   { path: '/login', component: Login, meta: { public: true } },

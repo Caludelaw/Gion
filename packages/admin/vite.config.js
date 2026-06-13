@@ -12,6 +12,14 @@ export default defineConfig({
   },
   build: {
     outDir: '../server/public/admin',
-    emptyOutDir: true
-  }
+    emptyOutDir: true,
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          'vendor-vue': ['vue', 'vue-router'],
+          'vendor-tiptap': ['@tiptap/vue-3', '@tiptap/starter-kit', '@tiptap/extension-image', '@tiptap/extension-link', '@tiptap/extension-placeholder'],
+        },
+      },
+    },
+  },
 })

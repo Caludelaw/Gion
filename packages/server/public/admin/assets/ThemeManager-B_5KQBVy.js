@@ -1,0 +1,19 @@
+import{o as y,j as i,k as a,F as k,l as X,y as w,G as C,v as r,K as T,r as d,i as c,D as S,H as v}from"./vendor-vue-85fudY9r.js";import{a as m}from"./index-CGpd-UW2.js";import{_ as E}from"./_plugin-vue_export-helper-DlAUqK2U.js";const x={class:"cards"},B={class:"card-header"},I={key:0,class:"badge active"},z={class:"card-desc"},A={class:"card-actions"},D=["onClick"],F=["onClick"],N={class:"card upload-card"},V={class:"form-group"},M={class:"form-group"},O=["disabled"],P=`// window.__TAICHU__ 包含以下配置：
+{
+  apiBase: "/api",
+  site: {
+    name: "我的博客",
+    icp: "粤ICP备XXXXXXXX号-1",
+    gongan: "粤公网安备 XXXXXX号"
+  },
+  theme: {
+    primaryColor: "#10B981",
+    fontFamily: "'Noto Sans SC', sans-serif",
+    maxWidth: "800px"
+  },
+  seo: {
+    title: "SEO 标题",
+    description: "SEO 描述",
+    keywords: ["关键词1", "关键词2"]
+  }
+}`,$={__name:"ThemeManager",setup(H){const l=d([]),o=d(""),n=d(null),p=d("选择文件"),u=d(!1);y(async()=>{try{const t=await m.request("/theme");l.value=t.themes||[]}catch{l.value=[{name:"default",label:"默认博客主题",description:"Taichu 内置简洁博客主题",active:!0,builtin:!0},{name:"theme-minimal",label:"极简主题",description:"衬线字体 + 留白布局",active:!1,builtin:!0}]}});function h(t){n.value=t.target.files[0],p.value=n.value?n.value.name:"选择文件"}async function f(t){try{await m.request("/theme/activate/"+t,{method:"POST"}),l.value.forEach(e=>e.active=e.name===t)}catch(e){alert("切换失败: "+e.message)}}async function _(){u.value=!0;try{const t=new FormData;t.append("file",n.value),t.append("name",o.value);const e=await fetch("/api/theme/upload",{method:"POST",headers:{Authorization:`Bearer ${localStorage.getItem("taichu_token")}`},body:t});if(!e.ok)throw new Error((await e.json()).message);l.value.push({name:o.value,label:o.value,description:"自定义主题",active:!1}),o.value="",n.value=null,p.value="选择文件"}catch(t){alert("上传失败: "+t.message)}u.value=!1}function g(t){confirm("确认删除主题「"+t+"」？")&&(fetch("/api/theme/"+t,{method:"DELETE",headers:{Authorization:`Bearer ${localStorage.getItem("taichu_token")}`}}),l.value=l.value.filter(e=>e.name!==t))}return(t,e)=>(c(),i("div",null,[e[5]||(e[5]=a("h1",{class:"page-title"},"🎨 主题管理",-1)),e[6]||(e[6]=a("p",{class:"desc"},"管理您网站的前端主题。Taichu 默认提供一个干净简洁的博客主题。您可以上传自定义主题替换它。",-1)),a("div",x,[(c(!0),i(k,null,X(l.value,s=>(c(),i("div",{class:S(["card",{active:s.active}]),key:s.name},[a("div",B,[a("h3",null,r(s.label),1),s.active?(c(),i("span",I,"使用中")):v("",!0)]),a("p",z,r(s.description),1),a("div",A,[s.active?v("",!0):(c(),i("button",{key:0,onClick:b=>f(s.name),class:"btn-primary"},"启用",8,D)),s.name!=="default"?(c(),i("button",{key:1,onClick:b=>g(s.name),class:"btn-danger"},"删除",8,F)):v("",!0)])],2))),128))]),a("div",N,[e[2]||(e[2]=a("h3",null,"📤 上传自定义主题",-1)),e[3]||(e[3]=a("p",{class:"desc"},"上传一个 .zip 文件，包含 index.html 和静态资源文件。",-1)),a("div",V,[e[1]||(e[1]=a("label",null,"主题名称",-1)),w(a("input",{"onUpdate:modelValue":e[0]||(e[0]=s=>o.value=s),class:"input",placeholder:"my-theme"},null,512),[[C,o.value]])]),a("div",M,[a("label",null,r(p.value),1),a("input",{type:"file",class:"input",onChange:h,accept:".zip"},null,32)]),a("button",{onClick:_,class:"btn-primary",disabled:!n.value||!o.value||u.value},r(u.value?"上传中...":"上传主题"),9,O)]),a("div",{class:"note"},[e[4]||(e[4]=T('<h3 data-v-6272a15c>💡 如何创建自定义主题</h3><p data-v-6272a15c>1. 创建 <code data-v-6272a15c>index.html</code> 文件，其中通过 <code data-v-6272a15c>window.__TAICHU__</code> 读取站点配置和主题变量</p><p data-v-6272a15c>2. 通过 <code data-v-6272a15c>/api/content/article</code> 等 REST API 获取内容数据</p><p data-v-6272a15c>3. 将所有文件打包成 <code data-v-6272a15c>.zip</code>，上传至此页面</p><p data-v-6272a15c>4. Taichu 会自动将主题注入站点配置并渲染前端页面</p><p class="mt-8" data-v-6272a15c><strong data-v-6272a15c>主题变量参考：</strong></p>',6)),a("pre",{class:"code-block"},r(P))])]))}},q=E($,[["__scopeId","data-v-6272a15c"]]);export{q as default};
