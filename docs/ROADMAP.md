@@ -104,12 +104,12 @@
 | Tag Management Admin UI | P2 | ✅ Done |
 | Content Draft Auto-Save | P2 | ✅ Done |
 | API Reference Documentation (OpenAPI) | P2 | ✅ Done |
-| Plugin Developer Guide | P2 | Todo |
+| Plugin Developer Guide | P2 | ✅ Done |
 | Admin UI Responsive Polish (mobile) | P3 | ✅ Done |
 | Performance Optimization (lazy load, chunk split) | P3 | ✅ Done |
-| Aliyun Docker Mirror Auto-Publish | P3 | Todo |
+| Aliyun Docker Mirror Auto-Publish | P3 | ✅ Done |
 
-## Long-Term Vision
+## v0.7.0 ✅ ALL DONE## Long-Term Vision
 
 - **Taichu as content backbone for AI agent ecosystems** — every agent in a workflow uses Taichu as its shared content infrastructure
 - **Federated content networks** — Taichu instances discover and share content via ActivityPub
