@@ -1,32 +1,40 @@
 <template>
   <div v-if="auth.isLoggedIn" class="layout">
-    <aside class="sidebar">
-      <div class="logo" @click="$router.push('/dashboard')">⚡ Taichu</div>
+    <!-- Hamburger toggle for mobile -->
+    <button class="menu-toggle" @click="sidebarOpen = !sidebarOpen" :aria-label="sidebarOpen ? '关闭菜单' : '打开菜单'">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- Mobile overlay backdrop -->
+    <div v-if="sidebarOpen" class="sidebar-overlay" @click="sidebarOpen = false"></div>
+
+    <aside class="sidebar" :class="{ open: sidebarOpen }">
+      <div class="logo" @click="$router.push('/dashboard'); sidebarOpen = false">⚡ Taichu</div>
       <nav>
         <div class="nav-section">内容</div>
         <template v-for="t in types" :key="t.name">
-          <router-link :to="`/content/${t.name}`" class="nav-item">{{ t.label }}</router-link>
+          <router-link :to="`/content/${t.name}`" class="nav-item" @click="sidebarOpen = false">{{ t.label }}</router-link>
         </template>
-        <router-link to="/media" class="nav-item">🖼️ 媒体库</router-link>
-        <router-link to="/categories" class="nav-item">📂 栏目管理</router-link>
-        <router-link to="/tags" class="nav-item">🏷️ 标签管理</router-link>
-        <router-link to="/navigation" class="nav-item">🧭 导航菜单</router-link>
+        <router-link to="/media" class="nav-item" @click="sidebarOpen = false">🖼️ 媒体库</router-link>
+        <router-link to="/categories" class="nav-item" @click="sidebarOpen = false">📂 栏目管理</router-link>
+        <router-link to="/tags" class="nav-item" @click="sidebarOpen = false">🏷️ 标签管理</router-link>
+        <router-link to="/navigation" class="nav-item" @click="sidebarOpen = false">🧭 导航菜单</router-link>
 
         <div class="nav-section">管理</div>
-        <router-link to="/users" class="nav-item">👥 用户管理</router-link>
-        <router-link to="/apikeys" class="nav-item">🔑 API Keys</router-link>
-        <router-link to="/webhooks" class="nav-item">🔗 Webhooks</router-link>
-        <router-link to="/settings" class="nav-item">⚙️ 站点配置</router-link>
-        <router-link to="/theme" class="nav-item">🎨 外观主题</router-link>
-        <router-link to="/theme-manager" class="nav-item">📦 主题管理</router-link>
+        <router-link to="/users" class="nav-item" @click="sidebarOpen = false">👥 用户管理</router-link>
+        <router-link to="/apikeys" class="nav-item" @click="sidebarOpen = false">🔑 API Keys</router-link>
+        <router-link to="/webhooks" class="nav-item" @click="sidebarOpen = false">🔗 Webhooks</router-link>
+        <router-link to="/settings" class="nav-item" @click="sidebarOpen = false">⚙️ 站点配置</router-link>
+        <router-link to="/theme" class="nav-item" @click="sidebarOpen = false">🎨 外观主题</router-link>
+        <router-link to="/theme-manager" class="nav-item" @click="sidebarOpen = false">📦 主题管理</router-link>
 
         <div class="nav-section">安全</div>
-        <router-link to="/audit" class="nav-item">📋 审计日志</router-link>
-        <router-link to="/workflow" class="nav-item">✅ 审核队列</router-link>
+        <router-link to="/audit" class="nav-item" @click="sidebarOpen = false">📋 审计日志</router-link>
+        <router-link to="/workflow" class="nav-item" @click="sidebarOpen = false">✅ 审核队列</router-link>
 
         <div class="nav-section">开发</div>
-        <router-link to="/plugins" class="nav-item">🧩 插件市场</router-link>
-        <router-link to="/pipelines" class="nav-item">🔄 管道模板</router-link>
+        <router-link to="/plugins" class="nav-item" @click="sidebarOpen = false">🧩 插件市场</router-link>
+        <router-link to="/pipelines" class="nav-item" @click="sidebarOpen = false">🔄 管道模板</router-link>
         <a href="/api/graphql" target="_blank" class="nav-item">🔬 GraphiQL</a>
         <a href="/ws-test.html" target="_blank" class="nav-item">📡 WS 测试</a>
       </nav>
@@ -62,6 +70,7 @@ const types = ref([])
 const i18n = useI18n()
 const locale = ref(i18n.locale.value)
 const isDark = ref(false)
+const sidebarOpen = ref(false)
 
 function applyTheme(dark) {
   isDark.value = dark
@@ -72,6 +81,11 @@ function applyTheme(dark) {
 function toggleDark() {
   applyTheme(!isDark.value)
 }
+
+// Close sidebar on route change
+router.afterEach(() => {
+  sidebarOpen.value = false
+})
 
 onMounted(async () => {
   // Restore theme preference
@@ -104,10 +118,19 @@ function logout() {
 </script>
 
 <style>
-.layout { display: flex; height: 100vh; }
+.layout { display: flex; height: 100vh; position: relative; }
+.menu-toggle {
+  display: none; position: fixed; top: 12px; left: 12px; z-index: 1001;
+  width: 36px; height: 36px; padding: 8px 6px; background: var(--surface);
+  border: 1px solid var(--border); border-radius: 6px; cursor: pointer;
+  flex-direction: column; justify-content: space-between;
+}
+.menu-toggle span { display: block; height: 2px; background: var(--text-primary); border-radius: 1px; transition: all 0.2s; }
+.sidebar-overlay { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 998; }
 .sidebar {
   width: 220px; background: var(--surface); border-right: 1px solid var(--border);
   display: flex; flex-direction: column; padding: 16px 0; overflow-y: auto;
+  flex-shrink: 0; transition: transform 0.25s ease;
 }
 .logo {
   font-size: 18px; font-weight: 700; color: var(--primary); padding: 0 20px 20px;
@@ -140,5 +163,22 @@ function logout() {
 }
 .main {
   flex: 1; overflow-y: auto; padding: 32px; background: var(--bg);
+}
+
+/* ── Responsive: Tablet ─────────────────────────── */
+@media (max-width: 1024px) {
+  .main { padding: 24px 16px; }
+}
+
+/* ── Responsive: Mobile ─────────────────────────── */
+@media (max-width: 768px) {
+  .menu-toggle { display: flex; }
+  .sidebar-overlay { display: block; }
+  .sidebar {
+    position: fixed; top: 0; left: 0; bottom: 0; z-index: 999;
+    transform: translateX(-100%);
+  }
+  .sidebar.open { transform: translateX(0); box-shadow: 4px 0 20px rgba(0,0,0,0.15); }
+  .main { padding: 16px 12px; padding-top: 56px; }
 }
 </style>

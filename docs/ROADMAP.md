@@ -105,7 +105,7 @@
 | Content Draft Auto-Save | P2 | ✅ Done |
 | API Reference Documentation (OpenAPI) | P2 | Todo |
 | Plugin Developer Guide | P2 | Todo |
-| Admin UI Responsive Polish (mobile) | P3 | Todo |
+| Admin UI Responsive Polish (mobile) | P3 | ✅ Done |
 | Performance Optimization (lazy load, chunk split) | P3 | ✅ Done |
 | Aliyun Docker Mirror Auto-Publish | P3 | Todo |
 
