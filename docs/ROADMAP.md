@@ -93,7 +93,7 @@
 | E2E Tests (Playwright, core flows) | P2 | ➡️ v0.7.0 |
 | API Reference Documentation | P2 | ➡️ v0.7.0 |
 
-## v0.7.0 (Current)
+## v0.7.0 ✅ RELEASED (2026-06-15)
 
 | Feature | Priority | Status |
 |---------|----------|--------|
@@ -109,7 +109,24 @@
 | Performance Optimization (lazy load, chunk split) | P3 | ✅ Done |
 | Aliyun Docker Mirror Auto-Publish | P3 | ✅ Done |
 
-## v0.7.0 ✅ ALL DONE## Long-Term Vision
+## v0.8.0 (Current) — Production Hardening & Ecosystem Depth
+
+**Goal**: Production readiness, observability, and deeper agent ecosystem integration.
+
+| Feature | Priority | Status |
+|---------|----------|--------|
+| Health Check Endpoint (/health + /ready) | P0 | 📋 Todo |
+| Backup & Restore (content + config dump) | P0 | 📋 Todo |
+| Admin Password Reset Flow | P1 | 📋 Todo |
+| Content Caching Layer (ETag, Last-Modified, Cache-Control) | P1 | 📋 Todo |
+| Metrics & Monitoring (Prometheus /metrics endpoint) | P2 | 📋 Todo |
+| Agent Marketplace: Capability Discovery API | P2 | 📋 Todo |
+| CSRF Protection for Admin API | P2 | 📋 Todo |
+| Content Import from Markdown/CSV/JSON | P3 | 📋 Todo |
+| Federation: Cross-Instance Content Discovery | P3 | 📋 Todo |
+| Zero-Config HA: Litestream Integration | P3 | 📋 Todo |
+
+## Long-Term Vision
 
 - **Taichu as content backbone for AI agent ecosystems** — every agent in a workflow uses Taichu as its shared content infrastructure
 - **Federated content networks** — Taichu instances discover and share content via ActivityPub
